@@ -256,37 +256,12 @@ void CSkinModel::Draw(XMMATRIX* world)
 
 	CRenderer::SetWorldMatrix(&_world);
 
-	aiNode* pNode = m_pScene->mRootNode;
-
-	// aiMatrix4x4 -> XMFLOAT4X4 -> XMMATRIX * _world 行列の合成
-	_world = XMMatrixMultiply(_world, XMLoadFloat4x4(&LoadAiMatrix4x4(&pNode->mTransformation)));
-
-	XMFLOAT4X4 float4x4Mtx;
-
-	// XMMATRIX -> XMFLOAT4X4
-	XMStoreFloat4x4(&float4x4Mtx, _world);
-
-	aiMatrix4x4 mulMatrix;
-
-	// XMFLOAT4X4 -> aiMatrix4x4
-	StoreAiMatrix4x4(&float4x4Mtx, mulMatrix);
-
-
 	// 描画
-	DrawMesh(pNode, &mulMatrix);
+	DrawMesh(m_pScene->mRootNode);
 }
 
-void CSkinModel::DrawMesh(const aiNode* pNode, aiMatrix4x4* _mtx)
+void CSkinModel::DrawMesh(const aiNode* pNode)
 {
-	aiMatrix4x4 world = *_mtx;
-	//world = pNode->mTransformation * world;
-
-	//// aiMatrix4x4 -> XMFLOAT4X4 -> XMMATRIX
-	//XMMATRIX mtx = XMLoadFloat4x4(&LoadAiMatrix4x4(&world));
-
-	//// 行列セット
-	//CRenderer::SetWorldMatrix(&mtx);
-
 	for (int mesh = 0; mesh < pNode->mNumMeshes; mesh++) {
 
 		// メッシュ1つ分取得
@@ -348,8 +323,6 @@ void CSkinModel::DrawMesh(const aiNode* pNode, aiMatrix4x4* _mtx)
 		////assert(m_Texture[pNode->mName.C_Str()]);
 		//CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
 
-		//if (mesh == pNode->mNumMeshes - 2)break;
-
 		CRenderer::SetVertexBuffers(m_Mesh[mesh_index].VertexBuffer);
 		CRenderer::SetIndexBuffer(m_Mesh[mesh_index].IndexBuffer);
 		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -359,7 +332,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode, aiMatrix4x4* _mtx)
 
 	// 子描画
 	for (int i = 0; i < pNode->mNumChildren; i++) {
-		DrawMesh(pNode->mChildren[i], &world);
+		DrawMesh(pNode->mChildren[i]);
 	}
 }
 
@@ -380,7 +353,7 @@ void CSkinModel::Animation(int frame)
 	if (m_pScene->HasAnimations()) {
 
 		// アニメーションデータ取得                     ↓どのアニメ―ション？
-		aiAnimation* pAnimation = m_pScene->mAnimations[m_AnimationIndex];
+		aiAnimation* pAnimation = m_pScene->mAnimations[m_CurrentAnimId];
 
 		for (auto c = 0; c < pAnimation->mNumChannels; c++) {
 

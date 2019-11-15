@@ -54,9 +54,9 @@ private:
 	bool m_IsStopMotion = false;
 	bool m_IsFrameMode = false;
 	bool m_IsDrawNormals = false;
-	char m_AnimationIndex = 0;
+	char m_CurrentAnimId = 0;
 
-	void DrawMesh(const aiNode* pNode, aiMatrix4x4* _mtx);
+	void DrawMesh(const aiNode* pNode);
 	void LoadMesh(const aiNode* pNode);
 	void CreateBone(aiNode* pNode);
 	void UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix);
@@ -67,17 +67,30 @@ public:
 	void Unload();
 	void Draw(XMMATRIX* world);
 	void Animation(int frame);
-	void SetMotionFrame(int frame) { m_MotionFrame = frame; }
+
 	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
 	void FrameMode(bool IsFrameMode) { m_IsFrameMode = IsFrameMode; }
 	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }
 
-	void SetNextAnimation() {
-		m_AnimationIndex++;
-		if (m_AnimationIndex == m_pScene->mNumAnimations) {
-			m_AnimationIndex = 0;
+	// ˆø” / _next : true = Next / _next : false = Back
+	void SetAnimIdNext(bool _next) {
+
+		m_CurrentAnimId += _next ? 1: -1;
+
+		if (m_CurrentAnimId == m_pScene->mNumAnimations) {
+			m_CurrentAnimId = 0;
+		}
+		else if (m_CurrentAnimId < 0) {
+			m_CurrentAnimId = m_pScene->mNumAnimations - 1;
 		}
 	}
+
+	char GetCurrentAnimId() { return m_CurrentAnimId; }
+	char* GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
+	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
+
+	bool* IsStopMotion() { return &m_IsStopMotion; }
+	int* MotionFrame() { return &m_MotionFrame; }
 };
 
 
