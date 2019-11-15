@@ -84,6 +84,7 @@ void CPlayer::Update()
 			m_Position.z += cameraRight.z * 0.05f;
 		}
 	}
+
 	if (CInput::GetKeyTrigger(VK_SPACE)) {
 
 		CSound::Play(SOUND_LABEL_SE_ATTACK);
@@ -183,6 +184,9 @@ void CPlayer::Draw()
 	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&m_DamageManager->GetCollisionSphere()->GetCenter(),m_DamageManager->GetCollisionSphere()->GetRadius(), &color);
 }
 
+
+static bool enable = false;
+
 void CPlayer:: DrawGUI()
 {
 	ImGui::Begin("System");
@@ -195,14 +199,54 @@ void CPlayer:: DrawGUI()
 		ImGuiID Window_Player_Id = ImGui::GetID("Player");
 
 		ImVec2 s = ImGui::GetWindowSize();
+
 		m_DamageManager->DebugDraw();
 
-		ImGui::BeginChildFrame(Window_Player_Id, ImVec2(s.x, 100));
-		ImGui::InputFloat3("Position", (float*)&m_Position);
-		ImGui::Text("PosX = %.1f", m_Position.x);
-		ImGui::Text("PosY = %.1f", m_Position.y);
-		ImGui::Text("PosZ = %.1f", m_Position.z);
-		ImGui::EndChildFrame();
+		ImGui::Columns(3, "Player");
+
+		//ÅÉ:: Status ::ÅÑ
+		if(ImGui::CollapsingHeader("Status"))
+		{
+			int id = ImGui::GetColumnIndex();
+			float width = ImGui::GetColumnWidth(id);
+
+			ImGuiID Window_Status_Id = ImGui::GetID("Status");
+
+			ImGui::BeginChildFrame(Window_Status_Id, ImVec2(width, 100));
+			ImGui::InputFloat3("Position", (float*)&m_Position);
+			ImGui::Text("PosX = %.1f", m_Position.x);
+			ImGui::Text("PosY = %.1f", m_Position.y);
+			ImGui::Text("PosZ = %.1f", m_Position.z);
+			ImGui::EndChildFrame();
+		}
+
+		ImGui::NextColumn();
+
+		//ÅÉ:: Animation ::ÅÑ
+		if (ImGui::CollapsingHeader("Animation"))
+		{
+			int id = ImGui::GetColumnIndex();
+			float width = ImGui::GetColumnWidth(id);
+
+			ImGuiID Window_Animation_Id = ImGui::GetID("Animation");
+
+			ImGui::BeginChildFrame(Window_Animation_Id, ImVec2(width, 100));
+			{
+				if (ImGui::Button("<")) { m_pModel->SetAnimIdNext(false); }ImGui::SameLine();
+				ImGui::Text(m_pModel->GetCurrentAnimName()); ImGui::SameLine();
+				if (ImGui::Button(">")) { m_pModel->SetAnimIdNext(true); }
+
+				ImGui::Checkbox("Stop", m_pModel->IsStopMotion());
+
+				if(*m_pModel->IsStopMotion())
+				{
+					ImGui::SameLine();
+					ImGui::SliderInt("Frame", m_pModel->MotionFrame(), 0, 100);
+				}
+
+			}
+			ImGui::EndChildFrame();
+		}
 	}
 
 	ImGui::End();
