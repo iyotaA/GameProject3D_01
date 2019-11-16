@@ -17,6 +17,10 @@ using namespace DirectX;
 #define SCREEN_HEIGHT		(768) 			// ウインドウの高さ
 #define PI					(3.1415926535f)	// 円周率
 #define FAILD_NUM			(-99)
+#define DELTA_TIME			(1000 / 60)
+
+#define SAFE_RELEASE(p) if(p){ p->Release(); p=NULL; }
+#define SAFE_DELETE(p) if(p){ delete[] p; p=NULL; }
 
 
 #pragma comment (lib, "d3d11.lib")

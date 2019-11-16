@@ -193,11 +193,75 @@ void CTexture::LoadSTB(const char *FileName)
 	stbi_image_free(image);
 }
 
+void CTexture::loadTextureFromMemory(const unsigned char* image, int len)
+{
+	unsigned char* pixels;
+	int bpp;
+
+	// ファイルを読み込み、画像データを取り出す
+	//   最後の引数でピクセルあたりのバイト数を強制できる
+	pixels = (unsigned char*)stbi_load_from_memory(image, len, &m_Size.x, &m_Size.y, &bpp, 0);
+	if (pixels == nullptr) {
+		assert(false);
+	}
+
+	D3D11_TEXTURE2D_DESC desc;
+	D3D11_SUBRESOURCE_DATA initialData;
+	HRESULT hr;
+
+	ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+	desc.Width = m_Size.x;
+	desc.Height = m_Size.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+
+	if (bpp == 3) {
+		desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM;
+	}
+	else if (bpp == 4) {
+		desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	}
+
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	ZeroMemory(&initialData, sizeof(D3D11_SUBRESOURCE_DATA));
+	initialData.pSysMem = image;
+	initialData.SysMemPitch = m_Size.x * bpp;
+	initialData.SysMemSlicePitch = m_Size.x * m_Size.y * bpp;
+
+	hr = CRenderer::GetDevice()->CreateTexture2D(&desc, &initialData, &m_Texture);
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
+	ZeroMemory(&SRVDesc, sizeof(SRVDesc));
+	SRVDesc.Format = desc.Format;
+	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	SRVDesc.Texture2D.MostDetailedMip = 0;
+	SRVDesc.Texture2D.MipLevels = 1;
+
+	hr = CRenderer::GetDevice()->CreateShaderResourceView(m_Texture, &SRVDesc, &m_ShaderResourceView);
+
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	// メモリ上の画像データを破棄
+	stbi_image_free(pixels);
+}
 
 void CTexture::Unload()
 {
-	m_Texture->Release();
-	m_ShaderResourceView->Release();
+	SAFE_RELEASE(m_Texture);
+	SAFE_RELEASE(m_ShaderResourceView);
 }
 
 

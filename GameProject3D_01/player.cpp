@@ -185,7 +185,6 @@ void CPlayer::Draw()
 }
 
 
-static bool enable = false;
 
 void CPlayer:: DrawGUI()
 {

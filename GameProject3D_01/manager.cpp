@@ -69,12 +69,11 @@ void CManager::Draw()
 	// imgui•`‰æ€”õ
 	CImgui::NewFrame();
 
-	DrawFPS();
+	// GUI‚Ì•`‰æ
+	DrawGUI();
 
 	// ƒV[ƒ“‚Ì•`‰æ
 	m_Scene->Draw();
-
-
 
 	// imgui•`‰æ
 	CImgui::Draw();
@@ -82,6 +81,11 @@ void CManager::Draw()
 	CRenderer::End();
 	// •`‰æ‚ÌI—¹
 
+}
+
+void CManager::DrawGUI()
+{
+	DrawFPS();
 }
 
 CScene* CManager::GetScene()

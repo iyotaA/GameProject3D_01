@@ -13,6 +13,7 @@ public:
 
 	void Load(const char *FileName);
 	void LoadSTB(const char *FileName);
+	void loadTextureFromMemory(const unsigned char* image, int len);
 	void Unload();
 	const XMINT2* GetSize() { return &m_Size; }
 

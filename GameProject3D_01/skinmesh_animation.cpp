@@ -120,27 +120,28 @@ void CSkinModel::Load(char* pFileName, float size)
 	//// テクスチャ取得
 	aiString path;
 
-//	for (int tex = 0; tex < m_pScene->mNumMaterials; tex++) {
-//
-//		if (m_pScene->mMaterials[tex]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
-//
-//			// fbxファイルの内部にテクスチャが入っているか否か
-//			if (path.data[0] == '*') {
-//				// fbxファイル内にテクスチャあり
-//				int id = atoi(&path.data[1]);
-////				m_Texture[path.data] = LoadTextureFromMemory((const unsigned char*)m_pScene->mTextures[id]->pcData, m_pScene->mTextures[id]->mWidth);
-//			}
-//			else {
-//				// fbxファイル外にテクスチャあり
-//				//size_t pos = modelPath.find_last_of("\\/");					// モデルのパスの後ろから最初に出てきた"\\/"の場所を取得
-//				//std::string texPath = (char*)& path.data;					// Textureのパス取得
-//				//size_t texpos = texPath.find_last_of("\\/");				// Textureのパスの後ろから最初に出てきた"\\/"の場所を取得
-//				//std::string texturePath = modelPath.substr(0, pos + 1);		// モデルと同じ場所のパスを取得
-//				//texturePath += texPath.substr(texpos + 1, sizeof(texPath));	// モデルと同じ場所にあるテクスチャのパスに書き換え
-//				//m_Texture[tex] = LoadTextureSTB(texturePath.c_str());		// 指定したパスのテクスチャを読み込む
-//			}
-//		}
-//	}
+	//for (int tex = 0; tex < m_pScene->mNumMaterials; tex++) {
+
+	//	if (m_pScene->mMaterials[tex]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+
+	//		// fbxファイルの内部にテクスチャが入っているか否か
+	//		if (path.data[0] == '*') {
+	//			// fbxファイル内にテクスチャあり
+	//			int id = atoi(&path.data[1]);
+	//			m_Texture[path.data] = new CTexture();
+	//			m_Texture[path.data]->loadTextureFromMemory((const unsigned char*)m_pScene->mTextures[id]->pcData, m_pScene->mTextures[id]->mWidth);
+	//		}
+	//		else {
+	//			// fbxファイル外にテクスチャあり
+	//			//size_t pos = modelPath.find_last_of("\\/");				// モデルのパスの後ろから最初に出てきた"\\/"の場所を取得
+	//			//std::string texPath = (char*)& path.data;					// Textureのパス取得
+	//			//size_t texpos = texPath.find_last_of("\\/");				// Textureのパスの後ろから最初に出てきた"\\/"の場所を取得
+	//			//std::string texturePath = modelPath.substr(0, pos + 1);		// モデルと同じ場所のパスを取得
+	//			//texturePath += texPath.substr(texpos + 1, sizeof(texPath));	// モデルと同じ場所にあるテクスチャのパスに書き換え
+	//			//m_Texture[tex] = LoadTextureSTB(texturePath.c_str());		// 指定したパスのテクスチャを読み込む
+	//		}
+	//	}
+	//}
 
 	//DrawMesh(m_pScene->mRootNode, &aiMatrix4x4());
 }
@@ -157,10 +158,6 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 		const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
 		aiColor4D diffuse;
 		aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
-
-		// テクスチャ取得
-		//aiString path;
-		//mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
 
 		VERTEX_3D* vertices = new VERTEX_3D[pMesh->mNumVertices];
 
@@ -275,8 +272,8 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
 
 		// テクスチャ取得
-		//aiString path;
-		//mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+		aiString path;
+		mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
 
 		VERTEX_3D* vertices = new VERTEX_3D[pMesh->mNumVertices];
 
@@ -319,8 +316,8 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 
 		//// テクスチャ読み込み //////
+		//assert(m_Texture[pNode->mName.C_Str()]);
 		//m_Texture[pNode->mName.C_Str()]->LoadSTB(path.C_Str());
-		////assert(m_Texture[pNode->mName.C_Str()]);
 		//CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
 
 		CRenderer::SetVertexBuffers(m_Mesh[mesh_index].VertexBuffer);
