@@ -6,10 +6,11 @@
 #include "gameObject.h"
 #include "skyDome.h"
 
-#define Radius		(300.0f)
-#define Height		(100)
+#define Radius		(400.0f)
+#define Height		(300.0f)
 #define GridNumX	(500)
 #define GridNumZ	(60)
+#define RotateSpeed (0.05f)
 
 void CSkyDome::Init()
 {
@@ -31,12 +32,12 @@ void CSkyDome::Init()
 				if (z == GridNumZ) {	// 最後の列の頂点
 					radius = 0.0f;
 				}
-				else {                      // 最後以外の列
-					radius = cosf(((90 / (GridNumZ)) * z) * PI / 180.0f) * Radius;
+				else {                  // 最後以外の列
+					radius = sinf(((180.0f / GridNumZ) * z) * PI / 180.0f) * Radius;
 				}
 
 
-				float height = sinf(((90  / GridNumZ) * z) * PI / 180.0f) * Height;
+				float height = sinf((270.0f + (180.0f  / GridNumZ) * z) * PI / 180.0f) * Height;
 				float Pos_x  = cosf(((360.0f / GridNumX) * x) * PI / 180.0f) * radius;
 				float Pos_z  = sinf(((360.0f / GridNumX) * x) * PI / 180.0f) * radius;
 
@@ -130,7 +131,7 @@ void CSkyDome::Init()
 
 	// テクスチャ読み込み /////
 	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/sky001.tga");
+	m_Texture->LoadSTB("asset/image/sky004.png");
 
 	// トランスフォーム初期化
 	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -147,7 +148,7 @@ void CSkyDome::Uninit()
 
 void CSkyDome::Update()
 {
-	m_Rotation.y += XMConvertToRadians(0.005f);
+	m_Rotation.y += XMConvertToRadians(RotateSpeed);
 }
 
 void CSkyDome::Draw()

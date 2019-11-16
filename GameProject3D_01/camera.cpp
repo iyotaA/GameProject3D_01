@@ -273,7 +273,7 @@ void CCamera::DrawGUI()
 		{
 			ImGui::SliderFloat("LengthToAt", &m_LengthToAt, 1.0f, 200.0f);
 			ImGui::SliderFloat("RotateSpeed", &m_RotateSpeed, 0.001f, 0.01f);
-			ImGui::SliderFloat("MoveSpeed", &m_MoveSpeedScale, 1.0f, 10.0f);
+			ImGui::SliderFloat("MoveSpeed", &m_MoveSpeedScale, 1.0f, 20.0f);
 		}
 
 		ImGui::Spacing();
