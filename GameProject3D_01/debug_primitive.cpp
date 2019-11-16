@@ -5,6 +5,7 @@
 #include "renderer.h"
 #include "texture.h"
 #include "debug_primitive.h"
+#include "imGui_all.h"
 
 //=================================================================================
 // マクロ定義
@@ -18,12 +19,13 @@ ID3D11Buffer*	CDebugPrimitive::m_IndexBufer;
 VERTEX_3D*		CDebugPrimitive::m_pVertex;
 WORD*           CDebugPrimitive::m_pIndex;
 int             CDebugPrimitive::m_CircleCount;
+bool			CDebugPrimitive::m_IsDisplayed;
 
 
 void CDebugPrimitive::DebugPrimitive_Init(void)
 {
-#if defined(_DEBUG) || defined(DEBUG)
 	m_CircleCount = 0;
+	m_IsDisplayed = false;
 
 	m_pVertex = new VERTEX_3D[CIRCLE_VERTEX_COUNT * CIRCLE_DRAW_MAX];
 	m_pIndex  = new WORD[CIRCLE_VERTEX_COUNT * 2 * CIRCLE_DRAW_MAX];
@@ -32,12 +34,10 @@ void CDebugPrimitive::DebugPrimitive_Init(void)
 	//DirectX3D_GetDevice()->CreateVertexBuffer(sizeof(DebugVertex) * CIRCLE_VERTEX_COUNT * CIRCLE_DRAW_MAX, D3DUSAGE_WRITEONLY, FVF_DEBUG_VERTEX, D3DPOOL_MANAGED, &g_pVertexBuffer, NULL);
 	//// インデックスバッファ確保
 	//DirectX3D_GetDevice()->CreateIndexBuffer(sizeof(WORD) * CIRCLE_VERTEX_COUNT * 2 * CIRCLE_DRAW_MAX, D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_MANAGED, &g_pIndexBuffer, NULL);
-#endif
 }
 
 void CDebugPrimitive::DebugPrimitive_Uninit(void)
 {
-#if defined(_DEBUG) || defined(DEBUG)
 	if(m_VertexBufer)	m_VertexBufer->Release();
 	if(m_IndexBufer)	m_IndexBufer->Release();
 
@@ -46,23 +46,23 @@ void CDebugPrimitive::DebugPrimitive_Uninit(void)
 
 	//SAFE_RELEASE(g_pIndexBuffer);
 	//SAFE_RELEASE(g_pVertexBuffer);
-#endif
 }
 
 void CDebugPrimitive::DebugPrimitive_BatchBegin(void)
 {
-#if defined(_DEBUG) || defined(DEBUG)
 	// サークル描画数をゼロに
 	m_CircleCount = 0;
 
 	//g_pVertexBuffer->Lock(0, 0, (void**)&g_pVertex, 0);
 	//g_pIndexBuffer->Lock(0, 0, (void**)&g_pIndex, 0);
-#endif
 }
 
 void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(const XMFLOAT3* pos, float radius, const XMFLOAT4* color)
 {
-#if defined(_DEBUG) || defined(DEBUG)
+	//表示する時のみ
+	if (!m_IsDisplayed)return;
+
+
 	int n = m_CircleCount * CIRCLE_VERTEX_COUNT;
 	float a = PI * 2.0f / CIRCLE_VERTEX_COUNT;
 
@@ -122,17 +122,15 @@ void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(const XMFLOAT3* pos, float
 	}
 
 	m_CircleCount++;
-
-#else
-	UNREFERENCED_PARAMETER(pos);
-	UNREFERENCED_PARAMETER(radius);
-	UNREFERENCED_PARAMETER(color);
-#endif
 }
 
 void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 {
-#if defined(_DEBUG) || defined(DEBUG)
+	//ImGui Render
+	DrawGUI();
+
+	//表示する時のみ
+	if (!m_IsDisplayed)return;
 
 	// ヴァーテクスバッファ生成 //////
 	{
@@ -203,5 +201,15 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 	//pDevice->SetIndices(g_pIndexBuffer);
 
 	//pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, g_CircleCount * CIRCLE_VERTEX_COUNT, 0, g_CircleCount * CIRCLE_VERTEX_COUNT);
-#endif
+}
+
+void CDebugPrimitive::DrawGUI()
+{
+	using namespace ImGui;
+
+	Begin("Collision");
+	{
+		Checkbox("DisplayCollision", &m_IsDisplayed);
+	}
+	End();
 }

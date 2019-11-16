@@ -24,6 +24,7 @@ public:
 	static void Uninit();
 	static void Update();
 	static void Draw();
+	static void DrawGUI();
 
 	static CScene* GetScene();
 

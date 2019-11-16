@@ -76,32 +76,32 @@ class CRenderer
 {
 private:
 
-	static D3D_FEATURE_LEVEL       m_FeatureLevel;
+	static D3D_FEATURE_LEVEL		m_FeatureLevel;
 
-	static ID3D11Device*           m_D3DDevice;
-	static ID3D11DeviceContext*    m_ImmediateContext;
-	static IDXGISwapChain*         m_SwapChain;
-	static ID3D11RenderTargetView* m_RenderTargetView;
-	static ID3D11DepthStencilView* m_DepthStencilView;
+	static ID3D11Device*			m_D3DDevice;
+	static ID3D11DeviceContext*		m_ImmediateContext;
+	static IDXGISwapChain*			m_SwapChain;
+	static ID3D11RenderTargetView*	m_RenderTargetView;
+	static ID3D11DepthStencilView*	m_DepthStencilView;
 
 
 
-	static ID3D11VertexShader*     m_VertexShader;
-	static ID3D11PixelShader*      m_PixelShader;
-	static ID3D11InputLayout*      m_VertexLayout;
+	static ID3D11VertexShader*		m_VertexShader;
+	static ID3D11PixelShader*		m_PixelShader;
+	static ID3D11InputLayout*		m_VertexLayout;
 	static ID3D11Buffer*			m_WorldBuffer;
 	static ID3D11Buffer*			m_ViewBuffer;
 	static ID3D11Buffer*			m_ProjectionBuffer;
 	static ID3D11Buffer*			m_MaterialBuffer;
 	static ID3D11Buffer*			m_LightBuffer;
+	static ID3D11DepthStencilState* m_DepthStateEnable;
+	static ID3D11DepthStencilState* m_DepthStateDisable;
 
 /*
 	static XMMATRIX				m_WorldMatrix;
 	static XMMATRIX				m_ViewMatrix;
 	static XMMATRIX				m_ProjectionMatrix;
 */
-	static ID3D11DepthStencilState* m_DepthStateEnable;
-	static ID3D11DepthStencilState* m_DepthStateDisable;
 
 
 public:
@@ -121,7 +121,6 @@ public:
 	static void SetIndexBuffer( ID3D11Buffer* IndexBuffer );
 	static void SetTexture( CTexture* Texture );
 	static void DrawIndexed( unsigned int IndexCount, unsigned int StartIndexLocation, int BaseVertexLocation );
-	static void SetTopology();
 
 	static ID3D11Device* GetDevice( void ){ return m_D3DDevice; }
 	static ID3D11DeviceContext* GetDeviceContext( void ){ return m_ImmediateContext; }

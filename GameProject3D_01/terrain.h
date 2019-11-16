@@ -29,7 +29,6 @@ private:
 	};
 
 	bool LoadHeightMap(char*);
-	void NormalizeHeightMap();
 	void UnloadHeightMap();
 
 	bool InitializeBuffers();

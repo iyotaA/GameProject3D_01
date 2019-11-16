@@ -19,8 +19,6 @@ void CTerrain::Init()
 	m_Texture = new CTexture();
 	m_Texture->LoadSTB("asset/image/field_dart1.png");
 
-	NormalizeHeightMap();
-
 	result = InitializeBuffers();
 	assert(result);
 }
@@ -130,9 +128,9 @@ bool CTerrain::LoadHeightMap(char* filename)
 
 			index = (m_terrainHeight * z) + x;
 
-			m_heightMap[index].x = (float)x;
-			m_heightMap[index].y = (float)height / 15.0f;
-			m_heightMap[index].z = (float)z;
+			m_heightMap[index].x = (float)x - offset_x;
+			m_heightMap[index].y = (float)height / 15.0f; // NormalizeHeight
+			m_heightMap[index].z = (float)z - offset_z;
 
 			k += 3;
 		}
@@ -144,28 +142,9 @@ bool CTerrain::LoadHeightMap(char* filename)
 	return true;
 }
 
-void CTerrain::NormalizeHeightMap()
-{
-	return;
-	for (int z = 0; z < m_terrainHeight; z++)
-	{
-		for (int x = 0; x < m_terrainWidth; x++)
-		{
-			m_heightMap[m_terrainHeight * z + x].y /= 15.0f;
-		}
-	}
-
-}
-
 void CTerrain::UnloadHeightMap()
 {
-	if (m_heightMap)
-	{
-		delete[] m_heightMap;
-		m_heightMap = 0;
-	}
-
-	return;
+	SAFE_DELETE(m_heightMap)
 }
 
 bool CTerrain::InitializeBuffers()
@@ -240,9 +219,8 @@ bool CTerrain::InitializeBuffers()
 	UINT* indices;
 	indices = new UINT[m_indexCount];
 	{
-		int i = 0;
 		/* インデックス情報格納 */
-		for (int z = 0; z < m_terrainHeight - 1; z++) {
+		for (int z = 0, i = 0; z < m_terrainHeight - 1; z++) {
 			for (int x = 0; x < m_terrainWidth; x++) {
 				if (x == (m_terrainWidth - 1)) {/* 右端の頂点情報（行の終わり） */
 					indices[i] = x + m_terrainWidth * z + m_terrainWidth;
@@ -345,7 +323,7 @@ void CTerrain::DrawBuffers()
 
 	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	CRenderer::SetTexture(m_Texture);
 
@@ -354,12 +332,46 @@ void CTerrain::DrawBuffers()
 
 void CTerrain::DrawGUI()
 {
-	ImGui::Begin("Field");
+	ImGui::Begin("System");
 
-	ImGui::Text("StandArea_x = %.1f / StandArea_y = %.1f / StandArea_z = %.1f", PlayerArea.x, PlayerArea.y, PlayerArea.z);
-	ImGui::Text("index_Width = %d", PlayerArea_Index_W);
-	ImGui::Text("index_Height = %d", PlayerArea_Index_H);
-	ImGui::Text(IsRange ?"True" : "False");
+	if (ImGui::CollapsingHeader("Field"))
+	{
+		ImGui::Columns(2, "Field");
+
+		if (ImGui::CollapsingHeader("PlayerAreaPosition"))
+		{
+			int id = ImGui::GetColumnIndex();
+			float width = ImGui::GetColumnWidth(id);
+
+			ImGuiID HeaderId = ImGui::GetID("PlayerAreaParam");
+
+			ImGui::BeginChildFrame(HeaderId, ImVec2(width, 60));
+			ImGui::Text("StandArea_x = %.1f", PlayerArea.x);
+			ImGui::Text("StandArea_y = %.1f", PlayerArea.y);
+			ImGui::Text("StandArea_z = %.1f", PlayerArea.z);
+			ImGui::EndChildFrame();
+		}
+
+		ImGui::NextColumn();
+
+		//＜:: Animation ::＞
+		if (ImGui::CollapsingHeader("PlayerAreaStatus"))
+		{
+			int id = ImGui::GetColumnIndex();
+			float width = ImGui::GetColumnWidth(id);
+
+			ImGuiID HeaderId = ImGui::GetID("PlayerAreaStatus");
+
+			ImGui::BeginChildFrame(HeaderId, ImVec2(width, 60));
+
+			ImGui::Text("index_Width = %d", PlayerArea_Index_W);
+			ImGui::Text("index_Height = %d", PlayerArea_Index_H);
+			ImGui::Text(IsRange ? "Range" : "Out of Range");
+
+			ImGui::EndChildFrame();
+		}
+
+	}
 
 	ImGui::End();
 }
@@ -382,9 +394,11 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	// プレイヤーから伸びる下方向のベクトル
 	v = XMFLOAT3(0.0f, -1.0f, 0.0f);
 
-	// プレイヤーの座標を幅で割るとインデックスが取得できる
-	x = position.x  / m_terrainWidth;
-	z = -position.z / m_terrainHeight;
+	float offset_x =  GRID_SIZE * m_terrainWidth / 2.0f;
+	float offset_z =  GRID_SIZE * m_terrainHeight / 2.0f;
+
+	x = (position.x + offset_x) / GRID_SIZE;
+	z = (position.z + offset_z) / GRID_SIZE;
 
 	PlayerArea_Index_W = x;
 	PlayerArea_Index_H = z;
