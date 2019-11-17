@@ -67,22 +67,15 @@ bool CTerrain::LoadHeightMap(char* filename)
 	unsigned char height;
 
 	error = fopen_s(&filePtr, filename, "rb");
-	if (error != 0)
-	{
-		return false;
-	}
+	assert(error == 0);
+	assert(filePtr != 0);
 
 	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
+	assert(count == 1);
 
 	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
+	assert(count == 1);
+	assert(filePtr);
 
 	m_terrainWidth = bitmapInfoHeader.biWidth;
 	m_terrainHeight = bitmapInfoHeader.biHeight;
@@ -90,30 +83,19 @@ bool CTerrain::LoadHeightMap(char* filename)
 	imageSize = m_terrainWidth * m_terrainHeight * 3;
 
 	bitmapImage = new unsigned char[imageSize];
-	if (!bitmapImage)
-	{
-		return false;
-	}
+	assert(bitmapImage);
 
 	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
 
 	count = fread(bitmapImage, 1, imageSize, filePtr);
-	if (count != imageSize)
-	{
-		return false;
-	}
+	assert(count == imageSize);
+	assert(filePtr);
 
 	error = fclose(filePtr);
-	if (error != 0)
-	{
-		return false;
-	}
+	assert(error == 0);
 
 	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
-	if (!m_heightMap)
-	{
-		return false;
-	}
+	assert(m_heightMap);
 
 	k = 0;
 
@@ -178,8 +160,8 @@ bool CTerrain::InitializeBuffers()
 
 				m_Vertex[m_terrainHeight * z + x] = {
 
-					XMFLOAT3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
-					XMFLOAT3(0.0f, 1.0f, 0.0f),
+					Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
+					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 					XMFLOAT2(x, z)
 				};
@@ -190,7 +172,7 @@ bool CTerrain::InitializeBuffers()
 		for (int z = 1; z < m_terrainHeight - 1; z++) {
 			for (int x = 1; x < m_terrainWidth - 1; x++) {
 
-				XMFLOAT3 va, vb, vc;
+				Vector3 va, vb, vc;
 				va.x = m_Vertex[x + 1 + m_terrainWidth * z].Position.x - m_Vertex[x - 1 + m_terrainWidth * z].Position.x;
 				va.y = m_Vertex[x + 1 + m_terrainWidth * z].Position.y - m_Vertex[x - 1 + m_terrainWidth * z].Position.y;
 				va.z = m_Vertex[x + 1 + m_terrainWidth * z].Position.z - m_Vertex[x - 1 + m_terrainWidth * z].Position.z;
@@ -262,10 +244,7 @@ bool CTerrain::InitializeBuffers()
 	vertexData.SysMemSlicePitch = 0;
 
 	result = CRenderer::GetDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(SUCCEEDED(result));
 
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned int) * m_indexCount;
@@ -279,10 +258,7 @@ bool CTerrain::InitializeBuffers()
 	indexData.SysMemSlicePitch = 0;
 
 	result = CRenderer::GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(SUCCEEDED(result));
 
 	delete[] indices;
 	indices = 0;
@@ -397,8 +373,8 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	float offset_x =  GRID_SIZE * m_terrainWidth / 2.0f;
 	float offset_z =  GRID_SIZE * m_terrainHeight / 2.0f;
 
-	x = (position.x + offset_x) / GRID_SIZE;
-	z = (position.z + offset_z) / GRID_SIZE;
+	x = static_cast<int>(position.x + offset_x) / GRID_SIZE;
+	z = static_cast<int>(position.z + offset_z) / GRID_SIZE;
 
 	PlayerArea_Index_W = x;
 	PlayerArea_Index_H = z;

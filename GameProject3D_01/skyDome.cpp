@@ -43,24 +43,24 @@ void CSkyDome::Init()
 
 				if (x == 0) {
 					pVertex[x + (GridNumX + 1) * z] = {
-						XMFLOAT3(Pos_x, height, Pos_z),
-						XMFLOAT3(0.0f, 1.0f, 0.0f),
+						Vector3(Pos_x, height, Pos_z),
+						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 						XMFLOAT2((float)x * 2 / GridNumX + 0.01f, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 				else if (x == GridNumX) {
 					pVertex[x + (GridNumX + 1) * z] = {
-						XMFLOAT3(Pos_x, height, Pos_z),
-						XMFLOAT3(0.0f, 1.0f, 0.0f),
+						Vector3(Pos_x, height, Pos_z),
+						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 						XMFLOAT2((float)x * 2 / GridNumX - 0.01f, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 				else {
 					pVertex[x + (GridNumX + 1) * z] = {
-						XMFLOAT3(Pos_x, height, Pos_z),
-						XMFLOAT3(0.0f, 1.0f, 0.0f),
+						Vector3(Pos_x, height, Pos_z),
+						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 						XMFLOAT2((float)x * 2 / GridNumX, (float)(GridNumZ - z) / GridNumZ)
 					};
@@ -134,9 +134,9 @@ void CSkyDome::Init()
 	m_Texture->LoadSTB("asset/image/sky004.png");
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	m_Position = Vector3(0.0f, 0.0f, 0.0f);
+	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
+	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 }
 
 void CSkyDome::Uninit()

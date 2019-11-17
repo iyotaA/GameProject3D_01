@@ -44,11 +44,11 @@ private:
 	MESH* m_Mesh = nullptr;
 	const aiScene* m_pScene = nullptr;	// パーシング後のデータ格納用
 	float			m_Size;
-	std::unordered_map<std::string, CTexture*>	m_Texture;
 	FileType		m_FileType;
+	std::unordered_map<std::string, CTexture*>	m_Texture;
 	//std::vector<BONE> m_Bone;	// こっちのほうが良い
 	std::unordered_map<std::string, BONE> m_Bone;
-	std::vector<DEFORM_VERTEX>* m_pDeformVertex;
+	std::vector<DEFORM_VERTEX>* m_pDeformVertex = nullptr;
 
 	int m_MotionFrame = 0;
 	bool m_IsStopMotion = false;

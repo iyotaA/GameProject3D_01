@@ -42,8 +42,8 @@ private:
 	ID3D11Buffer* m_vertexBuffer = nullptr;
 
 	HeightMapType* m_heightMap = nullptr;
-	VERTEX_3D* m_Vertex;
-	CTexture* m_Texture;
+	VERTEX_3D* m_Vertex = nullptr;
+	CTexture* m_Texture = nullptr;
 
 	// デバッグ用
 	XMFLOAT3 PlayerArea = XMFLOAT3(0.0f, 0.0f, 0.0f);

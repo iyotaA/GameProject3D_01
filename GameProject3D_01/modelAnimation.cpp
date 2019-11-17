@@ -39,8 +39,8 @@ void CModelAnimation::Load(const char* file)
 
 		// Vertexî•ñŠi”[
 		for (int i = 0; i < mesh->mNumVertices; i++) {
-			vertex[i].Position = XMFLOAT3(-mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-			vertex[i].Normal = XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+			vertex[i].Position = Vector3(-mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+			vertex[i].Normal = Vector3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 			vertex[i].TexCoord = XMFLOAT2(1.0f, 0.0f);
 
 			const aiMaterial* pMat = m_Scene[0]->mMaterials[mesh->mMaterialIndex];

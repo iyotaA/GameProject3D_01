@@ -18,7 +18,6 @@ public:
 		// カメラの初期化
 		CCamera* camera;
 		camera = AddGameObject<CCamera>(CManager::E_Camera);
-		camera->SetAt(NULL);		// 注視点
 
 		// スカイドームの初期化
 		AddGameObject<CSkyDome>(CManager::E_Background);
@@ -30,6 +29,7 @@ public:
 		CPlayer* player;
 		player = AddGameObject<CPlayer>(CManager::E_3D);
 		player->SetCamera(camera);	// カメラセット
+		camera->SetAt(player);		// 注視点
 
 		// 数字の初期化
 		number = new CNumber;

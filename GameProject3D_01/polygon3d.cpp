@@ -8,27 +8,27 @@
 #include "polygon3d.h"
 
 
-void CPolygon3D::Init(XMFLOAT3 pos, XMFLOAT3 scal, XMFLOAT3 rot)
+void CPolygon3D::Init(Vector3 pos, Vector3 scal, Vector3 rot)
 {
 	VERTEX_3D vertex[4] = {
 
-		vertex[0].Position = XMFLOAT3(-0.5f, 0.0f, 0.5f),	// "XM"が頭についてる変数・関数はDirectXMathライブラリの一部
-		vertex[0].Normal   = XMFLOAT3(0.0f, 1.0f, 0.0f),
+		vertex[0].Position = Vector3(-0.5f, 0.0f, 0.5f),	// "XM"が頭についてる変数・関数はDirectXMathライブラリの一部
+		vertex[0].Normal   = Vector3(0.0f, 1.0f, 0.0f),
 		vertex[0].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[0].TexCoord = XMFLOAT2(0.0f, 0.0f),
 
-		vertex[1].Position = XMFLOAT3(0.5f, 0.0f, 0.5f),
-		vertex[1].Normal   = XMFLOAT3(1.0f, 1.0f, 0.0f),
+		vertex[1].Position = Vector3(0.5f, 0.0f, 0.5f),
+		vertex[1].Normal   = Vector3(1.0f, 1.0f, 0.0f),
 		vertex[1].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[1].TexCoord = XMFLOAT2(1.0f, 0.0f),
 
-		vertex[2].Position = XMFLOAT3(-0.5f, 0.0f, -0.5f),
-		vertex[2].Normal   = XMFLOAT3(0.0f, 1.0f, 0.0f),
+		vertex[2].Position = Vector3(-0.5f, 0.0f, -0.5f),
+		vertex[2].Normal   = Vector3(0.0f, 1.0f, 0.0f),
 		vertex[2].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[2].TexCoord = XMFLOAT2(0.0f, 1.0f),
 
-		vertex[3].Position = XMFLOAT3(0.5f, 0.0f, -0.5f),
-		vertex[3].Normal   = XMFLOAT3(0.0f, 1.0f, 0.0f),
+		vertex[3].Position = Vector3(0.5f, 0.0f, -0.5f),
+		vertex[3].Normal   = Vector3(0.0f, 1.0f, 0.0f),
 		vertex[3].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[3].TexCoord = XMFLOAT2(1.0f, 1.0f),
 	};
@@ -52,7 +52,7 @@ void CPolygon3D::Init(XMFLOAT3 pos, XMFLOAT3 scal, XMFLOAT3 rot)
 	// テクスチャ読み込み //////
 	m_Texture = new CTexture();
 	m_Texture->LoadSTB("asset/field001.tga");
-	
+
 	// トランスフォーム初期化
 	m_Position = pos;
 	m_Rotation.x = XMConvertToRadians(rot.x);

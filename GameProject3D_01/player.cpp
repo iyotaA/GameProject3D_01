@@ -8,42 +8,45 @@
 #include "tutorial.h"
 #include "skinmesh_animation.h"
 
-#define Glavity (0.098f)
-#define LimitBottom (1.0f)
+#define Glavity (-0.098f)
+#define Mass	(3.0f)
 
 static int f = 0;
+static double t = 0.0;
 
 void CPlayer::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/SAKURA1.fbx", 0.01f);
+	m_pModel->Load("asset/model/SAKURA1.fbx", 0.005f);
 	//m_pModel->SetAnimationIndex(0);
 
 	m_Texture = new CTexture();
 	m_Texture->LoadSTB("asset/black.png");
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 20.0f, 0.0f);
-	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	m_Position = Vector3(0.0f, 20.0f, 0.0f);
+	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
+	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
 	// 前ベクトル初期化
 	m_DirVec.front = { 0.0f, 0.0f, -1.0f };
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+	m_DirVec.front.Normalize();
 
 	// 右ベクトル初期化
-	m_DirVec.up = { 0.0f, -1.0f, 0.0f };
-	m_DirVec.right = XMVector3Cross(m_DirVec.up, m_DirVec.front);
-	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+	m_DirVec.up = { 0.0f, 1.0f, 0.0f };
+	m_DirVec.right = m_DirVec.up.VCross(m_DirVec.front);
+	m_DirVec.right.Normalize();
 
 	// 上ベクトル初期化
-	m_DirVec.up = XMVector3Cross(m_DirVec.front, m_DirVec.right);
-	m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+	m_DirVec.up = m_DirVec.front.VCross(m_DirVec.right);
+	m_DirVec.up.Normalize();
 
 	// コリジョンの初期化
 	m_CollisionSphere = new CCollisionSphere;
 	m_CollisionSphere->SetRadius(0.7f);
+
+	m_CollisionOBB = new CCollisionOBB(m_Position, m_DirVec, Vector3(0.5f, 0.5f, 0.5f));
 
 	// ダメージ関連ステータスの初期化
 	m_DamageManager = new CDamage(100, 15);
@@ -52,7 +55,13 @@ void CPlayer::Init()
 
 void CPlayer::Uninit()
 {
-	// モデルの終了処理
+	delete m_DamageManager;
+	delete m_CollisionOBB;
+	delete m_CollisionSphere;
+
+	m_Texture->Unload();
+	delete m_Texture;
+
 	m_pModel->Unload();
 	delete m_pModel;
 }
@@ -60,10 +69,8 @@ void CPlayer::Uninit()
 void CPlayer::Update()
 {
 	XMFLOAT3 prevPos = m_Position;
-	XMFLOAT3 cameraFront;
-	XMFLOAT3 cameraRight;
-	XMStoreFloat3(&cameraFront, m_pCamera->GetDir3Vector()->front);	// カメラの前方向ゲット
-	XMStoreFloat3(&cameraRight, m_pCamera->GetDir3Vector()->right);	// カメラの右方向ゲット
+	XMFLOAT3 cameraFront = m_pCamera->GetDir3Vector()->front;
+	XMFLOAT3 cameraRight = m_pCamera->GetDir3Vector()->right;
 
 	if (CInput::GetKeyPress(VK_RSHIFT))
 	{
@@ -97,7 +104,7 @@ void CPlayer::Update()
 			if (enemy != nullptr) {
 
 				// 当たり判定
-				if (CJudgeCollisionSphere::Collision3D_EachSpher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
+				if (CJudgeCollision3D::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
 
 					CSound::Play(SOUND_LABEL_SE_HIT);
 					// ダメ―ジ判定
@@ -106,16 +113,6 @@ void CPlayer::Update()
 			}
 		}
 	}
-
-	//if (CInput::GetKeyPress(VK_NUMPAD0)) {
-	//	m_pModel->SetAnimationIndex(0);
-	//}
-	//if (CInput::GetKeyPress(VK_NUMPAD1)) {
-	//	m_pModel->SetAnimationIndex(1);
-	//}
-	//if (CInput::GetKeyPress(VK_NUMPAD2)) {
-	//	m_pModel->SetAnimationIndex(2);
-	//}
 
 	XMFLOAT3 FrontDir;
 	FrontDir.x = m_Position.x - prevPos.x;
@@ -126,6 +123,13 @@ void CPlayer::Update()
 		m_Rotation.y = atan2f(FrontDir.x, FrontDir.z);
 	}
 
+	XMMATRIX rotationMtx;
+	rotationMtx = XMMatrixRotationAxis(m_DirVec.up, m_Rotation.y);
+	m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
+	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+
 	//if (m_Position.x + m_CollisionSphere->GetRadius() > 15.0) m_Position.x = 15.0f - m_CollisionSphere->GetRadius();
 	//if (m_Position.x - m_CollisionSphere->GetRadius() < -15.0) m_Position.x = -15.0f + m_CollisionSphere->GetRadius();
 	//if (m_Position.z + m_CollisionSphere->GetRadius() > 15.0) m_Position.z = 15.0f - m_CollisionSphere->GetRadius();
@@ -133,23 +137,27 @@ void CPlayer::Update()
 
 	// コリジョン位置の更新
 	m_CollisionSphere->SetCenter(&m_Position);
-	m_DamageManager->GetCollisionSphere()->SetCenter(&XMFLOAT3(m_Position.x + FrontDir.x * 2, m_Position.y + FrontDir.y * 2, m_Position.z + FrontDir.z * 2));
+	m_DamageManager->GetCollisionSphere()->SetCenter(&Vector3(m_Position.x + FrontDir.x * 2, m_Position.y + FrontDir.y * 2, m_Position.z + FrontDir.z * 2));
+
+	m_CollisionOBB->SetStatus(&m_Position, &m_DirVec, &Vector3(1.0f, 1.0f, 1.0f));
 
 	// 重力
-	m_Position.y -= Glavity;
+	float move_y = Glavity * Mass * t * t * 0.5f;
+	m_Position.y += move_y;
 
-	// 地面とのコリジョン
-	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::E_Background);
-	float height = pTerrain->GetHeight(&m_Position);
-	if (FAILD_NUM != (int)height) {
-		if (m_Position.y <= height) {
-			m_Position.y = height;
-		}
+	// 地形との衝突判定
+	bool landing = IsLanding();
+	if (landing) {
+		t = 0.0f;
+	}
+	else {
+		t += DELTA_TIME;
 	}
 
 	// モデル更新
 	m_pModel->Animation(f++);
 
+	// 最下層
 	if (m_Position.y < -20.0f) { m_Position.y = -20.0f; }
 }
 
@@ -179,9 +187,11 @@ void CPlayer::Draw()
 
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&m_CollisionSphere->GetCenter(), m_CollisionSphere->GetRadius(), &color);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
 	color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&m_DamageManager->GetCollisionSphere()->GetCenter(),m_DamageManager->GetCollisionSphere()->GetRadius(), &color);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
+	color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(m_CollisionOBB, &color);
 }
 
 
@@ -249,6 +259,22 @@ void CPlayer:: DrawGUI()
 	}
 
 	ImGui::End();
+}
+
+bool CPlayer::IsLanding()
+{
+	// 地面とのコリジョン
+	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::E_Background);
+	float height = pTerrain->GetHeight(&m_Position);
+	if (FAILD_NUM != (int)height) {
+		if (m_Position.y <= height) {
+			m_Position.y = height;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
 
 void CPlayer::SetCamera(CCamera* pCamera)

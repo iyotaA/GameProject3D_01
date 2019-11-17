@@ -4,8 +4,8 @@
 // í∏ì_ç\ë¢ëÃ
 struct VERTEX_3D
 {
-    XMFLOAT3 Position;
-    XMFLOAT3 Normal;
+	Vector3  Position;
+	Vector3  Normal;
     XMFLOAT4 Diffuse;
     XMFLOAT2 TexCoord;
 };

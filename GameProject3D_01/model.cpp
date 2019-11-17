@@ -113,8 +113,8 @@ void CModel::Unload()
 void CModel::LoadObj( const char *FileName, MODEL *Model )
 {
 
-	XMFLOAT3	*positionArray;
-	XMFLOAT3	*normalArray;
+	Vector3*positionArray;
+	Vector3*normalArray;
 	XMFLOAT2	*texcoordArray;
 
 	unsigned short	positionNum = 0;
@@ -186,8 +186,8 @@ void CModel::LoadObj( const char *FileName, MODEL *Model )
 
 
 	//ÉÅÉÇÉäämï€
-	positionArray = new XMFLOAT3[ positionNum ];
-	normalArray = new XMFLOAT3[ normalNum ];
+	positionArray = new Vector3[ positionNum ];
+	normalArray = new Vector3[ normalNum ];
 	texcoordArray = new XMFLOAT2[ texcoordNum ];
 
 
@@ -204,8 +204,8 @@ void CModel::LoadObj( const char *FileName, MODEL *Model )
 
 
 	//óvëfì«çû
-	XMFLOAT3 *position = positionArray;
-	XMFLOAT3 *normal = normalArray;
+	Vector3 *position = positionArray;
+	Vector3 *normal = normalArray;
 	XMFLOAT2 *texcoord = texcoordArray;
 
 	unsigned short vc = 0;
