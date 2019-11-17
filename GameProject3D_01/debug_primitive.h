@@ -5,20 +5,25 @@
 class CDebugPrimitive
 {
 private:
-	static ID3D11Buffer*	m_VertexBufer;
-	static ID3D11Buffer*	m_IndexBufer;
-	static VERTEX_3D*		m_pVertex;
-	static WORD*            m_pIndex;
-	static int              m_CircleCount;	// サークル描画数
-	static bool				m_IsDisplayed;  // 表示するか？
+	static std::vector<VERTEX_3D> m_Vertices;
+	static std::vector<WORD>      m_Indices;
+	static ID3D11Buffer*	      m_VertexBufer;
+	static ID3D11Buffer*	      m_IndexBufer;
+	static unsigned int           m_CircleCount;	// サークル描画数
+	static unsigned int           m_CubeCount;	// 立方体描画数
+	static bool				      m_IsDisplayed;  // 表示するか？
 
 public:
 	static void DebugPrimitive_Init();
 	static void DebugPrimitive_Uninit();
+
 	static void DebugPrimitive_BatchBegin();
-	static void DebugPrimitive_BatchCirecleDraw(const XMFLOAT3* pos, float radius, const XMFLOAT4* color);
 	static void DebugPrimitive_BatchRun();
+
 	static void DrawGUI();
+
+	static void DebugPrimitive_BatchCirecleDraw( CCollisionSphere* _sphere, const XMFLOAT4* _color);
+	static void DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const XMFLOAT4* _color);
 
 	// set m_IsDisplayed
 	static void IsDisplayed(bool flag) { m_IsDisplayed = flag; }

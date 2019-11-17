@@ -188,8 +188,8 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 
 				// 頂点情報格納
 				vertices[id].Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
-				vertices[id].Normal = XMFLOAT3(pVertex->Normal.x, pVertex->Normal.y, pVertex->Normal.z);
-				vertices[id].Position = XMFLOAT3(pVertex->Position.x, pVertex->Position.y, pVertex->Position.z);
+				vertices[id].Normal = Vector3(pVertex->Normal.x, pVertex->Normal.y, pVertex->Normal.z);
+				vertices[id].Position = Vector3(pVertex->Position.x, pVertex->Position.y, pVertex->Position.z);
 				vertices[id].TexCoord = pMesh->HasTextureCoords(0) ? XMFLOAT2(pMesh->mTextureCoords[0][id].x, 1.0f - pMesh->mTextureCoords[0][id].y) : XMFLOAT2(0.0f, 0.0f);
 			}
 		}
@@ -268,6 +268,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 		// マテリアル取得
 		const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
+		assert(mat);
 		aiColor4D diffuse;
 		aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
 
@@ -275,7 +276,9 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		aiString path;
 		mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
 
-		VERTEX_3D* vertices = new VERTEX_3D[pMesh->mNumVertices];
+		VERTEX_3D* vertices = nullptr;
+		vertices = new VERTEX_3D[pMesh->mNumVertices];
+		assert(vertices);
 
 		// メッシュの面ポリゴンの個数分繰り返し
 		for (int face = 0; face < pMesh->mNumFaces; face++) {
@@ -297,8 +300,8 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 				// 頂点情報格納
 				vertices[id].Diffuse  = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
-				vertices[id].Normal   = XMFLOAT3(pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
-				vertices[id].Position = XMFLOAT3(pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
+				vertices[id].Normal   = Vector3(pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
+				vertices[id].Position = Vector3(pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
 				vertices[id].TexCoord = pMesh->HasTextureCoords(0) ? XMFLOAT2(pMesh->mTextureCoords[0][id].x, 1.0f - pMesh->mTextureCoords[0][id].y) : XMFLOAT2(0.0f, 0.0f);
 			}
 		}

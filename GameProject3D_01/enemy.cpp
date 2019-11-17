@@ -16,9 +16,9 @@ void CEnemy::Init()
 	m_pModel->Load("asset/miku_01.obj");
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 1.0f, 5.0f);
-	m_Rotation = XMFLOAT3(0.0f, XMConvertToRadians(180.0f), 0.0f);
-	m_Scale    = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	m_Position = Vector3(0.0f, 1.0f, 5.0f);
+	m_Rotation = Vector3(0.0f, XMConvertToRadians(180.0f), 0.0f);
+	m_Scale    = Vector3(1.0f, 1.0f, 1.0f);
 
 	// コリジョンの初期化
 	m_CollisionSphere = new CCollisionSphere;
@@ -75,5 +75,5 @@ void CEnemy::Draw()
 
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&m_CollisionSphere->GetCenter(), m_CollisionSphere->GetRadius(), &color);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
 }

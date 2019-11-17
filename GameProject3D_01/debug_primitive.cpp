@@ -4,6 +4,8 @@
 #include "main.h"
 #include "renderer.h"
 #include "texture.h"
+#include "collision3D.h"
+#include "stl.h"
 #include "debug_primitive.h"
 #include "imGui_all.h"
 
@@ -11,117 +13,40 @@
 // マクロ定義
 //=================================================================================
 #define CIRCLE_VERTEX_COUNT	(8)
-#define CIRCLE_DRAW_MAX		(2048)
 
-
-ID3D11Buffer*	CDebugPrimitive::m_VertexBufer;
-ID3D11Buffer*	CDebugPrimitive::m_IndexBufer;
-VERTEX_3D*		CDebugPrimitive::m_pVertex;
-WORD*           CDebugPrimitive::m_pIndex;
-int             CDebugPrimitive::m_CircleCount;
-bool			CDebugPrimitive::m_IsDisplayed;
+std::vector<VERTEX_3D>	CDebugPrimitive::m_Vertices;
+std::vector<WORD>       CDebugPrimitive::m_Indices;
+ID3D11Buffer*			CDebugPrimitive::m_VertexBufer;
+ID3D11Buffer*			CDebugPrimitive::m_IndexBufer;
+unsigned int			CDebugPrimitive::m_CircleCount;
+unsigned int            CDebugPrimitive::m_CubeCount;
+bool					CDebugPrimitive::m_IsDisplayed;
 
 
 void CDebugPrimitive::DebugPrimitive_Init(void)
 {
 	m_CircleCount = 0;
+	m_CubeCount = 0;
 	m_IsDisplayed = false;
-
-	m_pVertex = new VERTEX_3D[CIRCLE_VERTEX_COUNT * CIRCLE_DRAW_MAX];
-	m_pIndex  = new WORD[CIRCLE_VERTEX_COUNT * 2 * CIRCLE_DRAW_MAX];
-
-	//// 頂点バッファ確保
-	//DirectX3D_GetDevice()->CreateVertexBuffer(sizeof(DebugVertex) * CIRCLE_VERTEX_COUNT * CIRCLE_DRAW_MAX, D3DUSAGE_WRITEONLY, FVF_DEBUG_VERTEX, D3DPOOL_MANAGED, &g_pVertexBuffer, NULL);
-	//// インデックスバッファ確保
-	//DirectX3D_GetDevice()->CreateIndexBuffer(sizeof(WORD) * CIRCLE_VERTEX_COUNT * 2 * CIRCLE_DRAW_MAX, D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_MANAGED, &g_pIndexBuffer, NULL);
 }
 
 void CDebugPrimitive::DebugPrimitive_Uninit(void)
 {
-	if(m_VertexBufer)	m_VertexBufer->Release();
-	if(m_IndexBufer)	m_IndexBufer->Release();
+	SAFE_RELEASE(m_VertexBufer);
+	SAFE_RELEASE(m_IndexBufer);
 
-	delete m_pVertex;
-	delete m_pIndex;
-
-	//SAFE_RELEASE(g_pIndexBuffer);
-	//SAFE_RELEASE(g_pVertexBuffer);
+	m_Vertices.clear();
+	m_Indices.clear();
 }
 
 void CDebugPrimitive::DebugPrimitive_BatchBegin(void)
 {
-	// サークル描画数をゼロに
+	// 描画数をゼロに
 	m_CircleCount = 0;
+	m_CubeCount = 0;
 
-	//g_pVertexBuffer->Lock(0, 0, (void**)&g_pVertex, 0);
-	//g_pIndexBuffer->Lock(0, 0, (void**)&g_pIndex, 0);
-}
-
-void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(const XMFLOAT3* pos, float radius, const XMFLOAT4* color)
-{
-	//表示する時のみ
-	if (!m_IsDisplayed)return;
-
-
-	int n = m_CircleCount * CIRCLE_VERTEX_COUNT;
-	float a = PI * 2.0f / CIRCLE_VERTEX_COUNT;
-
-	// ( 円 1 ) //////////////////////////////////////////////////////////////
-	n = m_CircleCount * CIRCLE_VERTEX_COUNT;
-
-	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
-		m_pVertex[n + i].Position.x = cos(a * i) * radius + pos->x;
-		m_pVertex[n + i].Position.y = sin(a * i) * radius + pos->y;
-		m_pVertex[n + i].Position.z = pos->z;
-		m_pVertex[n + i].Normal     = XMFLOAT3(0.0f, 1.0f, 0.0f);
-		m_pVertex[n + i].Diffuse    = *color;
-		m_pVertex[n + i].TexCoord   = XMFLOAT2(0.0f, 0.0f);
-	}
-
-	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
-		m_pIndex[n * 2 + i * 2] = n + i;
-		m_pIndex[n * 2 + i * 2 + 1] = n + (i + 1) % CIRCLE_VERTEX_COUNT;
-	}
-	m_CircleCount++;
-
-	// ( 円 2 ) //////////////////////////////////////////////////////////////
-	n = m_CircleCount * CIRCLE_VERTEX_COUNT;
-
-	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
-		m_pVertex[n + i].Position.x = pos->x;
-		m_pVertex[n + i].Position.y = cos(a * i) * radius + pos->y;
-		m_pVertex[n + i].Position.z = sin(a * i) * radius + pos->z;
-		m_pVertex[n + i].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-		m_pVertex[n + i].Diffuse = *color;
-		m_pVertex[n + i].TexCoord = XMFLOAT2(0.0f, 0.0f);
-	}
-
-
-	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
-		m_pIndex[n * 2 + i * 2] = n + i;
-		m_pIndex[n * 2 + i * 2 + 1] = n + (i + 1) % CIRCLE_VERTEX_COUNT;
-	}
-
-	m_CircleCount++;
-
-	// ( 円 3 ) //////////////////////////////////////////////////////////////
-	n = m_CircleCount * CIRCLE_VERTEX_COUNT;
-
-	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
-		m_pVertex[n + i].Position.x = cos(a * i) * radius + pos->x;
-		m_pVertex[n + i].Position.y = pos->y;
-		m_pVertex[n + i].Position.z = sin(a * i) * radius + pos->z;
-		m_pVertex[n + i].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-		m_pVertex[n + i].Diffuse = *color;
-		m_pVertex[n + i].TexCoord = XMFLOAT2(0.0f, 0.0f);
-	}
-
-	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
-		m_pIndex[n * 2 + i * 2] = n + i;
-		m_pIndex[n * 2 + i * 2 + 1] = n + (i + 1) % CIRCLE_VERTEX_COUNT;
-	}
-
-	m_CircleCount++;
+	if(!m_Vertices.empty()){ m_Vertices.clear(); }
+	if(!m_Indices.empty()){ m_Indices.clear(); }
 }
 
 void CDebugPrimitive::DebugPrimitive_BatchRun(void)
@@ -137,13 +62,13 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(VERTEX_3D) * m_CircleCount * CIRCLE_VERTEX_COUNT;
+		bd.ByteWidth = sizeof(VERTEX_3D) * m_Vertices.size();
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 
 		D3D11_SUBRESOURCE_DATA sd;
 		ZeroMemory(&sd, sizeof(sd));
-		sd.pSysMem = m_pVertex;
+		sd.pSysMem = m_Vertices.data();
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_VertexBufer);
 	}
 
@@ -152,26 +77,19 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(WORD) * CIRCLE_VERTEX_COUNT * 2 * m_CircleCount;
+		bd.ByteWidth = sizeof(WORD) * m_Indices.size();
 		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 
 		D3D11_SUBRESOURCE_DATA sd;
 		ZeroMemory(&sd, sizeof(sd));
-		sd.pSysMem = m_pIndex;
+		sd.pSysMem = m_Indices.data();
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_IndexBufer);
 	}
 
 	XMMATRIX world;
 	world = XMMatrixIdentity();
 	CRenderer::SetWorldMatrix(&world);
-
-	// ライト初期化
-	//LIGHT light;
-	//light.Direction = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	//light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	//light.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	//CRenderer::SetLight(light);
 
 	UINT Stride = sizeof(VERTEX_3D);
 	UINT offdet = 0;
@@ -180,28 +98,215 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	CRenderer::GetDeviceContext()->DrawIndexed(CIRCLE_VERTEX_COUNT * 2 * m_CircleCount, 0, 0);
 
-
-	//g_pVertexBuffer->Unlock();
-	//g_pIndexBuffer->Unlock();
-
-	//LPDIRECT3DDEVICE9 pDevice = DirectX3D_GetDevice();
-
-	//// 一番手前に描画
-	//pDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, NULL, 1.0f, 0);
-
-	//D3DXMATRIX MtxWorld;
-	//D3DXMatrixIdentity(&MtxWorld);
-
-	//pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-	//pDevice->SetTransform(D3DTS_WORLD, &MtxWorld);	// ワールド座標返還用の行列をデバイスにセット
-	//pDevice->SetFVF(FVF_DEBUG_VERTEX);
-	//pDevice->SetTexture(0, NULL);
-
-	//pDevice->SetStreamSource(0, g_pVertexBuffer, 0, sizeof(DebugVertex));
-	//pDevice->SetIndices(g_pIndexBuffer);
-
-	//pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, g_CircleCount * CIRCLE_VERTEX_COUNT, 0, g_CircleCount * CIRCLE_VERTEX_COUNT);
+	SAFE_RELEASE(m_IndexBufer);
+	SAFE_RELEASE(m_VertexBufer);
 }
+
+
+void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere, const XMFLOAT4* _color)
+{
+	//表示する時のみ
+	if (!m_IsDisplayed)return;
+
+
+	int n;
+	float a = PI * 2.0f / CIRCLE_VERTEX_COUNT;
+
+	// ( 円 1 ) //////////////////////////////////////////////////////////////
+	n = (m_CubeCount + m_CircleCount) * CIRCLE_VERTEX_COUNT;
+
+	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
+		VERTEX_3D vertex;
+		vertex.Position.x = cos(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().x;
+		vertex.Position.y = sin(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().y;
+		vertex.Position.z = _sphere->GetCenter().z;
+		vertex.Normal     = Vector3(0.0f, 1.0f, 0.0f);
+		vertex.Diffuse    = *_color;
+		vertex.TexCoord   = XMFLOAT2(0.0f, 0.0f);
+
+		m_Vertices.push_back(vertex);
+	}
+
+	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
+
+		WORD indices;
+
+		indices = n + i;
+		m_Indices.push_back(indices);
+
+		indices = n + (i + 1) % CIRCLE_VERTEX_COUNT;
+		m_Indices.push_back(indices);
+	}
+	m_CircleCount++;
+
+	// ( 円 2 ) //////////////////////////////////////////////////////////////
+	n = (m_CubeCount + m_CircleCount) * CIRCLE_VERTEX_COUNT;
+
+	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
+		VERTEX_3D vertex;
+
+		vertex.Position.x = _sphere->GetCenter().x;
+		vertex.Position.y = cos(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().y;
+		vertex.Position.z = sin(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().z;
+		vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+		vertex.Diffuse = *_color;
+		vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+
+		m_Vertices.push_back(vertex);
+	}
+
+
+	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
+
+		WORD indices;
+
+		indices = n + i;
+		m_Indices.push_back(indices);
+
+		indices = n + (i + 1) % CIRCLE_VERTEX_COUNT;
+		m_Indices.push_back(indices);
+	}
+
+	m_CircleCount++;
+
+	// ( 円 3 ) //////////////////////////////////////////////////////////////
+	n = (m_CubeCount + m_CircleCount) * CIRCLE_VERTEX_COUNT;
+
+	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
+		VERTEX_3D vertex;
+
+		vertex.Position.x = cos((static_cast<double>(a) * static_cast<double>(i))) * _sphere->GetRadius() + _sphere->GetCenter().x;
+		vertex.Position.y = _sphere->GetCenter().y;
+		vertex.Position.z = sin(static_cast<double>(a)* static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().z;
+		vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+		vertex.Diffuse = *_color;
+		vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+
+		m_Vertices.push_back(vertex);
+	}
+
+	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
+
+		WORD indices;
+
+		indices = n + i;
+		m_Indices.push_back(indices);
+
+		indices = n + (i + 1) % CIRCLE_VERTEX_COUNT;
+		m_Indices.push_back(indices);
+	}
+
+	m_CircleCount++;
+}
+
+void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const XMFLOAT4* _color)
+{
+	//表示する時のみ
+	if (!m_IsDisplayed)return;
+
+	Vector3 vFront, vRigth, vUp, length3, center;
+
+	vFront  = Vector3(0.0f, 1.0f, 0.0f);
+	vRigth  = _cube->GetDirect(1);
+	vUp     = _cube->GetDirect(2);
+	length3 = _cube->GetLen_W();
+	center  = _cube->GetPos_W();
+
+
+	VERTEX_3D vertex;
+
+	//////////////////////////////////////////////
+	// 後面
+	//////////////////////////////////////////////
+	// 0
+	vertex.Position = center + (-vFront * length3.z) + (-vRigth * length3.x) + (vUp * length3.y);
+	vertex.Normal   = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse  = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	// 1
+	vertex.Position = center + (-vFront * length3.z) + (vRigth * length3.x) + (vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	// 2
+	vertex.Position = center + (-vFront * length3.z) + (-vRigth * length3.x) + (-vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	// 3
+	vertex.Position = center + (-vFront * length3.z) + (vRigth * length3.x)+(-vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	//////////////////////////////////////////////
+	// 前面
+	//////////////////////////////////////////////
+	// 4
+	vertex.Position = center + (vFront * length3.z) + (-vRigth * length3.x) + (vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	// 5
+	vertex.Position = center + (vFront * length3.z) + (vRigth * length3.x) + (vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	// 6
+	vertex.Position = center + (vFront * length3.z) + (-vRigth * length3.x) + (-vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	// 7
+	vertex.Position = center + (vFront * length3.z) + (vRigth * length3.x)+(-vUp * length3.y);
+	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
+	vertex.Diffuse = *_color;
+	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
+	m_Vertices.push_back(vertex);
+
+	int n = (m_CubeCount + m_CircleCount) * CIRCLE_VERTEX_COUNT;
+	m_Indices.push_back(n);
+	m_Indices.push_back(n + 1);
+	m_Indices.push_back(n + 1);
+	m_Indices.push_back(n + 2);
+	m_Indices.push_back(n + 2);
+	m_Indices.push_back(n + 3);
+	m_Indices.push_back(n + 3);
+	m_Indices.push_back(n);
+
+	m_Indices.push_back(n + 4);
+	m_Indices.push_back(n + 5);
+	m_Indices.push_back(n + 5);
+	m_Indices.push_back(n + 6);
+	m_Indices.push_back(n + 6);
+	m_Indices.push_back(n + 7);
+	m_Indices.push_back(n + 7);
+	m_Indices.push_back(n + 4);
+
+	m_Indices.push_back(n + 5);
+	m_Indices.push_back(n + 1);
+	m_Indices.push_back(n + 6);
+	m_Indices.push_back(n + 2);
+	m_Indices.push_back(n + 7);
+	m_Indices.push_back(n + 3);
+
+
+	m_CubeCount++;
+}
+
 
 void CDebugPrimitive::DrawGUI()
 {

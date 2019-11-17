@@ -1,6 +1,8 @@
 #ifndef SCENE_H_
 #define SCENE_H_
 
+#include "collision3D.h"
+#include "stl.h"
 #include "debug_primitive.h"
 #include "gameObject.h"
 #include "model.h"
@@ -19,9 +21,6 @@
 #include "number.h"
 #include "score.h"
 #include "terrain.h"
-#include <list>
-#include <typeinfo>
-#include <vector>
 
 class CScene
 {

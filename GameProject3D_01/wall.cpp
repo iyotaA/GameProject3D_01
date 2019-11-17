@@ -38,8 +38,8 @@ void CWall::Init()
 				}
 
 				pVertex[x + (GridNumX + 1) * z] = {
-					XMFLOAT3(x * SIZE - ShiftedAmount_x, 0.0f, -z * SIZE + ShiftedAmount_z),
-					XMFLOAT3(0.0f, 1.0f, 0.0f),
+					Vector3(x * SIZE - ShiftedAmount_x, 0.0f, -z * SIZE + ShiftedAmount_z),
+					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 					XMFLOAT2(x, z)
 				};
@@ -112,9 +112,9 @@ void CWall::Init()
 	m_Texture->LoadSTB("asset/field004.tga");
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	m_Position = Vector3(0.0f, 0.0f, 0.0f);
+	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
+	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 }
 
 void CWall::Uninit()
@@ -124,7 +124,7 @@ void CWall::Uninit()
 	delete m_Texture;
 }
 
-void CWall::Update(const XMFLOAT3 pos)
+void CWall::Update(const Vector3 pos)
 {
 
 }

@@ -22,23 +22,23 @@ void C2DAnimation::Draw(XMFLOAT2 position, XMFLOAT2 uv0, XMFLOAT2 cutSize)
 	// 頂点座標設定
 	VERTEX_3D vertex[4] = {
 
-		vertex[0].Position = XMFLOAT3(position.x, position.y, 0.0f),	// "XM"が頭についてる変数・関数はDirectXMathライブラリの一部
-		vertex[0].Normal = XMFLOAT3(0.0f, 0.0f, -1.0f),
+		vertex[0].Position = Vector3(position.x, position.y, 0.0f),	// "XM"が頭についてる変数・関数はDirectXMathライブラリの一部
+		vertex[0].Normal = Vector3(0.0f, 0.0f, -1.0f),
 		vertex[0].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[0].TexCoord = XMFLOAT2(u0, v0),
 
-		vertex[1].Position = XMFLOAT3(position.x + cutSize.x, position.y, 0.0f),
-		vertex[1].Normal = XMFLOAT3(0.0f, 0.0f, -1.0f),
+		vertex[1].Position = Vector3(position.x + cutSize.x, position.y, 0.0f),
+		vertex[1].Normal = Vector3(0.0f, 0.0f, -1.0f),
 		vertex[1].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[1].TexCoord = XMFLOAT2(u1, v0),
 
-		vertex[2].Position = XMFLOAT3(position.x, position.y + cutSize.y, 0.0f),
-		vertex[2].Normal = XMFLOAT3(0.0f, 0.0f, -1.0f),
+		vertex[2].Position = Vector3(position.x, position.y + cutSize.y, 0.0f),
+		vertex[2].Normal = Vector3(0.0f, 0.0f, -1.0f),
 		vertex[2].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[2].TexCoord = XMFLOAT2(u0, v1),
 
-		vertex[3].Position = XMFLOAT3(position.x + cutSize.x, position.y + cutSize.y, 0.0f),
-		vertex[3].Normal = XMFLOAT3(0.0f, 0.0f, -1.0f),
+		vertex[3].Position = Vector3(position.x + cutSize.x, position.y + cutSize.y, 0.0f),
+		vertex[3].Normal = Vector3(0.0f, 0.0f, -1.0f),
 		vertex[3].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		vertex[3].TexCoord = XMFLOAT2(u1, v1),
 	};

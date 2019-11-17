@@ -17,7 +17,7 @@ void CNumber::Init(char* pFileName)
 	// テクスチャ読み込み //////
 	m_Texture = new CTexture();
 	m_Texture->Load(pFileName);
-	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_Position = Vector3(0.0f, 0.0f, 0.0f);
 }
 
 void CNumber::Uninit()
@@ -31,7 +31,7 @@ void CNumber::Update()
 
 void CNumber::Draw()
 {
-	int num = m_Num;
+	int num = static_cast<int>(m_Num);
 
 	// カンスト処理
 	if (num > COUNTER_STOP)	num = COUNTER_STOP;
@@ -60,7 +60,11 @@ void CNumber::Draw()
 		if (!(n < 0 || n > 9)) {
 
 			XMINT2 size = C2DAnimation::GetTextureSize();
-			C2DAnimation::Draw(XMFLOAT2(m_Position.x + i * (size.x / 5), m_Position.y), XMFLOAT2((float)(n % 5 * 0.2f), (float)(n / 5 * 0.2f)), XMFLOAT2(size.x / 5, size.y / 5));
+			C2DAnimation::Draw(
+				XMFLOAT2(m_Position.x + i * (size.x / 5), m_Position.y),
+				XMFLOAT2(static_cast<float>(n % 5 * 0.2f), static_cast<float>(n / 5 * 0.2f)),
+				XMFLOAT2(static_cast<float>(size.x / 5), static_cast<float>(size.y / 5))
+			);
 		}
 
 		num /= 10;

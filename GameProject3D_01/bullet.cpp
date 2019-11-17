@@ -16,9 +16,9 @@ void CBullet::Init()
 	m_pModel->Load("asset/miku_01.obj");
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Scale = XMFLOAT3(SCALE, SCALE, SCALE);
+	m_Position = Vector3(0.0f, 1.0f, 0.0f);
+	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
+	m_Scale = Vector3(SCALE, SCALE, SCALE);
 
 	// コリジョンの初期化
 	m_CollisionSphere = new CCollisionSphere;
@@ -46,7 +46,7 @@ void CBullet::Update()
 		if (enemy != nullptr) {
 
 			// 当たり判定
-			if (CJudgeCollisionSphere::Collision3D_EachSpher(enemy->GetCollisionSphere(), m_CollisionSphere)) {
+			if (CJudgeCollision3D::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_CollisionSphere)) {
 
 				CSound::Play(SOUND_LABEL_SE_HIT);
 
@@ -85,6 +85,6 @@ void CBullet::Draw()
 
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&m_CollisionSphere->GetCenter(), m_CollisionSphere->GetRadius(), &color);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
 }
 

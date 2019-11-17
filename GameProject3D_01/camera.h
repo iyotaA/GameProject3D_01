@@ -7,10 +7,10 @@ class CCamera : public CGameObject
 {
 private:
 
-	CPlayer* m_pPlayer;
+	CGameObject* m_pAtObject;
 	RECT		m_Viewport;
 	Dir3Vector  m_DirVec;
-	XMVECTOR    m_At;
+	Vector3    m_At;
 
 	XMFLOAT4X4 m_ViewMatrix;
 	XMFLOAT4X4 m_ProjectionMatrix;
@@ -23,6 +23,9 @@ private:
 	float		m_MoveSpeedScale;
 
 	bool IsRange();
+	void Pan();
+	void Tilt();
+	void Move();
 
 public:
 	void Init();
@@ -34,7 +37,7 @@ public:
 	Dir3Vector* GetDir3Vector() { return &m_DirVec; }
 	bool GetVisivility(XMFLOAT3* position);
 
-	void SetAt(CPlayer* pPlayer);
+	void SetAt(CGameObject* pPlayer);
 };
 
 #endif

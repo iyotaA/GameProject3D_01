@@ -100,7 +100,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		{
 			dwCurrentTime = timeGetTime();
 
-			if((dwCurrentTime - dwExecLastTime) >= DELTA_TIME)
+			if((dwCurrentTime - dwExecLastTime) >= (1000.0 / 60.0))
 			{
 
 				// XVˆ—

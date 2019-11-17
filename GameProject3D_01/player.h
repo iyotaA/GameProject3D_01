@@ -14,8 +14,11 @@ private:
 	CSkinModel* m_pModel;
 	Dir3Vector m_DirVec;
 	CCollisionSphere* m_CollisionSphere;
+	CCollisionOBB* m_CollisionOBB;
 	CDamage* m_DamageManager;
 	CTexture* m_Texture;
+
+	bool IsLanding();
 
 public:
 
@@ -25,7 +28,6 @@ public:
 	void Draw();
 	void DrawGUI();
 
-	const XMFLOAT3 GetPosition() { return m_Position; }
 	void SetCamera(CCamera* pCamera);
 	CCollisionSphere* GetCollisionSphere(void) { return m_CollisionSphere; }
 	CDamage* GetDamageManager(void) { return m_DamageManager; }

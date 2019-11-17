@@ -17,7 +17,7 @@ public:
 		m_CollisionSphere = new CCollisionSphere;
 	}
 
-	void ReceiveDamage(float damageValue) {	m_HitPoint -= damageValue; }
+	void ReceiveDamage(short damageValue) {	m_HitPoint -= damageValue; }
 	void DoDamage(CDamage* object) { object->ReceiveDamage(m_AttackValue); }
 	CCollisionSphere* GetCollisionSphere(void) { return m_CollisionSphere; }
 	bool IsAlive(void) {

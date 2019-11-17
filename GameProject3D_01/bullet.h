@@ -18,7 +18,6 @@ public:
 	void Update();
 	void Draw();
 
-	void SetPosition(XMFLOAT3 pos) { m_Position = pos; }
 	void SetDirection(Dir3Vector* direction) { m_Direction = *direction; }
 };
 

@@ -9,7 +9,7 @@ private:
 	float			m_Counter = 0.0f;
 
 public:
-	void Init(XMFLOAT3 pos, XMFLOAT3 scal, XMFLOAT3 rot);
+	void Init(Vector3 pos, Vector3 scal, Vector3 rot);
 	void Uninit();
 	void Update();
 	void Draw();

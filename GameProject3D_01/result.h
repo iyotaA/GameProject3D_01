@@ -27,29 +27,29 @@ public:
 			switch (i)
 			{
 			case 0:
-				wall->SetPosition(XMFLOAT3(15.0f, 2.5f, 0.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 90.0f, 0.0f));
+				wall->SetPosition(&Vector3(15.0f, 2.5f, 0.0f));
+				wall->SetRotation(&Vector3(90.0f, 90.0f, 0.0f));
 				break;
 
 			case 1:
-				wall->SetPosition(XMFLOAT3(0.0f, 2.5f, -15.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 180.0f, 0.0f));
+				wall->SetPosition(&Vector3(0.0f, 2.5f, -15.0f));
+				wall->SetRotation(&Vector3(90.0f, 180.0f, 0.0f));
 				break;
 
 			case 2:
-				wall->SetPosition(XMFLOAT3(-15.0f, 2.5f, 0.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 270.0f, 0.0f));
+				wall->SetPosition(&Vector3(-15.0f, 2.5f, 0.0f));
+				wall->SetRotation(&Vector3(90.0f, 270.0f, 0.0f));
 				break;
 
 			case 3:
-				wall->SetPosition(XMFLOAT3(0.0f, 2.5f, 15.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 0.0f, 0.0f));
+				wall->SetPosition(&Vector3(0.0f, 2.5f, 15.0f));
+				wall->SetRotation(&Vector3(90.0f, 0.0f, 0.0f));
 				break;
 
 			}
 		}
 
-		// タイトルロゴの初期化	
+		// タイトルロゴの初期化
 		CPolygon* ui = new CPolygon;
 		ui->Init(XMFLOAT2(350, 70), XMFLOAT2(670, 200), "asset/score.tga");
 		m_GameObject[CManager::E_UI].push_back(ui);
@@ -58,11 +58,11 @@ public:
 		ui2->Init(XMFLOAT2(530, 600), XMFLOAT2(315, 75), "asset/press.tga");
 		m_GameObject[CManager::E_UI].push_back(ui2);
 
-		// 数字の初期化	
+		// 数字の初期化
 		CNumber* number = new CNumber;
 		number->Init("asset/number.tga");
 		number->SetPosition(XMFLOAT2(550.0f, 300.0f));
-		number->SetNum(CManager::GetScore());
+		number->SetNum(static_cast<float>(CManager::GetScore()));
 		m_GameObject[CManager::E_UI].push_back(number);
 
 		FrameCount = 0;

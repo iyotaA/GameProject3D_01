@@ -15,8 +15,6 @@ public:
 	void Update();
 	void Draw();
 
-	const XMFLOAT3 GetPosition() { return m_Position; }
-	void SetPosition(XMFLOAT3 position) { m_Position = position; }
 	CCollisionSphere* GetCollisionSphere(void) { return m_CollisionSphere; }
 	CDamage* GetDamageManager(void) { return m_DamageManager; }
 

@@ -10,7 +10,7 @@
 #define GridNumX	(15)
 #define GridNumZ	(15)
 
-char g_height[(GridNumX + 1) * (GridNumZ + 1)]{
+float g_height[(GridNumX + 1) * (GridNumZ + 1)]{
 	//  0     1     2     3     4     5     6     7     8     9     10    11    12    13    14    15
 		0.0f, 0.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 0
 		0.0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 1
@@ -64,8 +64,8 @@ void CField::Init()
 				//y = g_height[x + (GridNumX + 1) * z];
 
 				m_Vertex[x + (GridNumX + 1) * z] = {
-					XMFLOAT3(x * SIZE - ShiftedAmount_x, g_height[x + (GridNumX + 1) * z], -z * SIZE + ShiftedAmount_z),
-					XMFLOAT3(0.0f, 1.0f, 0.0f),
+					Vector3(x * SIZE - ShiftedAmount_x, g_height[x + (GridNumX + 1) * z], -z * SIZE + ShiftedAmount_z),
+					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 					XMFLOAT2(x, z)
 				};
@@ -76,7 +76,7 @@ void CField::Init()
 		for (int z = 1; z < GridNumZ; z++) {
 			for (int x = 1; x < GridNumX; x++) {
 
-				XMFLOAT3 va, vb, vc;
+				Vector3 va, vb, vc;
 				va.x = m_Vertex[x + 1 + (GridNumX + 1) * z].Position.x - m_Vertex[x - 1 + (GridNumX + 1) * z].Position.x;
 				va.y = m_Vertex[x + 1 + (GridNumX + 1) * z].Position.y - m_Vertex[x - 1 + (GridNumX + 1) * z].Position.y;
 				va.z = m_Vertex[x + 1 + (GridNumX + 1) * z].Position.z - m_Vertex[x - 1 + (GridNumX + 1) * z].Position.z;
@@ -166,9 +166,9 @@ void CField::Init()
 	m_Texture->LoadSTB("asset/image/field_dart1.png");
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	m_Position = Vector3(0.0f, 0.0f, 0.0f);
+	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
+	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 }
 
 void CField::Uninit()

@@ -11,8 +11,8 @@
 void CCamera::Init()
 {
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 5.0f, -10.0f);
-	m_Rotation = XMFLOAT3(XMConvertToRadians(15.0f), 0.0f, 0.0f);
+	m_Position = Vector3(0.0f, 5.0f, -10.0f);
+	m_Rotation = Vector3(XMConvertToRadians(15.0f), 0.0f, 0.0f);
 
 	// ビューポート初期化
 	m_Viewport.left   = 0;
@@ -21,32 +21,32 @@ void CCamera::Init()
 	m_Viewport.bottom = SCREEN_HEIGHT;
 
 	// 前ベクトル初期化
-	m_DirVec.front = { 0.0f, 0.0f, 1.0f};
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+	m_DirVec.front = Vector3(0.0f, 0.0f, 1.0f);
+	m_DirVec.front.Normalize();
 
 	// 右ベクトル初期化
-	m_DirVec.up = { 0.0f, 1.0f, 0.0f };
-	m_DirVec.right = XMVector3Cross(m_DirVec.up, m_DirVec.front);
-	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+	m_DirVec.up    = Vector3(0.0f, 1.0f, 0.0f);
+	m_DirVec.right = m_DirVec.up.VCross(m_DirVec.front);
+	m_DirVec.right.Normalize();
 
 	// 上ベクトル初期化
-	m_DirVec.up = XMVector3Cross(m_DirVec.front, m_DirVec.right);
-	m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+	m_DirVec.up = m_DirVec.front.VCross(m_DirVec.right);
+	m_DirVec.up.Normalize();
 
-
-	//XMMATRIX rotationMtx;
-	//rotationMtx = XMMatrixRotationAxis(m_DirVec.right, XMConvertToRadians(15.0f));
-	//m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-	//m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-	//m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-	//m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+	// 少しだけ下を向く
+	XMMATRIX rotationMtx;
+	rotationMtx    = XMMatrixRotationAxis(m_DirVec.right, XMConvertToRadians(15.0f));
+	m_DirVec.up    = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+	m_DirVec.up    = XMVector3Normalize(m_DirVec.up);
 
 	/* カメラ情報初期化 */
-	m_LengthToAt = 5.0f;									// 注視点までの距離を設定
-	m_At = { 0.0f, 0.0f, 0.0f };
+	m_LengthToAt     = 5.0f;
+	m_At             = Vector3(0.0f, 10.0f, 0.0f);
 	m_SpinVerticall  = 0.0f;
 	m_SpinHorizontal = 0.0f;
-	m_RotateSpeed = 0.004f;
+	m_RotateSpeed    = 0.004f;
 	m_MoveSpeedScale = 1.0f;
 }
 
@@ -60,126 +60,36 @@ void CCamera::Uninit()
 
 void CCamera::Update()
 {
-	XMFLOAT3 at;
-	XMStoreFloat3(&at, m_At);
-
-	XMFLOAT3 cameraFront;
-	XMFLOAT3 cameraRight;
-	XMStoreFloat3(&cameraFront, m_DirVec.front);
-	XMStoreFloat3(&cameraRight, m_DirVec.right);
-
-	float speed = CAMERA_MOVE_SPEED * m_MoveSpeedScale;
-
-	// 視点の縦横回転
-	if (CInput::GetKeyPress(VK_UP)) {
-		m_SpinVerticall -= m_RotateSpeed;
-	}
-	if (CInput::GetKeyPress(VK_LEFT)) {
-		m_SpinHorizontal -= m_RotateSpeed;
-	}
-	if (CInput::GetKeyPress(VK_DOWN)) {
-		m_SpinVerticall += m_RotateSpeed;
-	}
-	if (CInput::GetKeyPress(VK_RIGHT)) {
-		m_SpinHorizontal += m_RotateSpeed;
-	}
-
-	if (!CInput::GetKeyPress(VK_RSHIFT))
-	{
-
-		if (CInput::GetKeyPress('W')) {
-			m_Position.x += cameraFront.x * speed;
-			m_Position.y += cameraFront.y * speed;
-			m_Position.z += cameraFront.z * speed;
-		}
-		if (CInput::GetKeyPress('A')) {
-			m_Position.x -= cameraRight.x * speed;
-			m_Position.y -= cameraRight.y * speed;
-			m_Position.z -= cameraRight.z * speed;
-		}
-		if (CInput::GetKeyPress('S')) {
-			m_Position.x -= cameraFront.x * speed;
-			m_Position.y -= cameraFront.y * speed;
-			m_Position.z -= cameraFront.z * speed;
-		}
-		if (CInput::GetKeyPress('D')) {
-			m_Position.x += cameraRight.x * speed;
-			m_Position.y += cameraRight.y * speed;
-			m_Position.z += cameraRight.z * speed;
-		}
-		if (CInput::GetKeyPress('Q')) {
-			m_Position.y -= speed;
-		}
-		if (CInput::GetKeyPress('E')) {
-			m_Position.y += speed;
-		}
-	}
+	// 視点移動
+	Move();
 
 	// カメラの移動可能範囲か？
 	if (IsRange()) {
 
-		XMMATRIX rotationMtx;
-		rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
-		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+		Pan();// 視点遷移左右（注視オブジェクトがある場合注視点回転）
 
-		rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
-		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-		m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
-		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
-		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-		m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+		Tilt();// 視点遷移上下（注視オブジェクトがある場合注視点回転）
 	}
 
-	//XMFLOAT3 rotationValue;
-	//rotationValue.x = m_Position.x - at.x;
-	//rotationValue.y = m_Position.y - at.y;
-	//rotationValue.z = m_Position.z - at.z;
+	// 前フレームとの回転差分
+	Vector3 rotationValue =
+		Vector3(m_Position.x - m_At.x, m_Position.y - m_At.y, m_Position.z - m_At.z);
 
-	//m_Rotation.x = XMConvertToRadians(atan2f(rotationValue.y, rotationValue.x));
-	//m_Rotation.y = XMConvertToRadians(atan2f(rotationValue.z, rotationValue.x));
-	//m_Rotation.z = XMConvertToRadians(atan2f(rotationValue.y, rotationValue.x));
-
-	// XMVECTOR -> XMFLOAT3
-	XMFLOAT3 vFront;
-	XMStoreFloat3(&vFront, m_DirVec.front);
-	vFront.x *= m_LengthToAt;
-	vFront.y *= m_LengthToAt;
-	vFront.z *= m_LengthToAt;
+	// 回転差分から回転角度計算
+	m_Rotation = Vector3(
+		XMConvertToRadians(atan2f(rotationValue.y, rotationValue.x)),
+		XMConvertToRadians(atan2f(rotationValue.z, rotationValue.x)),
+		XMConvertToRadians(atan2f(rotationValue.y, rotationValue.x))
+	);
 
 	// カメラの位置更新
-	//m_Position.x = at.x - vFront.x;
-	//m_Position.y = at.y + 1.0f - vFront.y;
-	//m_Position.z = at.z - vFront.z;
-
-	if (m_pPlayer != nullptr) {
-		m_At = XMLoadFloat3(
-			&XMFLOAT3(
-				m_pPlayer->GetPosition().x,
-				m_pPlayer->GetPosition().y + 1.0f,
-				m_pPlayer->GetPosition().z
-			)
-		);
-	}
-	else {
-		m_At = XMLoadFloat3(
-			&XMFLOAT3(
-				m_Position.x + cameraFront.x * m_LengthToAt,
-				m_Position.y + cameraFront.y * m_LengthToAt,
-				m_Position.z + cameraFront.z * m_LengthToAt
-			)
-		);
-	}
-
+	Vector3 vFront = m_DirVec.front * m_LengthToAt;
+	m_Position = Vector3(m_At.x - vFront.x, m_At.y + 1.0f - vFront.y, m_At.z - vFront.z);
 
 	// 慣性（徐々にスピードダウン）
 	m_SpinVerticall *= 0.92f;
 	m_SpinHorizontal *= 0.92f;
 }
-
 
 
 void CCamera::Draw()
@@ -200,8 +110,7 @@ void CCamera::Draw()
 	invMtx *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 	XMStoreFloat4x4(&m_InvViewMatrix, invMtx);
 
-	XMFLOAT3 cameraFront;
-	XMStoreFloat3(&cameraFront, m_DirVec.front);
+	 Vector3 cameraFront = m_DirVec.front;
 
 	//if (m_pPlayer != nullptr) {
 	//	m_At = XMLoadFloat3(
@@ -223,7 +132,7 @@ void CCamera::Draw()
 	//}
 
 	// XMFLOAT3 -> XMVECTOR
-	XMVECTOR position  = XMLoadFloat3(&m_Position);
+	Vector3 position  = m_Position;
 
 	// ビューマトリクス設定
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixLookAtLH(position, m_At, m_DirVec.up));
@@ -233,9 +142,6 @@ void CCamera::Draw()
 	XMStoreFloat4x4(&m_ProjectionMatrix ,XMMatrixPerspectiveFovLH(1.0f, dxViewport.Width / dxViewport.Height, 0.1f, 1000.0f));
 
 	CRenderer::SetProjectionMatrix(&XMLoadFloat4x4(&m_ProjectionMatrix));
-
-	XMFLOAT3 At;
-	XMStoreFloat3(&At, m_At);
 
 	// ImGui
 	DrawGUI();
@@ -280,7 +186,6 @@ void CCamera::DrawGUI()
 
 		ImGuiID Window_Camera_Id = ImGui::GetID("Camera");
 
-
 		{
 			ImGui::NextColumn();
 			ImGui::BeginChildFrame(Window_Camera_Id, ImVec2(ImGui::GetColumnWidth(0), 100));
@@ -313,10 +218,86 @@ bool CCamera::IsRange()
 	else return false;
 }
 
-void CCamera::SetAt(CPlayer* pPlayer)
+void CCamera::Pan()
+{
+	if (CInput::GetKeyPress(VK_LEFT)) {
+		m_SpinHorizontal -= m_RotateSpeed;
+	}
+	if (CInput::GetKeyPress(VK_RIGHT)) {
+		m_SpinHorizontal += m_RotateSpeed;
+	}
+
+	XMMATRIX rotationMtx;
+	rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
+	m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+	m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
+	m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+}
+
+void CCamera::Tilt()
+{
+	if (CInput::GetKeyPress(VK_UP)) {
+		m_SpinVerticall -= m_RotateSpeed;
+	}
+	if (CInput::GetKeyPress(VK_DOWN)) {
+		m_SpinVerticall += m_RotateSpeed;
+	}
+
+	XMMATRIX rotationMtx;
+	rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
+	m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+	m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+}
+
+void CCamera::Move()
+{
+	if (m_pAtObject != NULL)
+	{
+		m_At = Vector3(m_pAtObject->GetPosition()->x, m_pAtObject->GetPosition()->y + 2.0f, m_pAtObject->GetPosition()->z);
+	}
+	else
+	{
+		float speed = CAMERA_MOVE_SPEED * m_MoveSpeedScale;
+
+		if (CInput::GetKeyPress('W')) {
+			m_At.x += m_DirVec.front.x * speed;
+			m_At.y += m_DirVec.front.y * speed;
+			m_At.z += m_DirVec.front.z * speed;
+		}
+		if (CInput::GetKeyPress('A')) {
+			m_At.x -= m_DirVec.right.x * speed;
+			m_At.y -= m_DirVec.right.y * speed;
+			m_At.z -= m_DirVec.right.z * speed;
+		}
+		if (CInput::GetKeyPress('S')) {
+			m_At.x -= m_DirVec.front.x * speed;
+			m_At.y -= m_DirVec.front.y * speed;
+			m_At.z -= m_DirVec.front.z * speed;
+		}
+		if (CInput::GetKeyPress('D')) {
+			m_At.x += m_DirVec.right.x * speed;
+			m_At.y += m_DirVec.right.y * speed;
+			m_At.z += m_DirVec.right.z * speed;
+		}
+		if (CInput::GetKeyPress('Q')) {
+			m_At.y -= speed;
+		}
+		if (CInput::GetKeyPress('E')) {
+			m_At.y += speed;
+		}
+	}
+
+}
+
+void CCamera::SetAt(CGameObject* pPlayer)
 {
 	if (pPlayer) {
-		m_pPlayer = pPlayer;
+		m_pAtObject = pPlayer;
 		XMFLOAT3 front;
 		XMStoreFloat3(&front, m_DirVec.front);
 		front.x *= m_LengthToAt;
@@ -324,12 +305,12 @@ void CCamera::SetAt(CPlayer* pPlayer)
 		front.z *= m_LengthToAt;
 
 		// カメラの初期位置
-		m_Position.x = m_pPlayer->GetPosition().x - front.x;
-		m_Position.y = m_pPlayer->GetPosition().y - front.y;
-		m_Position.z = m_pPlayer->GetPosition().z - front.z;
+		m_Position.x = m_pAtObject->GetPosition()->x - front.x;
+		m_Position.y = m_pAtObject->GetPosition()->y - front.y;
+		m_Position.z = m_pAtObject->GetPosition()->z - front.z;
 	}
 	else {
-		m_pPlayer = NULL;
+		m_pAtObject = NULL;
 		XMFLOAT3 front;
 		XMStoreFloat3(&front, m_DirVec.front);
 		front.x *= m_LengthToAt;
