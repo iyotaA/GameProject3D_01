@@ -2,7 +2,7 @@
 #include "collision3D.h"
 
 // 分離軸に投影された軸成分から投影線分長を算出
-float CJudgeCollision3D::LenSegOnSeparateAxis(Vector3* Sep, Vector3* e1, Vector3* e2, Vector3* e3)
+float CCollision3DJudge::LenSegOnSeparateAxis(Vector3* Sep, Vector3* e1, Vector3* e2, Vector3* e3)
 {
 	XMVECTOR SEP, E1, E2, E3;
 
@@ -14,7 +14,7 @@ float CJudgeCollision3D::LenSegOnSeparateAxis(Vector3* Sep, Vector3* e1, Vector3
 	return r1 + r2 + r3;
 }
 // 球と球の衝突判定
-bool CJudgeCollision3D::Collision3D_Spher_Spher(CCollisionSphere* pSA, CCollisionSphere* pSB)
+bool CCollision3DJudge::Collision3D_Spher_Spher(CCollisionSphere* pSA, CCollisionSphere* pSB)
 {
 	// 球Aと球Bの差分を求める
 	XMFLOAT3 sub;
@@ -27,7 +27,7 @@ bool CJudgeCollision3D::Collision3D_Spher_Spher(CCollisionSphere* pSA, CCollisio
 }
 
 // 球と点の衝突判定
-bool CJudgeCollision3D::Collision3D_Spher_Point(CCollisionSphere* pSA, XMFLOAT3* pPB)
+bool CCollision3DJudge::Collision3D_Spher_Point(CCollisionSphere* pSA, XMFLOAT3* pPB)
 {
 	// 球Aと球Bの差分を求める
 	XMFLOAT3 sub;
@@ -38,7 +38,7 @@ bool CJudgeCollision3D::Collision3D_Spher_Point(CCollisionSphere* pSA, XMFLOAT3*
 	return sqrtf(sub.x * sub.x + sub.y * sub.y + sub.z * sub.z) <= pSA->GetRadius() ? true : false;
 }
 
-bool CJudgeCollision3D::Collision3D_OBB_OBB(CCollisionOBB& obb1, CCollisionOBB& obb2)
+bool CCollision3DJudge::Collision3D_OBB_OBB(CCollisionOBB& obb1, CCollisionOBB& obb2)
 {
 	// 各方向ベクトルの確保
 	// （N***:標準化方向ベクトル）

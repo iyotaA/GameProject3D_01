@@ -9,18 +9,19 @@ class CSkinModel;
 class CPlayer : public CGameObject
 {
 private:
-	const float m_defaultSpeed = 0.01f;
+	const float m_DefaultSpeed = 0.01f;
 
 	CCamera*          m_pCamera;
 	//CModel*         m_pModel;
 	CSkinModel*       m_pModel;
-	Dir3Vector        m_DirVec;
+	Vector3X3         m_DirVec;
 	CCollisionSphere* m_CollisionSphere;
 	CCollisionOBB*    m_CollisionOBB;
 	CDamage*          m_DamageManager;
 	CTexture*         m_Texture;
 	Vector3			  m_MoveDistance;
 	float             m_MoveSpeed;
+	bool			  m_Collision;
 
 	bool IsLanding();
 	void Move();

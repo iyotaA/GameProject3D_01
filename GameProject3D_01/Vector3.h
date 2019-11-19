@@ -1,3 +1,6 @@
+#ifndef VECTOR3_H_
+#define VECTOR3_H_
+
 
 using namespace DirectX;
 
@@ -14,29 +17,29 @@ using namespace DirectX;
 struct Vector3 : public XMFLOAT3 {
 
 	Vector3() = default;
-	Vector3(float x, float y, float z)
+	Vector3(float _x, float _y, float _z)
 	{
-		this->x = x; this->y = y; this->z = z;
+		this->x = _x; this->y = _y; this->z = _z;
 	}
 	//コンストラクタ
-	Vector3(const XMVECTOR& other) :XMFLOAT3() {
-		XMVECTOR temp = other;
+	Vector3(const XMVECTOR& _other) :XMFLOAT3() {
+		XMVECTOR temp = _other;
 		XMStoreFloat3(this, temp);
 	}
 
-	inline BOOL    operator == (const Vector3& r) const { return x == r.x && y == r.y && z == r.z; }
-	inline BOOL    operator != (const Vector3& r) const { return x != r.x || y != r.y || z != r.z; }
-	inline Vector3 operator *  (const float r) const { return Vector3(x * r, y * r, z * r); }
-	inline Vector3 operator /  (const float r) const { return Vector3(x / r, y / r, z / r); }
-	inline Vector3 operator +  (const Vector3 r) const { return Vector3(x + r.x, y + r.y, z + r.z); }
-	inline Vector3 operator -  (const Vector3 r) const { return Vector3(x - r.x, y - r.y, z - r.z); }
+	inline BOOL    operator == (const Vector3& _r) const { return x == _r.x && y == _r.y && z == _r.z; }
+	inline BOOL    operator != (const Vector3& _r) const { return x != _r.x || y != _r.y || z != _r.z; }
+	inline Vector3 operator *  (const float _r) const { return Vector3(x * _r, y * _r, z * _r); }
+	inline Vector3 operator /  (const float _r) const { return Vector3(x / _r, y / _r, z / _r); }
+	inline Vector3 operator +  (const Vector3 _r) const { return Vector3(x + _r.x, y + _r.y, z + _r.z); }
+	inline Vector3 operator -  (const Vector3 _r) const { return Vector3(x - _r.x, y - _r.y, z - _r.z); }
 
-	inline void	   operator *= (const float r) { this->x *= r; this->y *= r; this->z *= r; }
-	inline void	   operator /= (const float r) { this->x /= r; this->y /= r; this->z /= r; }
-	inline void    operator += (const Vector3 r) { this->x += r.x; this->y += r.y; this->z += r.z;}
-	inline void    operator -= (const Vector3 r) { this->x -= r.x; this->y -= r.y; this->z -= r.z;}
-	inline void    operator *= (const Vector3 r) { this->x *= r.x; this->y *= r.y; this->z *= r.z;}
-	inline void    operator /= (const Vector3 r) { this->x /= r.x; this->y /= r.y; this->z /= r.z;}
+	inline void	   operator *= (const float _r) { this->x *= _r; this->y *= _r; this->z *= _r; }
+	inline void	   operator /= (const float _r) { this->x /= _r; this->y /= _r; this->z /= _r; }
+	inline void    operator += (const Vector3 _r) { this->x += _r.x; this->y += _r.y; this->z += _r.z;}
+	inline void    operator -= (const Vector3 _r) { this->x -= _r.x; this->y -= _r.y; this->z -= _r.z;}
+	inline void    operator *= (const Vector3 _r) { this->x *= _r.x; this->y *= _r.y; this->z *= _r.z;}
+	inline void    operator /= (const Vector3 _r) { this->x /= _r.x; this->y /= _r.y; this->z /= _r.z;}
 
 	// ベクトルの内積
 	float VDot(Vector3 In) { return x * In.x + y * In.y + z * In.z; }
@@ -66,3 +69,51 @@ struct Vector3 : public XMFLOAT3 {
 		*this = XMVector3Normalize(XMVECTOR(*this));
 	}
 };
+
+struct Vector3X3
+{
+	Vector3 front, up, right;
+
+
+	//コンストラクタ
+	Vector3X3() = default;
+	Vector3X3(Vector3 _right, Vector3 _up, Vector3 _front)
+	{
+		 right = _right; up = _up; front = _front;
+	}
+
+	inline Vector3X3 operator +  (const Vector3X3 r) const { return Vector3X3(front + r.front, up + r.up, front + r.front); }
+	inline Vector3X3 operator -  (const Vector3X3 r) const { return Vector3X3(front - r.front, up - r.up, front - r.front); }
+
+	inline void    operator += (const Vector3X3 r) { right += r.right; up += r.up; front += r.front;}
+	inline void    operator -= (const Vector3X3 r) { right -= r.right; up -= r.up; front -= r.front;}
+	inline void    operator *= (const Vector3X3 r) { right *= r.right; up *= r.up; front *= r.front;}
+	inline void    operator /= (const Vector3X3 r) { right /= r.right; up /= r.up; front /= r.front;}
+
+	//長さ
+	float Length(int _id) const {
+		switch (_id)
+		{
+		case 0:
+			return right.Length();
+
+		case 1:
+			return up.Length();
+
+		case 2:
+			return front.Length();
+
+		default:
+			return -1;
+		}
+	}
+	//正規化
+	void NormalizeAll() {
+
+		right.Normalize();
+		up.Normalize();
+		front.Normalize();
+	}
+};
+
+#endif // !VECTOR3_H_

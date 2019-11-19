@@ -52,7 +52,8 @@ void CPlayer::Init()
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.5f);
 
 	m_MoveDistance = Vector3(0.0f, 0.0f, 0.0f);
-	m_MoveSpeed = 0.05f;
+	m_MoveSpeed = m_DefaultSpeed;
+	m_Collision = false;
 }
 
 void CPlayer::Uninit()
@@ -116,10 +117,54 @@ void CPlayer::Draw()
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
+
+
+	CCollisionSphere vector_sphere;
+	vector_sphere.SetRadius(0.3f);
+	vector_sphere.SetCenter(
+		&Vector3(
+			m_Position.x + m_DirVec.front.x,
+			m_Position.y + m_DirVec.front.y + 1.5f,
+			m_Position.z + m_DirVec.front.z
+		)
+	);
+
+	// vFront
+	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&vector_sphere, &color);
+
+	vector_sphere.SetCenter(
+		&Vector3(
+			m_Position.x + m_DirVec.up.x,
+			m_Position.y + m_DirVec.up.y + 1.5f,
+			m_Position.z + m_DirVec.up.z
+		)
+	);
+
+	// vUp
+	color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&vector_sphere, &color);
+
+	vector_sphere.SetCenter(
+		&Vector3(
+			m_Position.x + m_DirVec.right.x,
+			m_Position.y + m_DirVec.right.y + 1.5f,
+			m_Position.z + m_DirVec.right.z
+		)
+	);
+
+	// vRight
 	color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(&vector_sphere, &color);
+
+	// OBB
 	color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(m_CollisionOBB, &color);
+
+	CCollisionOBB obbCol;
+	obbCol.SetStatus(&Vector3(0.0f, 5.0f, 0.0f), &Vector3X3(Vector3(-1.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)), &Vector3(1.0f, 10.0f, 1.0f));
+	color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
+	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(&obbCol, &color);
 }
 
 
@@ -154,6 +199,7 @@ void CPlayer:: DrawGUI()
 			ImGui::Text("PosX = %.1f", m_Position.x);
 			ImGui::Text("PosY = %.1f", m_Position.y);
 			ImGui::Text("PosZ = %.1f", m_Position.z);
+			ImGui::Text(m_Collision ? "Collision" :"Through");
 			ImGui::EndChildFrame();
 		}
 
@@ -196,7 +242,7 @@ void CPlayer:: DrawGUI()
 void CPlayer::Move()
 {
 	// 前フレームのポジション
-	XMFLOAT3 prevPos = m_Position;
+	Vector3 prevPos = m_Position;
 
 	if (!m_pCamera->GetIsBindAtObject())return;
 
@@ -225,7 +271,17 @@ void CPlayer::Move()
 	m_MoveDistance += moveDistance * m_MoveSpeed;
 
 	m_Position += m_MoveDistance;
-	m_MoveDistance *= 0.85f;
+	m_MoveDistance *= 0.92f;
+
+	CCollisionOBB obbCol;
+	obbCol.SetStatus(&Vector3(0.0f, 5.0f, 0.0f), &Vector3X3(Vector3(-1.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)), &Vector3(1.0f, 10.0f, 1.0f));
+	if (CCollision3DJudge::Collision3D_OBB_OBB(*m_CollisionOBB, obbCol)) {
+		m_Collision = true;
+	}
+	else {
+		m_Collision = false;
+	}
+
 
 	XMFLOAT3 MovedDir;
 	MovedDir.x = m_Position.x - prevPos.x;
@@ -236,38 +292,43 @@ void CPlayer::Move()
 
 		m_Rotation.y = atan2f(MovedDir.x, MovedDir.z);
 
-		m_pModel->SetAnimation(2);
-		m_pModel->SetAnimationSpeed(1.0f + m_MoveSpeed * 35.0f);
+		Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
+		XMMATRIX rotationMtx;
+		rotationMtx = XMMatrixRotationY(m_Rotation.y);
 
-		m_MoveSpeed *= 1.02f;
+		front = XMVector3TransformNormal(front, rotationMtx);
+		front.Normalize();
+		m_DirVec.front = front;
+		m_DirVec.right = -m_DirVec.front.VCross(m_DirVec.up);
+		m_DirVec.right.Normalize();
+
+		m_pModel->SetAnimation(2);
+		m_pModel->SetAnimationSpeed(1.0f + m_MoveDistance.Length() * 7.0f);
+
 		if (m_MoveSpeed >= 0.02f) { m_MoveSpeed = 0.02f; }
 	}
 	else {
 
 		m_pModel->SetAnimation(0);
 		m_pModel->SetAnimationSpeed(1.0f);
-		m_MoveSpeed = m_defaultSpeed;
 	}
-
-	XMMATRIX rotationMtx;
-	rotationMtx = XMMatrixRotationY( m_Rotation.y);
-	m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
-	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
-	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
 
 
 	// コリジョン位置の更新
 	m_CollisionSphere->SetCenter(&m_Position);
 	m_DamageManager->GetCollisionSphere()->SetCenter(
 		&Vector3(
-			m_Position.x + m_DirVec.right.x * 2,
-			m_Position.y + m_DirVec.right.y * 2,
-			m_Position.z + m_DirVec.right.z * 2
+			m_Position.x + m_DirVec.front.x * 2,
+			m_Position.y + m_DirVec.front.y * 2,
+			m_Position.z + m_DirVec.front.z * 2
 		)
 	);
 
-	m_CollisionOBB->SetStatus(&m_Position, &m_DirVec, &Vector3(1.0f, 1.0f, 1.0f));
+	Vector3X3 obbColSize;
+	obbColSize.front = m_DirVec.front;
+	obbColSize.up = m_DirVec.up;
+	obbColSize.right = m_DirVec.right;
+	m_CollisionOBB->SetStatus(&Vector3(m_Position.x, m_Position.y + 1.0f, m_Position.z), &obbColSize, &Vector3(0.5f, 1.0f, 0.5f));
 
 
 	// 重力
@@ -301,7 +362,7 @@ void CPlayer::Action()
 			if (enemy != nullptr) {
 
 				// 当たり判定
-				if (CJudgeCollision3D::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
+				if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
 
 					CSound::Play(SOUND_LABEL_SE_HIT);
 					// ダメ―ジ判定

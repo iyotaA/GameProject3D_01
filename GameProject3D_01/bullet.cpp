@@ -46,7 +46,7 @@ void CBullet::Update()
 		if (enemy != nullptr) {
 
 			// “–‚½‚è”»’è
-			if (CJudgeCollision3D::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_CollisionSphere)) {
+			if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_CollisionSphere)) {
 
 				CSound::Play(SOUND_LABEL_SE_HIT);
 

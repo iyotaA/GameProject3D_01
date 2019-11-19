@@ -8,7 +8,7 @@ class CBullet : public CGameObject
 {
 private:
 	CModel* m_pModel;
-	Dir3Vector m_Direction;
+	Vector3X3 m_Direction;
 	CCollisionSphere* m_CollisionSphere;
 
 public:
@@ -18,7 +18,7 @@ public:
 	void Update();
 	void Draw();
 
-	void SetDirection(Dir3Vector* direction) { m_Direction = *direction; }
+	void SetDirection(Vector3X3* direction) { m_Direction = *direction; }
 };
 
 #endif // !BULLET_H_

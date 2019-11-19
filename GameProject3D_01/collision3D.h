@@ -22,11 +22,11 @@ class CCollisionOBB
 {
 private:
 	Vector3    m_Pos;              // 位置
-	Dir3Vector m_NormaDirect;   // 方向ベクトル
+	Vector3X3  m_NormaDirect;	   // 方向ベクトル
 	Vector3    m_fLength;          // 各軸方向の長さ
 
 public:
-	CCollisionOBB(Vector3 _pos, Dir3Vector _vec3, Vector3 _len):
+	CCollisionOBB(Vector3 _pos, Vector3X3 _vec3, Vector3 _len):
 		m_Pos(_pos),
 		m_NormaDirect(_vec3),
 		m_fLength(_len){}
@@ -36,7 +36,7 @@ public:
 		m_NormaDirect(),
 		m_fLength() {}
 
-	void SetStatus(Vector3* _pos, Dir3Vector* _vec3, Vector3* _len)
+	void SetStatus(Vector3* _pos, Vector3X3* _vec3, Vector3* _len)
 	{
 		m_Pos = *_pos;
 		m_NormaDirect.front = _vec3->front;
@@ -49,11 +49,11 @@ public:
 	Vector3 GetDirect(int elem) {
 
 		if (elem == 0)
-			return m_NormaDirect.front;
-		else if (elem == 1)
 			return m_NormaDirect.right;
-		else if (elem == 2)
+		else if (elem == 1)
 			return m_NormaDirect.up;
+		else if (elem == 2)
+			return m_NormaDirect.front;
 		else
 			assert(false);
 			return Vector3(0.0f, 0.0f, 0.0f);
@@ -71,7 +71,7 @@ public:
 //	・球 と 球
 //	・球 と 点
 /////////////////////////////////////////////////////////////////
-class CJudgeCollision3D
+class CCollision3DJudge
 {
 private:
 	// 分離軸に投影された軸成分から投影線分長を算出

@@ -37,6 +37,9 @@
     <Filter Include="ヘッダー ファイル\System\imgui">
       <UniqueIdentifier>{9050f863-2935-4909-a87d-0afc28ddbb1e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\MyTypeClass">
+      <UniqueIdentifier>{ca17c882-461e-40af-8b90-59883c29fa96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp">
@@ -266,11 +269,11 @@
     <ClInclude Include="game_objects_all.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="stl.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>ソース ファイル\MyTypeClass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
