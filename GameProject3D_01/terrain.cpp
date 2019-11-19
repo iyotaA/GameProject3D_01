@@ -17,9 +17,6 @@ void CTerrain::Init()
 	assert(result);
 
 	// テクスチャ読み込み //////
-
-	unordered_map<int ,string> fileNames;
-
 	m_Texture = new CTexture*[m_TextureNum];
 	m_Texture[0] = new CTexture();
 	m_Texture[1] = new CTexture();

@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <vector>
 #include "Vector3.h"
+
 using namespace DirectX;
 using namespace std;
 
@@ -32,14 +33,6 @@ using namespace std;
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "winmm.lib")
 #pragma comment (lib, "xaudio2.lib")
-
-// •ûŒüƒxƒNƒgƒ‹
-struct Dir3Vector
-{
-	Vector3 front;
-	Vector3 right;
-	Vector3 up;
-};
 
 HWND GetWindow();
 void DrawFPS();
