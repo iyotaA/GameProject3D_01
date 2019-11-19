@@ -24,10 +24,19 @@ struct Vector3 : public XMFLOAT3 {
 		XMStoreFloat3(this, temp);
 	}
 
-	inline BOOL operator == (const Vector3& r) const { return x == r.x && y == r.y && z == r.z; }
-	inline BOOL operator != (const Vector3& r) const { return x != r.x || y != r.y || z != r.z; }
-	inline Vector3 operator *(const float r) const { return Vector3(x * r, y * r, z * r); }
-	inline Vector3 operator /(const float r) const { return Vector3(x / r, y / r, z / r); }
+	inline BOOL    operator == (const Vector3& r) const { return x == r.x && y == r.y && z == r.z; }
+	inline BOOL    operator != (const Vector3& r) const { return x != r.x || y != r.y || z != r.z; }
+	inline Vector3 operator *  (const float r) const { return Vector3(x * r, y * r, z * r); }
+	inline Vector3 operator /  (const float r) const { return Vector3(x / r, y / r, z / r); }
+	inline Vector3 operator +  (const Vector3 r) const { return Vector3(x + r.x, y + r.y, z + r.z); }
+	inline Vector3 operator -  (const Vector3 r) const { return Vector3(x - r.x, y - r.y, z - r.z); }
+
+	inline void	   operator *= (const float r) { this->x *= r; this->y *= r; this->z *= r; }
+	inline void	   operator /= (const float r) { this->x /= r; this->y /= r; this->z /= r; }
+	inline void    operator += (const Vector3 r) { this->x += r.x; this->y += r.y; this->z += r.z;}
+	inline void    operator -= (const Vector3 r) { this->x -= r.x; this->y -= r.y; this->z -= r.z;}
+	inline void    operator *= (const Vector3 r) { this->x *= r.x; this->y *= r.y; this->z *= r.z;}
+	inline void    operator /= (const Vector3 r) { this->x /= r.x; this->y /= r.y; this->z /= r.z;}
 
 	// ƒxƒNƒgƒ‹‚Ì“àÏ
 	float VDot(Vector3 In) { return x * In.x + y * In.y + z * In.z; }

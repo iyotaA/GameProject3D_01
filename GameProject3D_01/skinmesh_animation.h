@@ -1,7 +1,6 @@
 #ifndef SKINMESH_ANIMATION_H_
 #define SKINMESH_ANIMATION_H_
 
-using namespace std;
 class MESH;
 
 typedef enum {
@@ -41,20 +40,21 @@ struct BONE
 class CSkinModel
 {
 private:
-	MESH* m_Mesh = nullptr;
-	const aiScene* m_pScene = nullptr;	// パーシング後のデータ格納用
-	float			m_Size;
-	FileType		m_FileType;
 	std::unordered_map<std::string, CTexture*>	m_Texture;
-	//std::vector<BONE> m_Bone;	// こっちのほうが良い
-	std::unordered_map<std::string, BONE> m_Bone;
-	std::vector<DEFORM_VERTEX>* m_pDeformVertex = nullptr;
+	std::unordered_map<std::string, BONE>		m_Bone;
+	std::vector<DEFORM_VERTEX>*					m_pDeformVertex = nullptr;
+	const aiScene*								m_pScene = nullptr;	// パーシング後のデータ格納用
+	MESH*    m_Mesh = nullptr;
+	FileType m_FileType;
+	float    m_AnimationFrame = 0.0f;
+	float    m_Size;
 
-	int m_MotionFrame = 0;
+	int  m_MotionFrame = 0;
 	bool m_IsStopMotion = false;
-	bool m_IsFrameMode = false;
+	bool m_DrawAtLine = false;
 	bool m_IsDrawNormals = false;
 	char m_CurrentAnimId = 0;
+	float m_AnimationSpeed = 1.0f;
 
 	void DrawMesh(const aiNode* pNode);
 	void LoadMesh(const aiNode* pNode);
@@ -66,14 +66,13 @@ public:
 	void Load(char* pFileName, float size);
 	void Unload();
 	void Draw(XMMATRIX* world);
-	void Animation(int frame);
+	void Animation(int addAnimationFrame);
 
 	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
-	void FrameMode(bool IsFrameMode) { m_IsFrameMode = IsFrameMode; }
 	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }
 
 	// 引数 / _next : true = Next / _next : false = Back
-	void SetAnimIdNext(bool _next) {
+	void SetAnimation(bool _next) {
 
 		m_CurrentAnimId += _next ? 1: -1;
 
@@ -85,12 +84,16 @@ public:
 		}
 	}
 
+	void SetAnimation(int _id) { m_CurrentAnimId = _id; }
 	char GetCurrentAnimId() { return m_CurrentAnimId; }
-	char* GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
 	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
+	void SetAnimationSpeed(float _speed) { m_AnimationSpeed = _speed; }
 
-	bool* IsStopMotion() { return &m_IsStopMotion; }
+	float* AnimationSpeed() { return &m_AnimationSpeed; }
 	int* MotionFrame() { return &m_MotionFrame; }
+	char* GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
+	bool* IsStopMotion() { return &m_IsStopMotion; }
+	bool* DrawAtLine() { return &m_DrawAtLine; }
 };
 
 

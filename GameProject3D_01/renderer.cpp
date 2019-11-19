@@ -8,16 +8,16 @@
 
 // グローバル変数 ////////////////////////////////////
 D3D_FEATURE_LEVEL        CRenderer::m_FeatureLevel     = D3D_FEATURE_LEVEL_11_0;
-						 
+
 ID3D11Device*            CRenderer::m_D3DDevice        = NULL;
 ID3D11DeviceContext*     CRenderer::m_ImmediateContext = NULL;
 IDXGISwapChain*          CRenderer::m_SwapChain        = NULL;
 ID3D11RenderTargetView*  CRenderer::m_RenderTargetView = NULL;
 ID3D11DepthStencilView*  CRenderer::m_DepthStencilView = NULL;
-						 
-						 
+
+
 ID3D11VertexShader*      CRenderer::m_VertexShader     = NULL;
-ID3D11PixelShader*       CRenderer::m_PixelShader      = NULL;
+ID3D11PixelShader**       CRenderer::m_PixelShader      = NULL;
 ID3D11InputLayout*       CRenderer::m_VertexLayout     = NULL;
 ID3D11Buffer*			 CRenderer::m_WorldBuffer      = NULL;
 ID3D11Buffer*			 CRenderer::m_ViewBuffer       = NULL;
@@ -206,7 +206,7 @@ void CRenderer::Init()
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 		UINT numElements = ARRAYSIZE(layout);
 
@@ -223,6 +223,8 @@ void CRenderer::Init()
 
 	// ピクセルシェーダ生成
 	{
+		m_PixelShader = new ID3D11PixelShader*[SHADER_PS_MAX];
+
 		FILE* file;
 		long int fsize;
 
@@ -232,9 +234,21 @@ void CRenderer::Init()
 		fread(buffer, fsize, 1, file);
 		fclose(file);
 
-		m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader);
+		m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader[SHADER_PS_DEFOULT]);
 
 		delete[] buffer;
+
+		file = fopen("pixelShader_MultiTex.cso", "rb");
+		fsize = _filelength(_fileno(file));
+
+		buffer = new unsigned char[fsize];
+		fread(buffer, fsize, 1, file);
+		fclose(file);
+
+		m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader[SHADER_PS_MULTI_TEX]);
+
+		delete[] buffer;
+
 	}
 
 
@@ -277,7 +291,7 @@ void CRenderer::Init()
 
 	// シェーダ設定
 	m_ImmediateContext->VSSetShader( m_VertexShader, NULL, 0 );
-	m_ImmediateContext->PSSetShader( m_PixelShader, NULL, 0 );
+	m_ImmediateContext->PSSetShader( m_PixelShader[SHADER_PS_DEFOULT], NULL, 0 );
 
 
 	// ライト初期化
@@ -309,7 +323,8 @@ void CRenderer::Uninit()
 	if( m_MaterialBuffer )		m_MaterialBuffer->Release();
 	if( m_VertexLayout )		m_VertexLayout->Release();
 	if( m_VertexShader )		m_VertexShader->Release();
-	if( m_PixelShader )			m_PixelShader->Release();
+	if( m_PixelShader[0] )		m_PixelShader[0]->Release();
+	if( m_PixelShader[1] )		m_PixelShader[1]->Release();
 
 	if( m_ImmediateContext )	m_ImmediateContext->ClearState();
 	if( m_RenderTargetView )	m_RenderTargetView->Release();
@@ -397,6 +412,13 @@ void CRenderer::SetMaterial( MATERIAL Material )
 
 }
 
+void CRenderer::SetShaderPS(int elem)
+{
+
+	// シェーダ設定
+	m_ImmediateContext->PSSetShader(m_PixelShader[elem], NULL, 0);
+}
+
 void CRenderer::SetLight(LIGHT Light)
 {
 
@@ -433,6 +455,29 @@ void CRenderer::SetTexture( CTexture* Texture )
 
 }
 
+void CRenderer::SetTexture(CTexture* Texture, unsigned int Slot)
+{
+
+	ID3D11ShaderResourceView* srv[1] = { Texture->GetShaderResourceView() };
+	m_ImmediateContext->PSSetShaderResources(Slot, 1, srv);
+
+}
+
+void CRenderer::SetTexture(CTexture** Texture, unsigned int Slot, unsigned int NumTextures)
+{
+
+	ID3D11ShaderResourceView** srv = new ID3D11ShaderResourceView * [NumTextures];
+
+	for (int i = 0; i < NumTextures; i++) {
+
+		srv[i] = Texture[i]->GetShaderResourceView();
+	}
+
+	m_ImmediateContext->PSSetShaderResources(0, NumTextures, srv);
+
+	delete[] srv;
+
+}
 
 void CRenderer::DrawIndexed( unsigned int IndexCount, unsigned int StartIndexLocation, int BaseVertexLocation )
 {

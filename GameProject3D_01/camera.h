@@ -21,6 +21,7 @@ private:
 	float		m_SpinHorizontal;
 	float		m_RotateSpeed;
 	float		m_MoveSpeedScale;
+	bool		m_BindAtObject;
 
 	bool IsRange();
 	void Pan();
@@ -36,6 +37,7 @@ public:
 
 	Dir3Vector* GetDir3Vector() { return &m_DirVec; }
 	bool GetVisivility(XMFLOAT3* position);
+	bool GetIsBindAtObject(){ return m_BindAtObject; }
 
 	void SetAt(CGameObject* pPlayer);
 };

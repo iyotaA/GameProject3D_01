@@ -35,8 +35,8 @@ void CDebugPrimitive::DebugPrimitive_Uninit(void)
 	SAFE_RELEASE(m_VertexBufer);
 	SAFE_RELEASE(m_IndexBufer);
 
-	m_Vertices.clear();
-	m_Indices.clear();
+	if (!m_Vertices.empty()) { m_Vertices.clear(); }
+	if (!m_Indices.empty()) { m_Indices.clear(); }
 }
 
 void CDebugPrimitive::DebugPrimitive_BatchBegin(void)
@@ -51,9 +51,6 @@ void CDebugPrimitive::DebugPrimitive_BatchBegin(void)
 
 void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 {
-	//ImGui Render
-	DrawGUI();
-
 	//表示する時のみ
 	if (!m_IsDisplayed)return;
 
@@ -69,7 +66,10 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 		D3D11_SUBRESOURCE_DATA sd;
 		ZeroMemory(&sd, sizeof(sd));
 		sd.pSysMem = m_Vertices.data();
+
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_VertexBufer);
+
+		assert(m_VertexBufer =! NULL);
 	}
 
 	// インデックスバッファ生成 //////
@@ -85,6 +85,8 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 		ZeroMemory(&sd, sizeof(sd));
 		sd.pSysMem = m_Indices.data();
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_IndexBufer);
+
+		assert(m_IndexBufer = !NULL);
 	}
 
 	XMMATRIX world;
@@ -206,7 +208,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 
 	Vector3 vFront, vRigth, vUp, length3, center;
 
-	vFront  = Vector3(0.0f, 1.0f, 0.0f);
+	vFront  = _cube->GetDirect(0);
 	vRigth  = _cube->GetDirect(1);
 	vUp     = _cube->GetDirect(2);
 	length3 = _cube->GetLen_W();
@@ -219,28 +221,28 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 	// 後面
 	//////////////////////////////////////////////
 	// 0
-	vertex.Position = center + (-vFront * length3.z) + (-vRigth * length3.x) + (vUp * length3.y);
+	vertex.Position = Vector3(-1.0f, 20.0f, -1.0f);
 	vertex.Normal   = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse  = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	// 1
-	vertex.Position = center + (-vFront * length3.z) + (vRigth * length3.x) + (vUp * length3.y);
+	vertex.Position = Vector3(1.0f, 20.0f, -1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	// 2
-	vertex.Position = center + (-vFront * length3.z) + (-vRigth * length3.x) + (-vUp * length3.y);
+	vertex.Position = Vector3(-1.0f, 18.0f, -1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	// 3
-	vertex.Position = center + (-vFront * length3.z) + (vRigth * length3.x)+(-vUp * length3.y);
+	vertex.Position = Vector3(1.0f, 18.0f, -1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
@@ -250,56 +252,65 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 	// 前面
 	//////////////////////////////////////////////
 	// 4
-	vertex.Position = center + (vFront * length3.z) + (-vRigth * length3.x) + (vUp * length3.y);
+	vertex.Position = Vector3(-1.0f, 20.0f, 1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	// 5
-	vertex.Position = center + (vFront * length3.z) + (vRigth * length3.x) + (vUp * length3.y);
+	vertex.Position = Vector3(1.0f, 20.0f, 1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	// 6
-	vertex.Position = center + (vFront * length3.z) + (-vRigth * length3.x) + (-vUp * length3.y);
+	vertex.Position = Vector3(-1.0f, 18.0f, 1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	// 7
-	vertex.Position = center + (vFront * length3.z) + (vRigth * length3.x)+(-vUp * length3.y);
+	vertex.Position = Vector3(1.0f, 18.0f, 1.0f);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
 	vertex.Diffuse = *_color;
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
 	int n = (m_CubeCount + m_CircleCount) * CIRCLE_VERTEX_COUNT;
+
 	m_Indices.push_back(n);
 	m_Indices.push_back(n + 1);
+
 	m_Indices.push_back(n + 1);
 	m_Indices.push_back(n + 2);
+
 	m_Indices.push_back(n + 2);
 	m_Indices.push_back(n + 3);
+
 	m_Indices.push_back(n + 3);
 	m_Indices.push_back(n);
 
 	m_Indices.push_back(n + 4);
 	m_Indices.push_back(n + 5);
+
 	m_Indices.push_back(n + 5);
 	m_Indices.push_back(n + 6);
+
 	m_Indices.push_back(n + 6);
 	m_Indices.push_back(n + 7);
+
 	m_Indices.push_back(n + 7);
 	m_Indices.push_back(n + 4);
 
 	m_Indices.push_back(n + 5);
 	m_Indices.push_back(n + 1);
+
 	m_Indices.push_back(n + 6);
 	m_Indices.push_back(n + 2);
+
 	m_Indices.push_back(n + 7);
 	m_Indices.push_back(n + 3);
 

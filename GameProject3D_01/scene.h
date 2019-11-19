@@ -113,6 +113,8 @@ public:
 	// 全てのゲームオブジェクトの描画
 	virtual void Draw()
 	{
+		CDebugPrimitive::DrawGUI();
+
 		// コリジョングリッド準備
 		CDebugPrimitive::DebugPrimitive_BatchBegin();
 

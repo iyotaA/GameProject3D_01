@@ -48,6 +48,7 @@ void CCamera::Init()
 	m_SpinHorizontal = 0.0f;
 	m_RotateSpeed    = 0.004f;
 	m_MoveSpeedScale = 1.0f;
+	m_BindAtObject = true;
 }
 
 
@@ -131,7 +132,6 @@ void CCamera::Draw()
 	//	);
 	//}
 
-	// XMFLOAT3 -> XMVECTOR
 	Vector3 position  = m_Position;
 
 	// ビューマトリクス設定
@@ -180,6 +180,7 @@ void CCamera::DrawGUI()
 			ImGui::SliderFloat("LengthToAt", &m_LengthToAt, 1.0f, 200.0f);
 			ImGui::SliderFloat("RotateSpeed", &m_RotateSpeed, 0.001f, 0.01f);
 			ImGui::SliderFloat("MoveSpeed", &m_MoveSpeedScale, 1.0f, 20.0f);
+			ImGui::Checkbox("BindAt", &m_BindAtObject);
 		}
 
 		ImGui::Spacing();
@@ -258,40 +259,40 @@ void CCamera::Move()
 {
 	if (m_pAtObject != NULL)
 	{
-		m_At = Vector3(m_pAtObject->GetPosition()->x, m_pAtObject->GetPosition()->y + 2.0f, m_pAtObject->GetPosition()->z);
-	}
-	else
-	{
-		float speed = CAMERA_MOVE_SPEED * m_MoveSpeedScale;
-
-		if (CInput::GetKeyPress('W')) {
-			m_At.x += m_DirVec.front.x * speed;
-			m_At.y += m_DirVec.front.y * speed;
-			m_At.z += m_DirVec.front.z * speed;
-		}
-		if (CInput::GetKeyPress('A')) {
-			m_At.x -= m_DirVec.right.x * speed;
-			m_At.y -= m_DirVec.right.y * speed;
-			m_At.z -= m_DirVec.right.z * speed;
-		}
-		if (CInput::GetKeyPress('S')) {
-			m_At.x -= m_DirVec.front.x * speed;
-			m_At.y -= m_DirVec.front.y * speed;
-			m_At.z -= m_DirVec.front.z * speed;
-		}
-		if (CInput::GetKeyPress('D')) {
-			m_At.x += m_DirVec.right.x * speed;
-			m_At.y += m_DirVec.right.y * speed;
-			m_At.z += m_DirVec.right.z * speed;
-		}
-		if (CInput::GetKeyPress('Q')) {
-			m_At.y -= speed;
-		}
-		if (CInput::GetKeyPress('E')) {
-			m_At.y += speed;
+		if (m_BindAtObject) {
+			m_At = Vector3(m_pAtObject->GetPosition()->x, m_pAtObject->GetPosition()->y + 2.0f, m_pAtObject->GetPosition()->z);
+			return;
 		}
 	}
 
+	float speed = CAMERA_MOVE_SPEED * m_MoveSpeedScale;
+
+	if (CInput::GetKeyPress('W')) {
+		m_At.x += m_DirVec.front.x * speed;
+		m_At.y += m_DirVec.front.y * speed;
+		m_At.z += m_DirVec.front.z * speed;
+	}
+	if (CInput::GetKeyPress('A')) {
+		m_At.x -= m_DirVec.right.x * speed;
+		m_At.y -= m_DirVec.right.y * speed;
+		m_At.z -= m_DirVec.right.z * speed;
+	}
+	if (CInput::GetKeyPress('S')) {
+		m_At.x -= m_DirVec.front.x * speed;
+		m_At.y -= m_DirVec.front.y * speed;
+		m_At.z -= m_DirVec.front.z * speed;
+	}
+	if (CInput::GetKeyPress('D')) {
+		m_At.x += m_DirVec.right.x * speed;
+		m_At.y += m_DirVec.right.y * speed;
+		m_At.z += m_DirVec.right.z * speed;
+	}
+	if (CInput::GetKeyPress('Q')) {
+		m_At.y -= speed;
+	}
+	if (CInput::GetKeyPress('E')) {
+		m_At.y += speed;
+	}
 }
 
 void CCamera::SetAt(CGameObject* pPlayer)

@@ -183,6 +183,7 @@ void CTexture::LoadSTB(const char *FileName)
 	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	SRVDesc.Texture2D.MipLevels = 1;
 
+
 	hr = CRenderer::GetDevice()->CreateShaderResourceView(m_Texture, &SRVDesc, &m_ShaderResourceView);
 	if (FAILED(hr))
 	{

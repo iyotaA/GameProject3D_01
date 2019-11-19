@@ -280,5 +280,8 @@
     <FxCompile Include="vertexShader.hlsl">
       <Filter>ソース ファイル\Shader</Filter>
     </FxCompile>
+    <FxCompile Include="pixelShader_MultiTex.hlsl">
+      <Filter>ソース ファイル\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
