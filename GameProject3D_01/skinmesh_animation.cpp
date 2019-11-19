@@ -9,11 +9,6 @@
 #include <assimp/postprocess.h>
 #include <assimp/matrix4x4.h>
 
-#include <iostream>
-#include <fstream>
-#include <math.h>
-#include <unordered_map>
-#include <vector>
 #include "main.h"
 #include "renderer.h"
 #include "input.h"
@@ -321,12 +316,19 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		//// テクスチャ読み込み //////
 		//assert(m_Texture[pNode->mName.C_Str()]);
 		//m_Texture[pNode->mName.C_Str()]->LoadSTB(path.C_Str());
-		//CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
+		CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
 
-		CRenderer::SetVertexBuffers(m_Mesh[mesh_index].VertexBuffer);
-		CRenderer::SetIndexBuffer(m_Mesh[mesh_index].IndexBuffer);
-		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		CRenderer::DrawIndexed(m_Mesh[mesh_index].IndexNum, 0, 0);
+		CRenderer::SetVertexBuffers( m_Mesh[mesh_index].VertexBuffer );
+		CRenderer::SetIndexBuffer( m_Mesh[mesh_index].IndexBuffer );
+		if (m_DrawAtLine) {
+			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		}
+		else {
+			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		}
+		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
+		//CRenderer::GetDeviceContext()->DrawIndexedInstanced(m_Mesh[mesh_index].IndexNum, 100, 0, 0, 0);
+		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
 	}
 
 
@@ -341,6 +343,7 @@ void CSkinModel::CreateBone(aiNode* pNode)
 	BONE bone;
 	m_Bone[pNode->mName.C_Str()] = bone; // 何も初期化されていないゴミデータを入れることで"器"を作っておく
 	m_Texture[pNode->mName.C_Str()] = new CTexture();
+	m_Texture[pNode->mName.C_Str()]->LoadSTB("asset/image/field_dart1.png");
 
 	for (int i = 0; i < pNode->mNumChildren; i++) {
 		CreateBone(pNode->mChildren[i]);
@@ -349,6 +352,8 @@ void CSkinModel::CreateBone(aiNode* pNode)
 
 void CSkinModel::Animation(int frame)
 {
+	m_AnimationFrame += frame * m_AnimationSpeed;
+
 	// アニメーションデータを持っているか
 	if (m_pScene->HasAnimations()) {
 
@@ -365,7 +370,7 @@ void CSkinModel::Animation(int frame)
 			aiVector3D pos;
 
 			// 現在フレームのアニメーション行列の回転・平行移動成分を取得
-			int CurrentFrame = m_IsStopMotion ? (int)pAnimation->mDuration * (m_MotionFrame / 100.0f) : frame;
+			int CurrentFrame = m_IsStopMotion ? (int)pAnimation->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_AnimationFrame);
 			rot = pNodeAnim->mRotationKeys[CurrentFrame % pNodeAnim->mNumRotationKeys].mValue;
 			pos = pNodeAnim->mPositionKeys[CurrentFrame % pNodeAnim->mNumPositionKeys].mValue;
 

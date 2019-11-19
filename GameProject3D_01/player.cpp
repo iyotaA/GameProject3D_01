@@ -9,9 +9,8 @@
 #include "skinmesh_animation.h"
 
 #define Glavity (-0.098f)
-#define Mass	(3.0f)
+#define Mass	(10.0f)
 
-static int f = 0;
 static double t = 0.0;
 
 void CPlayer::Init()
@@ -51,6 +50,9 @@ void CPlayer::Init()
 	// ダメージ関連ステータスの初期化
 	m_DamageManager = new CDamage(100, 15);
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.5f);
+
+	m_MoveDistance = Vector3(0.0f, 0.0f, 0.0f);
+	m_MoveSpeed = 0.05f;
 }
 
 void CPlayer::Uninit()
@@ -68,97 +70,23 @@ void CPlayer::Uninit()
 
 void CPlayer::Update()
 {
-	XMFLOAT3 prevPos = m_Position;
-	XMFLOAT3 cameraFront = m_pCamera->GetDir3Vector()->front;
-	XMFLOAT3 cameraRight = m_pCamera->GetDir3Vector()->right;
+	// 移動
+	Move();
 
-	if (CInput::GetKeyPress(VK_RSHIFT))
-	{
-		if (CInput::GetKeyPress('W')) {
-			m_Position.x += cameraFront.x * 0.05f;
-			m_Position.z += cameraFront.z * 0.05f;
-		}
-		if (CInput::GetKeyPress('A')) {
-			m_Position.x -= cameraRight.x * 0.05f;
-			m_Position.z -= cameraRight.z * 0.05f;
-		}
-		if (CInput::GetKeyPress('S')) {
-			m_Position.x -= cameraFront.x * 0.05f;
-			m_Position.z -= cameraFront.z * 0.05f;
-		}
-		if (CInput::GetKeyPress('D')) {
-			m_Position.x += cameraRight.x * 0.05f;
-			m_Position.z += cameraRight.z * 0.05f;
-		}
-	}
+	// 行動
+	Action();
 
-	if (CInput::GetKeyTrigger(VK_SPACE)) {
-
-		CSound::Play(SOUND_LABEL_SE_ATTACK);
-
-		std::vector<CEnemy*> enemys;
-		enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
-
-		// 敵と攻撃範囲の当たり判定
-		for (CEnemy* enemy : enemys) {
-			if (enemy != nullptr) {
-
-				// 当たり判定
-				if (CJudgeCollision3D::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
-
-					CSound::Play(SOUND_LABEL_SE_HIT);
-					// ダメ―ジ判定
-					m_DamageManager->DoDamage(enemy->GetDamageManager());
-				}
-			}
-		}
-	}
-
-	XMFLOAT3 FrontDir;
-	FrontDir.x = m_Position.x - prevPos.x;
-	FrontDir.y = 0.0f;
-	FrontDir.z = m_Position.z - prevPos.z;
-
-	if ((fabs(FrontDir.x) > 0.001f) || (fabs(FrontDir.z) > 0.001f)) {
-		m_Rotation.y = atan2f(FrontDir.x, FrontDir.z);
-	}
-
-	XMMATRIX rotationMtx;
-	rotationMtx = XMMatrixRotationAxis(m_DirVec.up, m_Rotation.y);
-	m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
-	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
-	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
 
 	//if (m_Position.x + m_CollisionSphere->GetRadius() > 15.0) m_Position.x = 15.0f - m_CollisionSphere->GetRadius();
 	//if (m_Position.x - m_CollisionSphere->GetRadius() < -15.0) m_Position.x = -15.0f + m_CollisionSphere->GetRadius();
 	//if (m_Position.z + m_CollisionSphere->GetRadius() > 15.0) m_Position.z = 15.0f - m_CollisionSphere->GetRadius();
 	//if (m_Position.z - m_CollisionSphere->GetRadius() < -15.0) m_Position.z = -15.0f + m_CollisionSphere->GetRadius();
 
-	// コリジョン位置の更新
-	m_CollisionSphere->SetCenter(&m_Position);
-	m_DamageManager->GetCollisionSphere()->SetCenter(&Vector3(m_Position.x + FrontDir.x * 2, m_Position.y + FrontDir.y * 2, m_Position.z + FrontDir.z * 2));
 
-	m_CollisionOBB->SetStatus(&m_Position, &m_DirVec, &Vector3(1.0f, 1.0f, 1.0f));
-
-	// 重力
-	float move_y = Glavity * Mass * t * t * 0.5f;
-	m_Position.y += move_y;
-
-	// 地形との衝突判定
-	bool landing = IsLanding();
-	if (landing) {
-		t = 0.0f;
-	}
-	else {
-		t += DELTA_TIME;
-	}
 
 	// モデル更新
-	m_pModel->Animation(f++);
+	m_pModel->Animation(1);
 
-	// 最下層
-	if (m_Position.y < -20.0f) { m_Position.y = -20.0f; }
 }
 
 void CPlayer::Draw()
@@ -190,7 +118,7 @@ void CPlayer::Draw()
 	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
 	color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
-	color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+	color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(m_CollisionOBB, &color);
 }
 
@@ -241,9 +169,13 @@ void CPlayer:: DrawGUI()
 
 			ImGui::BeginChildFrame(Window_Animation_Id, ImVec2(width, 100));
 			{
-				if (ImGui::Button("<")) { m_pModel->SetAnimIdNext(false); }ImGui::SameLine();
+				if (ImGui::Button("<")) { m_pModel->SetAnimation(false); }ImGui::SameLine();
 				ImGui::Text(m_pModel->GetCurrentAnimName()); ImGui::SameLine();
-				if (ImGui::Button(">")) { m_pModel->SetAnimIdNext(true); }
+				if (ImGui::Button(">")) { m_pModel->SetAnimation(true); }
+
+				ImGui::SliderFloat("Speed", m_pModel->AnimationSpeed(), 0.01f, 10.0f);
+
+				ImGui::Checkbox("DrawAtLine", m_pModel->DrawAtLine());
 
 				ImGui::Checkbox("Stop", m_pModel->IsStopMotion());
 
@@ -259,6 +191,125 @@ void CPlayer:: DrawGUI()
 	}
 
 	ImGui::End();
+}
+
+void CPlayer::Move()
+{
+	// 前フレームのポジション
+	XMFLOAT3 prevPos = m_Position;
+
+	if (!m_pCamera->GetIsBindAtObject())return;
+
+	Vector3 cameraFront = m_pCamera->GetDir3Vector()->front;
+	Vector3 cameraRight = m_pCamera->GetDir3Vector()->right;
+	Vector3 moveDistance = Vector3(0.0f, 0.0f, 0.0f);
+
+	if (CInput::GetKeyPress('W')) {
+		moveDistance.x += cameraFront.x;
+		moveDistance.z += cameraFront.z;
+	}
+	if (CInput::GetKeyPress('A')) {
+		moveDistance.x -= cameraRight.x;
+		moveDistance.z -= cameraRight.z;
+	}
+	if (CInput::GetKeyPress('S')) {
+		moveDistance.x -= cameraFront.x;
+		moveDistance.z -= cameraFront.z;
+	}
+	if (CInput::GetKeyPress('D')) {
+		moveDistance.x += cameraRight.x;
+		moveDistance.z += cameraRight.z;
+	}
+
+	moveDistance.Normalize();
+	m_MoveDistance += moveDistance * m_MoveSpeed;
+
+	m_Position += m_MoveDistance;
+	m_MoveDistance *= 0.85f;
+
+	XMFLOAT3 MovedDir;
+	MovedDir.x = m_Position.x - prevPos.x;
+	MovedDir.y = 0.0f;
+	MovedDir.z = m_Position.z - prevPos.z;
+
+	if ((fabs(MovedDir.x) > 0.001f) || (fabs(MovedDir.z) > 0.001f)) {
+
+		m_Rotation.y = atan2f(MovedDir.x, MovedDir.z);
+
+		m_pModel->SetAnimation(2);
+		m_pModel->SetAnimationSpeed(1.0f + m_MoveSpeed * 35.0f);
+
+		m_MoveSpeed *= 1.02f;
+		if (m_MoveSpeed >= 0.02f) { m_MoveSpeed = 0.02f; }
+	}
+	else {
+
+		m_pModel->SetAnimation(0);
+		m_pModel->SetAnimationSpeed(1.0f);
+		m_MoveSpeed = m_defaultSpeed;
+	}
+
+	XMMATRIX rotationMtx;
+	rotationMtx = XMMatrixRotationY( m_Rotation.y);
+	m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
+	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+
+
+	// コリジョン位置の更新
+	m_CollisionSphere->SetCenter(&m_Position);
+	m_DamageManager->GetCollisionSphere()->SetCenter(
+		&Vector3(
+			m_Position.x + m_DirVec.right.x * 2,
+			m_Position.y + m_DirVec.right.y * 2,
+			m_Position.z + m_DirVec.right.z * 2
+		)
+	);
+
+	m_CollisionOBB->SetStatus(&m_Position, &m_DirVec, &Vector3(1.0f, 1.0f, 1.0f));
+
+
+	// 重力
+	float move_y = Glavity * Mass * t * t * 0.5f;
+	m_Position.y += move_y;
+
+	// 地形との衝突判定
+	bool landing = IsLanding();
+	if (landing) {
+		t = 0.0f;
+	}
+	else {
+		t += DELTA_TIME;
+	}
+
+	// 最下層（これ以下に下がらないように）
+	if (m_Position.y < -20.0f) { m_Position.y = -20.0f; }
+}
+
+void CPlayer::Action()
+{
+	if (CInput::GetKeyTrigger(VK_SPACE)) {
+
+		CSound::Play(SOUND_LABEL_SE_ATTACK);
+
+		std::vector<CEnemy*> enemys;
+		enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
+
+		// 敵と攻撃範囲の当たり判定
+		for (CEnemy* enemy : enemys) {
+			if (enemy != nullptr) {
+
+				// 当たり判定
+				if (CJudgeCollision3D::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
+
+					CSound::Play(SOUND_LABEL_SE_HIT);
+					// ダメ―ジ判定
+					m_DamageManager->DoDamage(enemy->GetDamageManager());
+				}
+			}
+		}
+	}
 }
 
 bool CPlayer::IsLanding()

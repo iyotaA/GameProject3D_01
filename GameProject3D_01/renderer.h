@@ -66,6 +66,13 @@ struct LIGHT
 	COLOR		Ambient;
 };
 
+enum
+{
+	SHADER_PS_DEFOULT,
+	SHADER_PS_MULTI_TEX,
+	SHADER_PS_MAX
+};
+
 
 class CVertexBuffer;
 class CIndexBuffer;
@@ -87,7 +94,7 @@ private:
 
 
 	static ID3D11VertexShader*		m_VertexShader;
-	static ID3D11PixelShader*		m_PixelShader;
+	static ID3D11PixelShader**		m_PixelShader;
 	static ID3D11InputLayout*		m_VertexLayout;
 	static ID3D11Buffer*			m_WorldBuffer;
 	static ID3D11Buffer*			m_ViewBuffer;
@@ -116,10 +123,13 @@ public:
 	static void SetViewMatrix(XMMATRIX * ViewMatrix);
 	static void SetProjectionMatrix(XMMATRIX * ProjectionMatrix);
 	static void SetMaterial(MATERIAL Material);
+	static void SetShaderPS(int elem);
 	static void SetLight(LIGHT Light);
 	static void SetVertexBuffers( ID3D11Buffer* VertexBuffer );
 	static void SetIndexBuffer( ID3D11Buffer* IndexBuffer );
 	static void SetTexture( CTexture* Texture );
+	static void SetTexture(CTexture* Texture, unsigned int Slot);
+	static void SetTexture(CTexture** Texture, unsigned int Slot, unsigned int NumTextures);
 	static void DrawIndexed( unsigned int IndexCount, unsigned int StartIndexLocation, int BaseVertexLocation );
 
 	static ID3D11Device* GetDevice( void ){ return m_D3DDevice; }

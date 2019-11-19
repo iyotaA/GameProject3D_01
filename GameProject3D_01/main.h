@@ -9,8 +9,14 @@
 #include <assert.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <iostream>
+#include <fstream>
+#include <math.h>
+#include <unordered_map>
+#include <vector>
 #include "Vector3.h"
 using namespace DirectX;
+using namespace std;
 
 
 #define SCREEN_WIDTH		(1366)			// ウインドウの幅

@@ -57,12 +57,17 @@ void main( in  float4 inPosition		: POSITION0,
 						  in  float4 inNormal		: NORMAL0,
 						  in  float4 inDiffuse		: COLOR0,
 						  in  float2 inTexCoord		: TEXCOORD0,
+						  in  uint inInstanceID     : SV_InstanceID,
 
 						  out float4 outPosition	: SV_POSITION,
 						  out float4 outNormal		: NORMAL0,
 						  out float2 outTexCoord	: TEXCOORD0,
 						  out float4 outDiffuse		: COLOR0 )
 {
+	// ジオメトリインスタンシング
+	inPosition.x += inInstanceID % 100 * 200;
+	inPosition.z += inInstanceID / 100 * 200;
+
 	matrix wvp;
 	wvp = mul(World, View);
 	wvp = mul(wvp, Projection);
@@ -82,4 +87,3 @@ void main( in  float4 inPosition		: POSITION0,
 	outDiffuse += inDiffuse * Material.Ambient * Light.Ambient;
 	outDiffuse.a = inDiffuse.a * Material.Diffuse.a;
 }
-

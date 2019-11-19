@@ -8,6 +8,7 @@
 
 #define GRID_SIZE 1.0f
 
+
 void CTerrain::Init()
 {
 	bool result;
@@ -16,8 +17,15 @@ void CTerrain::Init()
 	assert(result);
 
 	// テクスチャ読み込み //////
-	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/image/field_dart1.png");
+
+	unordered_map<int ,string> fileNames;
+
+	m_Texture = new CTexture*[m_TextureNum];
+	m_Texture[0] = new CTexture();
+	m_Texture[1] = new CTexture();
+
+	m_Texture[0]->LoadSTB("asset/image/field_dart1.png");
+	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
 
 	result = InitializeBuffers();
 	assert(result);
@@ -295,15 +303,20 @@ void CTerrain::DrawBuffers()
 	stride = sizeof(VERTEX_3D);
 	offset = 0;
 
+	CRenderer::SetShaderPS(SHADER_PS_MULTI_TEX);
+
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
 	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	CRenderer::SetTexture(m_Texture);
+	CRenderer::SetTexture(m_Texture, 0, m_TextureNum);
 
-	CRenderer::GetDeviceContext()->DrawIndexed(m_indexCount, 0, 0);
+	CRenderer::DrawIndexed(m_indexCount, 0, 0);
+
+	CRenderer::SetShaderPS(SHADER_PS_DEFOULT);
+
 }
 
 void CTerrain::DrawGUI()
