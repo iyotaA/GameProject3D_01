@@ -16,9 +16,9 @@ ID3D11RenderTargetView*  CRenderer::m_RenderTargetView = NULL;
 ID3D11DepthStencilView*  CRenderer::m_DepthStencilView = NULL;
 
 
-ID3D11VertexShader*      CRenderer::m_VertexShader     = NULL;
+ID3D11VertexShader**      CRenderer::m_VertexShader     = NULL;
 ID3D11PixelShader**       CRenderer::m_PixelShader      = NULL;
-ID3D11InputLayout*       CRenderer::m_VertexLayout     = NULL;
+ID3D11InputLayout**       CRenderer::m_VertexLayout     = NULL;
 ID3D11Buffer*			 CRenderer::m_WorldBuffer      = NULL;
 ID3D11Buffer*			 CRenderer::m_ViewBuffer       = NULL;
 ID3D11Buffer*			 CRenderer::m_ProjectionBuffer = NULL;
@@ -110,21 +110,8 @@ void CRenderer::Init()
 	m_ImmediateContext->RSSetViewports( 1, &vp );
 
 
-
 	// ラスタライザステート設定
-	D3D11_RASTERIZER_DESC rd; 
-	ZeroMemory( &rd, sizeof( rd ) );
-	rd.FillMode = D3D11_FILL_SOLID; 
-	rd.CullMode = D3D11_CULL_NONE; 
-	rd.DepthClipEnable = TRUE; 
-	rd.MultisampleEnable = FALSE; 
-
-	ID3D11RasterizerState *rs;
-	m_D3DDevice->CreateRasterizerState( &rd, &rs );
-
-	m_ImmediateContext->RSSetState( rs );
-
-
+	SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 
 
 	// ブレンドステート設定
@@ -188,35 +175,71 @@ void CRenderer::Init()
 
 	// 頂点シェーダ生成
 	{
-		FILE* file;
-		long int fsize;
-
-		file = fopen("vertexShader.cso", "rb");
-		fsize = _filelength(_fileno(file));
-		unsigned char* buffer = new unsigned char[fsize];
-		fread(buffer, fsize, 1, file);
-		fclose(file);
-
-		m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader);
+		m_VertexShader = new ID3D11VertexShader * [SHADER_VS_MAX];
+		m_VertexLayout = new ID3D11InputLayout * [SHADER_VS_MAX];
 
 
-		// 入力レイアウト生成
-		D3D11_INPUT_ELEMENT_DESC layout[] =
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-		UINT numElements = ARRAYSIZE(layout);
+			FILE* file;
+			long int fsize;
 
-		m_D3DDevice->CreateInputLayout(layout,
-			numElements,
-			buffer,
-			fsize,
-			&m_VertexLayout);
+			file = fopen("asset/shader/vertexShader.cso", "rb");
+			fsize = _filelength(_fileno(file));
+			unsigned char* buffer = new unsigned char[fsize];
+			fread(buffer, fsize, 1, file);
+			fclose(file);
 
+			m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader[SHADER_VS_DEFOULT]);
+
+
+			// 入力レイアウト生成
+			D3D11_INPUT_ELEMENT_DESC layout[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			};
+			UINT numElements = ARRAYSIZE(layout);
+
+			m_D3DDevice->CreateInputLayout(layout,
+				numElements,
+				buffer,
+				fsize,
+				&m_VertexLayout[SHADER_VS_DEFOULT]);
 		delete[] buffer;
+
+		}
+
+		{
+			FILE* file;
+			long int fsize;
+
+			file = fopen("asset/shader/vertexShader_SH31.cso", "rb");
+			fsize = _filelength(_fileno(file));
+			unsigned char* buffer = new unsigned char[fsize];
+			fread(buffer, fsize, 1, file);
+			fclose(file);
+
+			m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader[SHADER_VS_MULTI_TEX]);
+
+			// 入力レイアウト生成
+			D3D11_INPUT_ELEMENT_DESC layout[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "BLENDNUM", 0, DXGI_FORMAT_R32_FLOAT, 0, 4 * 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			};
+			UINT numElements = ARRAYSIZE(layout);
+
+			m_D3DDevice->CreateInputLayout(layout,
+				numElements,
+				buffer,
+				fsize,
+				&m_VertexLayout[SHADER_VS_MULTI_TEX]);
+		}
 	}
 
 
@@ -228,7 +251,7 @@ void CRenderer::Init()
 		FILE* file;
 		long int fsize;
 
-		file = fopen("pixelShader.cso", "rb");
+		file = fopen("asset/shader/pixelShader.cso", "rb");
 		fsize = _filelength(_fileno(file));
 		unsigned char* buffer = new unsigned char[fsize];
 		fread(buffer, fsize, 1, file);
@@ -238,7 +261,7 @@ void CRenderer::Init()
 
 		delete[] buffer;
 
-		file = fopen("pixelShader_MultiTex.cso", "rb");
+		file = fopen("asset/shader/pixelShader_MultiTex.cso", "rb");
 		fsize = _filelength(_fileno(file));
 
 		buffer = new unsigned char[fsize];
@@ -256,7 +279,7 @@ void CRenderer::Init()
 
 	// 定数バッファ生成
 	D3D11_BUFFER_DESC hBufferDesc;
-	hBufferDesc.ByteWidth = sizeof(XMMATRIX);
+	hBufferDesc.ByteWidth = sizeof(CONSTANT);
 	hBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	hBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	hBufferDesc.CPUAccessFlags = 0;
@@ -285,18 +308,16 @@ void CRenderer::Init()
 	m_ImmediateContext->VSSetConstantBuffers( 4, 1, &m_LightBuffer );
 
 
-
-	// 入力レイアウト設定
-	m_ImmediateContext->IASetInputLayout( m_VertexLayout );
-
-	// シェーダ設定
-	m_ImmediateContext->VSSetShader( m_VertexShader, NULL, 0 );
-	m_ImmediateContext->PSSetShader( m_PixelShader[SHADER_PS_DEFOULT], NULL, 0 );
+	// シェーダーセット
+	SetShaderVS(SHADER_VS_DEFOULT);
+	SetShaderPS(SHADER_PS_DEFOULT);
 
 
 	// ライト初期化
 	LIGHT light;
-	light.Direction = XMFLOAT4(0.0f, 0.0f, 1.0f, 0.0f);
+	Vector3 dir = Vector3(0.0f, -1.0f, 1.0f);
+	dir.Normalize();
+	light.Direction = XMFLOAT4(dir.x, dir.y, dir.z, 0.0f);
 	light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	light.Ambient = COLOR(0.6f, 0.6f, 0.6f, 1.0f);
 	SetLight(light);
@@ -308,7 +329,6 @@ void CRenderer::Init()
 	material.Diffuse = COLOR( 1.0f, 1.0f, 1.0f, 1.0f );
 	material.Ambient = COLOR( 1.0f, 1.0f, 1.0f, 1.0f );
 	SetMaterial( material );
-
 }
 
 
@@ -321,8 +341,11 @@ void CRenderer::Uninit()
 	if ( m_ProjectionBuffer )	m_ProjectionBuffer->Release();
 
 	if( m_MaterialBuffer )		m_MaterialBuffer->Release();
-	if( m_VertexLayout )		m_VertexLayout->Release();
-	if( m_VertexShader )		m_VertexShader->Release();
+
+	if( m_VertexLayout[0] )		m_VertexLayout[0]->Release();
+	if( m_VertexLayout[1] )		m_VertexLayout[1]->Release();
+	if( m_VertexShader[0] )		m_VertexShader[0]->Release();
+	if( m_VertexShader[1] )		m_VertexShader[1]->Release();
 	if( m_PixelShader[0] )		m_PixelShader[0]->Release();
 	if( m_PixelShader[1] )		m_PixelShader[1]->Release();
 
@@ -339,7 +362,7 @@ void CRenderer::Uninit()
 void CRenderer::Begin()
 {
 	// バックバッファクリア
-	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float ClearColor[4] = { 0.0f / 255.0f, 92.0f / 255.0f, 175.0f / 255.0f, 1.0f };
 	m_ImmediateContext->ClearRenderTargetView( m_RenderTargetView, ClearColor );
 	m_ImmediateContext->ClearDepthStencilView( m_DepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -404,7 +427,6 @@ void CRenderer::SetProjectionMatrix( XMMATRIX *ProjectionMatrix )
 }
 
 
-
 void CRenderer::SetMaterial( MATERIAL Material )
 {
 
@@ -414,16 +436,43 @@ void CRenderer::SetMaterial( MATERIAL Material )
 
 void CRenderer::SetShaderPS(int elem)
 {
-
 	// シェーダ設定
 	m_ImmediateContext->PSSetShader(m_PixelShader[elem], NULL, 0);
 }
+
+
+void CRenderer::SetShaderVS(int elem)
+{
+	// 入力レイアウト設定
+	m_ImmediateContext->IASetInputLayout(m_VertexLayout[elem]);
+
+	// シェーダ設定
+	m_ImmediateContext->VSSetShader(m_VertexShader[elem], NULL, 0);
+}
+
 
 void CRenderer::SetLight(LIGHT Light)
 {
 
 	m_ImmediateContext->UpdateSubresource(m_LightBuffer, 0, NULL, &Light, 0, 0);
 
+}
+
+
+void CRenderer::SetRasterizerState(D3D11_FILL_MODE _fill_mode, D3D11_CULL_MODE _cull_mode)
+{
+	// ラスタライザステート設定
+	D3D11_RASTERIZER_DESC rd;
+	ZeroMemory(&rd, sizeof(rd));
+	rd.FillMode = _fill_mode;
+	rd.CullMode = _cull_mode;
+	rd.DepthClipEnable = TRUE;
+	rd.MultisampleEnable = FALSE;
+
+	ID3D11RasterizerState* rs;
+	m_D3DDevice->CreateRasterizerState(&rd, &rs);
+
+	m_ImmediateContext->RSSetState(rs);
 }
 
 

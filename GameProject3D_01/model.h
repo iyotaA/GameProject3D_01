@@ -32,6 +32,12 @@ struct MODEL
 
 class CModel : public CGameObject
 {
+public:
+	void Draw(XMMATRIX* pWorld);
+
+	void Load(const char* FileName);
+	void Unload();
+
 private:
 
 	ID3D11Buffer*	m_VertexBuffer = NULL;
@@ -42,12 +48,6 @@ private:
 
 	void LoadObj( const char *FileName, MODEL *Model );
 	void LoadMaterial( const char *FileName, MODEL_MATERIAL **MaterialArray, unsigned short *MaterialNum );
-
-public:
-	void Draw(XMMATRIX* pWorld);
-
-	void Load( const char *FileName );
-	void Unload();
 
 };
 

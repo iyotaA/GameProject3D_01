@@ -3,10 +3,6 @@
 
 class CScore
 {
-private:
-	static int m_Score;
-	static CNumber* m_Num;
-
 public:
 	static void Init()
 	{
@@ -37,6 +33,10 @@ public:
 	{
 		m_Num->SetNum((float)m_Score);
 	}
+
+private:
+	static int m_Score;
+	static CNumber* m_Num;
 
 };
 

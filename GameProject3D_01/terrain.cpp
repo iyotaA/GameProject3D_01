@@ -13,7 +13,7 @@ void CTerrain::Init()
 {
 	bool result;
 
-	result = LoadHeightMap("asset/image/height_map3.bmp");
+	result = LoadHeightMap("asset/image/height_map000.bmp");
 	assert(result);
 
 	// テクスチャ読み込み //////
@@ -21,7 +21,7 @@ void CTerrain::Init()
 	m_Texture[0] = new CTexture();
 	m_Texture[1] = new CTexture();
 
-	m_Texture[0]->LoadSTB("asset/image/field_dart1.png");
+	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
 	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
 
 	result = InitializeBuffers();
@@ -150,7 +150,7 @@ bool CTerrain::InitializeBuffers()
 
 	// ヴァーテクス情報格納
 	{
-		m_Vertex = new VERTEX_3D[m_vertexCount];
+		m_Vertex = new VERTEX_3D_TEX2[m_vertexCount];
 
 		for (int z = 0; z < m_terrainHeight; z++) {
 			for (int x = 0; x < m_terrainWidth; x++) {
@@ -168,7 +168,8 @@ bool CTerrain::InitializeBuffers()
 					Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
 					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-					XMFLOAT2(x, z)
+					XMFLOAT2(x, z),
+					(rand() % 101) * 0.01f
 				};
 			}
 		}
@@ -238,7 +239,7 @@ bool CTerrain::InitializeBuffers()
 	}
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D) * m_vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D_TEX2) * m_vertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -297,10 +298,8 @@ void CTerrain::DrawBuffers()
 	unsigned int stride;
 	unsigned int offset;
 
-	stride = sizeof(VERTEX_3D);
+	stride = sizeof(VERTEX_3D_TEX2);
 	offset = 0;
-
-	CRenderer::SetShaderPS(SHADER_PS_MULTI_TEX);
 
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
@@ -308,12 +307,14 @@ void CTerrain::DrawBuffers()
 
 	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
+	CRenderer::SetShaderPS(SHADER_PS_MULTI_TEX);
 	CRenderer::SetTexture(m_Texture, 0, m_TextureNum);
 
+	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_FRONT);
 	CRenderer::DrawIndexed(m_indexCount, 0, 0);
+	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 
 	CRenderer::SetShaderPS(SHADER_PS_DEFOULT);
-
 }
 
 void CTerrain::DrawGUI()

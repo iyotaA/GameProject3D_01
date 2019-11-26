@@ -38,14 +38,14 @@ private:
 	void DrawBuffers();
 	void DrawGUI();
 
-	int m_terrainWidth, m_terrainHeight;
-	int m_vertexCount, m_indexCount;
-	ID3D11Buffer* m_indexBuffer = nullptr;
-	ID3D11Buffer* m_vertexBuffer = nullptr;
+	int             m_terrainWidth, m_terrainHeight;
+	int             m_vertexCount, m_indexCount;
+	ID3D11Buffer*   m_indexBuffer = nullptr;
+	ID3D11Buffer*   m_vertexBuffer = nullptr;
 
-	HeightMapType* m_heightMap = nullptr;
-	VERTEX_3D* m_Vertex = nullptr;
-	CTexture** m_Texture = nullptr;
+	HeightMapType*  m_heightMap = nullptr;
+	VERTEX_3D_TEX2* m_Vertex = nullptr;
+	CTexture**      m_Texture = nullptr;
 
 	// デバッグ用
 	XMFLOAT3 PlayerArea = XMFLOAT3(0.0f, 0.0f, 0.0f);

@@ -3,10 +3,6 @@
 
 class CNumber : public CGameObject
 {
-private:
-	CTexture* m_Texture;
-	float m_Num;
-
 public:
 	void Init(char* pFileName);
 	void Update();
@@ -23,6 +19,11 @@ public:
 	{
 		m_Num = num;
 	}
+
+private:
+	CTexture* m_Texture;
+	float m_Num;
+
 };
 
 #endif // !NUMBER_H_

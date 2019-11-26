@@ -48,42 +48,48 @@ cbuffer LightBuffer : register( b4 )
 	LIGHT		Light;
 }
 
+struct InputData
+{
+	float4 Position	  : POSITION0;
+	float4 Normal     : NORMAL0;
+	float4 Diffuse    : COLOR0;
+	float2 TexCoord   : TEXCOORD0;
+};
+
+struct OutputData
+{
+	float4 Position : SV_POSITION;
+	float4 Normal   : NORMAL0;
+	float2 TexCoord : TEXCOORD0;
+	float4 Diffuse  : COLOR0;
+};
 
 
 //=============================================================================
 // 頂点シェーダ
 //=============================================================================
-void main( in  float4 inPosition		: POSITION0,
-						  in  float4 inNormal		: NORMAL0,
-						  in  float4 inDiffuse		: COLOR0,
-						  in  float2 inTexCoord		: TEXCOORD0,
-						  in  uint inInstanceID     : SV_InstanceID,
-
-						  out float4 outPosition	: SV_POSITION,
-						  out float4 outNormal		: NORMAL0,
-						  out float2 outTexCoord	: TEXCOORD0,
-						  out float4 outDiffuse		: COLOR0 )
+void main(
+	in  InputData inData,
+	out OutputData outData
+)
 {
-	// ジオメトリインスタンシング
-	inPosition.x += inInstanceID % 100 * 200;
-	inPosition.z += inInstanceID / 100 * 200;
 
 	matrix wvp;
 	wvp = mul(World, View);
 	wvp = mul(wvp, Projection);
 
-	outPosition = mul( inPosition, wvp);
-	outNormal = inNormal;
-	outTexCoord = inTexCoord;
+	outData.Position = mul(inData.Position, wvp);
+	outData.Normal   = inData.Normal;
+	outData.TexCoord = inData.TexCoord;
 
 	float4 worldNormal, normal;
-	normal = float4(inNormal.xyz, 0.0);
+	normal = float4(inData.Normal.xyz, 0.0);
 	worldNormal = mul(normal, World);
 	worldNormal = normalize(worldNormal);
 
 	float light = 0.5 - 0.5 * dot(Light.Direction.xyz, worldNormal.xyz);
 
-	outDiffuse = inDiffuse * Material.Diffuse * light * Light.Diffuse;
-	outDiffuse += inDiffuse * Material.Ambient * Light.Ambient;
-	outDiffuse.a = inDiffuse.a * Material.Diffuse.a;
+	outData.Diffuse = inData.Diffuse * Material.Diffuse * light * Light.Diffuse;
+	outData.Diffuse += inData.Diffuse * Material.Ambient * Light.Ambient;
+	outData.Diffuse.a = inData.Diffuse.a * Material.Diffuse.a;
 }

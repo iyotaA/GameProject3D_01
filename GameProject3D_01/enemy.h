@@ -3,11 +3,6 @@
 
 class CEnemy : public CGameObject
 {
-private:
-	CModel* m_pModel;
-	CCollisionSphere* m_CollisionSphere;
-	CDamage* m_DamageManager;
-
 public:
 
 	void Init();
@@ -17,6 +12,11 @@ public:
 
 	CCollisionSphere* GetCollisionSphere(void) { return m_CollisionSphere; }
 	CDamage* GetDamageManager(void) { return m_DamageManager; }
+
+private:
+	CModel* m_pModel;
+	CCollisionSphere* m_CollisionSphere;
+	CDamage* m_DamageManager;
 
 };
 

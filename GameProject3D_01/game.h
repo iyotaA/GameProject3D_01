@@ -6,18 +6,12 @@ class CResult;
 
 class CGame : public CScene
 {
-private:
-	float m_time;
-	CNumber* number;
-	XMFLOAT2 EnemySpawnPlace[20];
-	int FrameCount;
-
 public:
 	void Init()
 	{
-		// カメラの初期化
-		CCamera* camera;
-		camera = AddGameObject<CCamera>(CManager::E_Camera);
+		//// カメラの初期化
+		//CCamera* camera;
+		//camera = AddGameObject<CCamera>(CManager::E_Camera);
 
 		// スカイドームの初期化
 		AddGameObject<CSkyDome>(CManager::E_Background);
@@ -28,8 +22,10 @@ public:
 		//// プレイヤーの初期化
 		CPlayer* player;
 		player = AddGameObject<CPlayer>(CManager::E_3D);
-		player->SetCamera(camera);	// カメラセット
-		camera->SetAt(player);		// 注視点
+		//player->SetCamera(camera);	// カメラセット
+
+		CCamera* camera = CCameraManager::GetCamera(0);		// 注視点
+		camera->SetAt(player);
 
 		// 数字の初期化
 		number = new CNumber;
@@ -107,9 +103,16 @@ public:
 
 	bool IsClear(void)
 	{
-		if(m_time <= 0.0f){ return true; }
+		if (m_time <= 0.0f) { return true; }
 		else return false;
 	}
+
+private:
+	float m_time;
+	CNumber* number;
+	XMFLOAT2 EnemySpawnPlace[20];
+	int FrameCount;
+
 };
 
 

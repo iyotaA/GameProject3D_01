@@ -5,10 +5,6 @@ class CScene;
 
 class CManager
 {
-private:
-	static CScene* m_Scene;
-	static int m_Score;
-
 public:
 	static 	enum
 	{
@@ -43,6 +39,11 @@ public:
 
 	static void AddScore() { m_Score++; }
 	static int GetScore() { return m_Score; }
+
+private:
+	static CScene* m_Scene;
+	static int m_Score;
+
 };
 
 #endif

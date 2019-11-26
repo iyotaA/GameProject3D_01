@@ -23,6 +23,9 @@ void CManager::Init()
 	// コリジョングリッド初期化
 	CDebugPrimitive::DebugPrimitive_Init();
 
+	//カメラの生成
+	CCameraManager::CreateCamera();
+
 	// シーンの初期化
 	SetScene<CGame>();
 
@@ -41,6 +44,9 @@ void CManager::Uninit()
 	m_Scene->Uninit();
 	delete m_Scene;
 
+	// カメラ破壊
+	CCameraManager::DeleteCamera();
+
 	// コリジョングリッド終了処理
 	CDebugPrimitive::DebugPrimitive_Uninit();
 
@@ -56,13 +62,15 @@ void CManager::Update()
 	// インプットの更新
 	CInput::Update();
 
+	// カメラ更新
+	CCameraManager::Update();
+
 	// シーンの更新
 	m_Scene->Update();
 }
 
 void CManager::Draw()
 {
-
 	// 描画の開始
 	CRenderer::Begin();
 
@@ -71,6 +79,9 @@ void CManager::Draw()
 
 	// GUIの描画
 	DrawGUI();
+
+	// カメラ投影
+	CCameraManager::Project();
 
 	// シーンの描画
 	m_Scene->Draw();

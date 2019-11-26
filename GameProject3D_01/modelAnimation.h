@@ -29,27 +29,6 @@ struct ANIMATION
 
 class CModelAnimation
 {
-private:
-	MESH* m_Mesh;
-	unsigned int m_MeshNum;
-	//const aiScene* m_Scene;
-	const aiScene* m_Scene[3];
-
-	ID3D11Buffer* m_VertexBuffer = nullptr;
-	ID3D11Buffer* m_IndexBuffer = nullptr;
-	unsigned int  m_IndexNum;
-	std::unordered_map<std::string, ANIMATION> m_Animation;
-	std::unordered_map < std::string, aiQuaternion > m_NodeRotation;
-	std::unordered_map < std::string, aiVector3D >	 m_NodePosition;
-
-	int m_CurrentAnimIndex = 0;
-	int m_PastAnimIndex = 0;
-	float m_Blend = 0.0f;
-
-	// デバッグ用
-	int m_Frame = 0;
-	bool m_Stop = false;
-
 public:
 	void Draw(XMMATRIX* pMtx);
 	void DrawMesh(aiNode* node, XMMATRIX* pMtx);
@@ -71,6 +50,28 @@ public:
 	}
 
 	aiVector3D aiVectorLerp(aiVector3D v1, aiVector3D v2, float blend);
+
+private:
+	MESH* m_Mesh;
+	unsigned int m_MeshNum;
+	//const aiScene* m_Scene;
+	const aiScene* m_Scene[3];
+
+	ID3D11Buffer* m_VertexBuffer = nullptr;
+	ID3D11Buffer* m_IndexBuffer = nullptr;
+	unsigned int  m_IndexNum;
+	std::unordered_map<std::string, ANIMATION> m_Animation;
+	std::unordered_map < std::string, aiQuaternion > m_NodeRotation;
+	std::unordered_map < std::string, aiVector3D >	 m_NodePosition;
+
+	int m_CurrentAnimIndex = 0;
+	int m_PastAnimIndex = 0;
+	float m_Blend = 0.0f;
+
+	// デバッグ用
+	int m_Frame = 0;
+	bool m_Stop = false;
+
 };
 
 #endif // !MODEL_ANIMATION_H_

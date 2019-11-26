@@ -1,7 +1,7 @@
 #ifndef VECTOR3_H_
 #define VECTOR3_H_
 
-
+#include <DirectXMath.h>
 using namespace DirectX;
 
 #define XMVECX(v) v.m128_f32[0] //X座標に当たる
@@ -27,8 +27,8 @@ struct Vector3 : public XMFLOAT3 {
 		XMStoreFloat3(this, temp);
 	}
 
-	inline BOOL    operator == (const Vector3& _r) const { return x == _r.x && y == _r.y && z == _r.z; }
-	inline BOOL    operator != (const Vector3& _r) const { return x != _r.x || y != _r.y || z != _r.z; }
+	inline bool    operator == (const Vector3& _r) const { return x == _r.x && y == _r.y && z == _r.z; }
+	inline bool    operator != (const Vector3& _r) const { return x != _r.x || y != _r.y || z != _r.z; }
 	inline Vector3 operator *  (const float _r) const { return Vector3(x * _r, y * _r, z * _r); }
 	inline Vector3 operator /  (const float _r) const { return Vector3(x / _r, y / _r, z / _r); }
 	inline Vector3 operator +  (const Vector3 _r) const { return Vector3(x + _r.x, y + _r.y, z + _r.z); }
@@ -113,6 +113,22 @@ struct Vector3X3
 		right.Normalize();
 		up.Normalize();
 		front.Normalize();
+	}
+
+	void SetFrontUpRight(Vector3 _front)
+	{
+		// 前ベクトル初期化
+		front = _front;
+		front.Normalize();
+
+		// 右ベクトル初期化
+		up = Vector3(0.0f, 1.0f, 0.0f);
+		right = up.VCross(front);
+		right.Normalize();
+
+		// 上ベクトル初期化
+		up = front.VCross(right);
+		up.Normalize();
 	}
 };
 

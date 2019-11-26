@@ -5,16 +5,11 @@ class CCollisionSphere;
 
 class CDamage
 {
-private:
-	short m_HitPoint;
-	short m_AttackValue;
-	CCollisionSphere* m_CollisionSphere;
-
 public:
 	CDamage(short hitPoint, short attackValue) {
 		m_HitPoint    = hitPoint;
 		m_AttackValue = attackValue;
-		m_CollisionSphere = new CCollisionSphere;
+		m_CollisionSphere = new CCollisionSphere();
 	}
 
 	void ReceiveDamage(short damageValue) {	m_HitPoint -= damageValue; }
@@ -27,6 +22,12 @@ public:
 	void DebugDraw(void) {
 		ImGui::Text("HP = %d", m_HitPoint);
 	}
+
+private:
+	short m_HitPoint;
+	short m_AttackValue;
+	CCollisionSphere* m_CollisionSphere;
+
 };
 
 
