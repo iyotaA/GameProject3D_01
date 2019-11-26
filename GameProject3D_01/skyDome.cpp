@@ -131,7 +131,7 @@ void CSkyDome::Init()
 
 	// テクスチャ読み込み /////
 	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/image/sky004.png");
+	m_Texture->LoadSTB("asset/image/cloud000.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 0.0f, 0.0f);

@@ -8,9 +8,9 @@ class CTutorial : public CScene
 public:
 	void Init()
 	{
-		// カメラの初期化
-		CCamera* camera;
-		camera = AddGameObject<CCamera>(CManager::E_Camera);
+		//// カメラの初期化
+		//CCamera* camera;
+		//camera = AddGameObject<CCamera>(CManager::E_Camera);
 
 		// フィールドの初期化
 		AddGameObject<CField>(CManager::E_Background);

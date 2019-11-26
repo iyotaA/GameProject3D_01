@@ -9,12 +9,15 @@
 #include <assert.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include <iostream>
-#include <fstream>
 #include <math.h>
-#include <unordered_map>
-#include <vector>
+#include "stl.h"
 #include "Vector3.h"
+#include "manager.h"
+#include "renderer.h"
+#include "sound.h"
+#include "input.h"
+
+#include "imGui_all.h"
 
 using namespace DirectX;
 using namespace std;

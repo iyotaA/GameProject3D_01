@@ -3,12 +3,6 @@
 
 class CTexture
 {
-private:
-
-	ID3D11Texture2D*			m_Texture;
-	ID3D11ShaderResourceView*	m_ShaderResourceView;
-	XMINT2						m_Size;
-
 public:
 
 	void Load(const char *FileName);
@@ -19,6 +13,11 @@ public:
 
 	ID3D11ShaderResourceView* GetShaderResourceView(){ return m_ShaderResourceView; }
 
+private:
+
+	ID3D11Texture2D* m_Texture;
+	ID3D11ShaderResourceView* m_ShaderResourceView;
+	XMINT2						m_Size;
 
 };
 

@@ -3,14 +3,6 @@
 
 class CGameObject
 {
-private:
-	bool m_Destroy = false;
-
-protected:
-	Vector3 m_Position;
-	Vector3 m_Rotation;
-	Vector3 m_Scale;
-
 public:
 	// getter
 	const Vector3* GetPosition() { return &m_Position; }
@@ -25,9 +17,9 @@ public:
 	CGameObject() {}
 	virtual ~CGameObject() {}
 	virtual void Init() {}
-	virtual void Uninit(){}
-	virtual void Update(){}
-	virtual void Draw(){}
+	virtual void Uninit() {}
+	virtual void Update() {}
+	virtual void Draw() {}
 
 	void SetDestroy() { m_Destroy = true; }
 	bool Destroy()
@@ -41,6 +33,15 @@ public:
 			return false;
 		}
 	}
+
+protected:
+	Vector3 m_Position;
+	Vector3 m_Rotation;
+	Vector3 m_Scale;
+
+private:
+	bool m_Destroy = false;
+
 };
 
 #endif

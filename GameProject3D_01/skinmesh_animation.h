@@ -27,6 +27,7 @@ struct BONE
 	aiMatrix4x4 Matrix;
 	aiMatrix4x4 AnimationMatrix;
 	aiMatrix4x4 OffsetMatrix;
+	Vector3		Position;
 };
 
 //struct MESH
@@ -39,12 +40,36 @@ struct BONE
 
 class CSkinModel
 {
+public:
+	void Load(char* pFileName, float size);
+	void Unload();
+	void Draw(XMMATRIX* world);
+	void update(int addAnimationFrame);
+	Vector3 GetWorldPosition(const char* _bone_name);
+
+	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
+	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }
+
+	// 引数 / _next : true = Next / _next : false = Back
+	void SetAnimation(bool _next);
+	void SetAnimation(int _id, float _startBlendNum);
+
+	char GetCurrentAnimId() { return m_CurrentAnimId; }
+	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
+	void SetAnimationSpeed(float _speed) { m_AnimationSpeed = _speed; }
+
+	float* AnimationSpeed() { return &m_AnimationSpeed; }
+	bool*  IsStopMotion() { return &m_IsStopMotion; }
+	bool*  DrawAtLine() { return &m_DrawAtLine; }
+	int*   MotionFrame() { return &m_MotionFrame; }
+	char*  GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
+
 private:
 	std::unordered_map<std::string, CTexture*>	m_Texture;
 	std::unordered_map<std::string, BONE>		m_Bone;
-	std::vector<DEFORM_VERTEX>*					m_pDeformVertex = nullptr;
-	const aiScene*								m_pScene = nullptr;	// パーシング後のデータ格納用
-	MESH*    m_Mesh = nullptr;
+	std::vector<DEFORM_VERTEX>* m_pDeformVertex = NULL;
+	const aiScene* m_pScene = NULL;	// パーシング後のデータ格納用
+	MESH* m_Mesh = nullptr;
 	FileType m_FileType;
 	float    m_AnimationFrame = 0.0f;
 	float    m_Size;
@@ -53,47 +78,32 @@ private:
 	bool m_IsStopMotion = false;
 	bool m_DrawAtLine = false;
 	bool m_IsDrawNormals = false;
+	bool m_IsAnimationBlending = false;
 	char m_CurrentAnimId = 0;
+	char m_TargetAnimId = 0;
 	float m_AnimationSpeed = 1.0f;
+	float m_PerBlend = 0.0f;
 
+	// アニメーション・描画 ////////////////////////////////////
 	void DrawMesh(const aiNode* pNode);
 	void LoadMesh(const aiNode* pNode);
 	void CreateBone(aiNode* pNode);
+	void CalculateBoneMatrix();
 	void UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix);
+	void AnimationBlend();
+	void Animation();
+	Vector3 GetPosLocalToWorld(aiNode* pNode);
+	aiNode* GetBoneNode(aiNode* pNode, const char* _name);
 
+	//変換系 ////////////////////////////////////
+	void aiVector3D_Lerp(aiVector3D& _blendVec, const aiVector3D _vec1, const aiVector3D _vec2, float _blend);
+	XMFLOAT4X4 LoadAiMatrix4x4(aiMatrix4x4* _martrix_ai);
+	void StoreAiMatrix4x4(XMFLOAT4X4* _matrix_ai, aiMatrix4x4& _martrix_ai);
 
-public:
-	void Load(char* pFileName, float size);
-	void Unload();
-	void Draw(XMMATRIX* world);
-	void Animation(int addAnimationFrame);
+	//ファイル操作・チェック ////////////////////////////////////
+	FileType ChackFileType(std::string pFileType);
+	void WritteName(aiNode* pNode);
 
-	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
-	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }
-
-	// 引数 / _next : true = Next / _next : false = Back
-	void SetAnimation(bool _next) {
-
-		m_CurrentAnimId += _next ? 1: -1;
-
-		if (m_CurrentAnimId == m_pScene->mNumAnimations) {
-			m_CurrentAnimId = 0;
-		}
-		else if (m_CurrentAnimId < 0) {
-			m_CurrentAnimId = m_pScene->mNumAnimations - 1;
-		}
-	}
-
-	void SetAnimation(int _id) { m_CurrentAnimId = _id; }
-	char GetCurrentAnimId() { return m_CurrentAnimId; }
-	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
-	void SetAnimationSpeed(float _speed) { m_AnimationSpeed = _speed; }
-
-	float* AnimationSpeed() { return &m_AnimationSpeed; }
-	int* MotionFrame() { return &m_MotionFrame; }
-	char* GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
-	bool* IsStopMotion() { return &m_IsStopMotion; }
-	bool* DrawAtLine() { return &m_DrawAtLine; }
 };
 
 

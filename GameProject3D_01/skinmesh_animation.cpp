@@ -17,7 +17,7 @@
 #include "skinmesh_animation.h"
 #include "modelAnimation.h"
 
-#define F "Node.txt"
+#define F "asset/Node.txt"
 
 
 /* Assimpの行列の合成順番は違うから気を付けよう！！
@@ -26,17 +26,20 @@
 	 Assimpは : A = B * A;
 */
 
-FileType ChackFileType(std::string pFileType);
-void WritteName(aiNode* pNode);
-XMFLOAT4X4 LoadAiMatrix4x4(aiMatrix4x4* _martrix_ai);
-void StoreAiMatrix4x4(XMFLOAT4X4* _matrix_ai, aiMatrix4x4& _martrix_ai);
 
 static ofstream outputfile(F);
 
+
+//************************************************
+// ファイルロード
+//************************************************
 void CSkinModel::Load(char* pFileName, float size)
 {
 	m_pScene = aiImportFile(pFileName, aiProcessPreset_TargetRealtime_MaxQuality);
-	assert(m_pScene);
+	if (m_pScene == NULL)
+	{
+		assert(false);
+	}
 
 	// 各ボーン名取得
 	CreateBone(m_pScene->mRootNode);
@@ -140,6 +143,11 @@ void CSkinModel::Load(char* pFileName, float size)
 
 	//DrawMesh(m_pScene->mRootNode, &aiMatrix4x4());
 }
+
+
+//************************************************
+// メッシュごとにバッファ作成
+//************************************************
 void CSkinModel::LoadMesh(const aiNode* pNode)
 {
 	for (int mesh = 0; mesh < pNode->mNumMeshes; mesh++) {
@@ -234,11 +242,19 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 
 }
 
+
+//************************************************
+// ファイルアンロード
+//************************************************
 void CSkinModel::Unload()
 {
 	aiReleaseImport(m_pScene);
 }
 
+
+//************************************************
+// 描画
+//************************************************
 void CSkinModel::Draw(XMMATRIX* world)
 {
 	XMMATRIX _world = *world;
@@ -248,10 +264,22 @@ void CSkinModel::Draw(XMMATRIX* world)
 
 	CRenderer::SetWorldMatrix(&_world);
 
+	if (m_DrawAtLine) {
+		CRenderer::SetRasterizerState(D3D11_FILL_WIREFRAME, D3D11_CULL_NONE);
+	}
+	else {
+		CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
+	}
 	// 描画
 	DrawMesh(m_pScene->mRootNode);
+
+	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 }
 
+
+//************************************************
+// メッシュごとの描画
+//************************************************
 void CSkinModel::DrawMesh(const aiNode* pNode)
 {
 	for (int mesh = 0; mesh < pNode->mNumMeshes; mesh++) {
@@ -319,13 +347,11 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
 
 		CRenderer::SetVertexBuffers( m_Mesh[mesh_index].VertexBuffer );
+
 		CRenderer::SetIndexBuffer( m_Mesh[mesh_index].IndexBuffer );
-		if (m_DrawAtLine) {
-			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		}
-		else {
-			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		}
+
+		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
 		//CRenderer::GetDeviceContext()->DrawIndexedInstanced(m_Mesh[mesh_index].IndexNum, 100, 0, 0, 0);
 		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
@@ -338,179 +364,259 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 	}
 }
 
+
+//************************************************
+// ボーンの初期化
+//************************************************
 void CSkinModel::CreateBone(aiNode* pNode)
 {
 	BONE bone;
 	m_Bone[pNode->mName.C_Str()] = bone; // 何も初期化されていないゴミデータを入れることで"器"を作っておく
 	m_Texture[pNode->mName.C_Str()] = new CTexture();
-	m_Texture[pNode->mName.C_Str()]->LoadSTB("asset/image/field_dart1.png");
+	m_Texture[pNode->mName.C_Str()]->LoadSTB("asset/image/white.png");
 
 	for (int i = 0; i < pNode->mNumChildren; i++) {
 		CreateBone(pNode->mChildren[i]);
 	}
 }
 
-void CSkinModel::Animation(int frame)
+
+//************************************************
+// アニメーションデータ更新
+//************************************************
+void CSkinModel::update(int addAnimationFrame)
 {
-	m_AnimationFrame += frame * m_AnimationSpeed;
-
 	// アニメーションデータを持っているか
-	if (m_pScene->HasAnimations()) {
+	if (!m_pScene->HasAnimations()) return;
 
-		// アニメーションデータ取得                     ↓どのアニメ―ション？
-		aiAnimation* pAnimation = m_pScene->mAnimations[m_CurrentAnimId];
+	// アニメーションキー更新
+	m_AnimationFrame += addAnimationFrame * m_AnimationSpeed;
 
-		for (auto c = 0; c < pAnimation->mNumChannels; c++) {
+	// アニメーションブレンドするか？しないか？
+	m_IsAnimationBlending ? AnimationBlend() : Animation();
 
-			// ノードアニメーション取得
-			aiNodeAnim* pNodeAnim = pAnimation->mChannels[c];
-			BONE* pBone = &m_Bone[pNodeAnim->mNodeName.C_Str()];
+	// ボーンの各行列を計算
+	CalculateBoneMatrix();
 
-			aiQuaternion rot;
-			aiVector3D pos;
-
-			// 現在フレームのアニメーション行列の回転・平行移動成分を取得
-			int CurrentFrame = m_IsStopMotion ? (int)pAnimation->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_AnimationFrame);
-			rot = pNodeAnim->mRotationKeys[CurrentFrame % pNodeAnim->mNumRotationKeys].mValue;
-			pos = pNodeAnim->mPositionKeys[CurrentFrame % pNodeAnim->mNumPositionKeys].mValue;
-
-			// 行列にしてクォータニオンとして格納
-			pBone->AnimationMatrix = aiMatrix4x4(
-				aiVector3D(1.0f, 1.0f, 1.0f), // 拡大縮小
-				rot,						  // 回転
-				pos                           // 移動
-			);
+	// 再帰的にボーンデータ更新
+	UpdateBoneMatrix(m_pScene->mRootNode, aiMatrix4x4());
+}
 
 
-			// 再帰的にボーンデータ更新
-			UpdateBoneMatrix(m_pScene->mRootNode, aiMatrix4x4());
+void CSkinModel::CalculateBoneMatrix()
+{
+	// 各頂点の座標計算（本来ならシェーダーがやるべき）
+/*
+  ある頂点を変換する行列は =
+  A * aw + B * bw + C * cw + D * dw		(aw + bw + cw + dw == 1.0f)
 
-			// 各頂点の座標計算（本来ならシェーダーがやるべき）
-			/*
-			  ある頂点を変換する行列は =
-			  A * aw + B * bw + C * cw + D * dw		(aw + bw + cw + dw == 1.0f)
+  ( 大文字 : 関連するボーン, 小文字 : そのウェイト )
+*/
+	for (unsigned int m = 0; m < m_pScene->mNumMeshes; m++)
+	{
+		for (auto& vertex : m_pDeformVertex[m])
+		{
+			aiMatrix4x4 matrix[4];
+			aiMatrix4x4 outMatrix;
+			matrix[0] = m_Bone[vertex.BoneName[0]].Matrix;
+			matrix[1] = m_Bone[vertex.BoneName[1]].Matrix;
+			matrix[2] = m_Bone[vertex.BoneName[2]].Matrix;
+			matrix[3] = m_Bone[vertex.BoneName[3]].Matrix;
 
-			  ( 大文字 : 関連するボーン, 小文字 : そのウェイト )
-			*/
-			for (unsigned int m = 0; m < m_pScene->mNumMeshes; m++)
+			//ウェイトを考慮してマトリクス算出
 			{
-				for (auto& vertex : m_pDeformVertex[m])
-				{
-					aiMatrix4x4 matrix[4];
-					aiMatrix4x4 outMatrix;
-					matrix[0] = m_Bone[vertex.BoneName[0]].Matrix;
-					matrix[1] = m_Bone[vertex.BoneName[1]].Matrix;
-					matrix[2] = m_Bone[vertex.BoneName[2]].Matrix;
-					matrix[3] = m_Bone[vertex.BoneName[3]].Matrix;
+				outMatrix.a1 = matrix[0].a1 * vertex.BoneWeight[0]
+					+ matrix[1].a1 * vertex.BoneWeight[1]
+					+ matrix[2].a1 * vertex.BoneWeight[2]
+					+ matrix[3].a1 * vertex.BoneWeight[3];
 
-					//ウェイトを考慮してマトリクス算出
-					{
-						outMatrix.a1 = matrix[0].a1 * vertex.BoneWeight[0]
-							+ matrix[1].a1 * vertex.BoneWeight[1]
-							+ matrix[2].a1 * vertex.BoneWeight[2]
-							+ matrix[3].a1 * vertex.BoneWeight[3];
+				outMatrix.a2 = matrix[0].a2 * vertex.BoneWeight[0]
+					+ matrix[1].a2 * vertex.BoneWeight[1]
+					+ matrix[2].a2 * vertex.BoneWeight[2]
+					+ matrix[3].a2 * vertex.BoneWeight[3];
 
-						outMatrix.a2 = matrix[0].a2 * vertex.BoneWeight[0]
-							+ matrix[1].a2 * vertex.BoneWeight[1]
-							+ matrix[2].a2 * vertex.BoneWeight[2]
-							+ matrix[3].a2 * vertex.BoneWeight[3];
+				outMatrix.a3 = matrix[0].a3 * vertex.BoneWeight[0]
+					+ matrix[1].a3 * vertex.BoneWeight[1]
+					+ matrix[2].a3 * vertex.BoneWeight[2]
+					+ matrix[3].a3 * vertex.BoneWeight[3];
 
-						outMatrix.a3 = matrix[0].a3 * vertex.BoneWeight[0]
-							+ matrix[1].a3 * vertex.BoneWeight[1]
-							+ matrix[2].a3 * vertex.BoneWeight[2]
-							+ matrix[3].a3 * vertex.BoneWeight[3];
-
-						outMatrix.a4 = matrix[0].a4 * vertex.BoneWeight[0]
-							+ matrix[1].a4 * vertex.BoneWeight[1]
-							+ matrix[2].a4 * vertex.BoneWeight[2]
-							+ matrix[3].a4 * vertex.BoneWeight[3];
+				outMatrix.a4 = matrix[0].a4 * vertex.BoneWeight[0]
+					+ matrix[1].a4 * vertex.BoneWeight[1]
+					+ matrix[2].a4 * vertex.BoneWeight[2]
+					+ matrix[3].a4 * vertex.BoneWeight[3];
 
 
 
-						outMatrix.b1 = matrix[0].b1 * vertex.BoneWeight[0]
-							+ matrix[1].b1 * vertex.BoneWeight[1]
-							+ matrix[2].b1 * vertex.BoneWeight[2]
-							+ matrix[3].b1 * vertex.BoneWeight[3];
+				outMatrix.b1 = matrix[0].b1 * vertex.BoneWeight[0]
+					+ matrix[1].b1 * vertex.BoneWeight[1]
+					+ matrix[2].b1 * vertex.BoneWeight[2]
+					+ matrix[3].b1 * vertex.BoneWeight[3];
 
-						outMatrix.b2 = matrix[0].b2 * vertex.BoneWeight[0]
-							+ matrix[1].b2 * vertex.BoneWeight[1]
-							+ matrix[2].b2 * vertex.BoneWeight[2]
-							+ matrix[3].b2 * vertex.BoneWeight[3];
+				outMatrix.b2 = matrix[0].b2 * vertex.BoneWeight[0]
+					+ matrix[1].b2 * vertex.BoneWeight[1]
+					+ matrix[2].b2 * vertex.BoneWeight[2]
+					+ matrix[3].b2 * vertex.BoneWeight[3];
 
-						outMatrix.b3 = matrix[0].b3 * vertex.BoneWeight[0]
-							+ matrix[1].b3 * vertex.BoneWeight[1]
-							+ matrix[2].b3 * vertex.BoneWeight[2]
-							+ matrix[3].b3 * vertex.BoneWeight[3];
+				outMatrix.b3 = matrix[0].b3 * vertex.BoneWeight[0]
+					+ matrix[1].b3 * vertex.BoneWeight[1]
+					+ matrix[2].b3 * vertex.BoneWeight[2]
+					+ matrix[3].b3 * vertex.BoneWeight[3];
 
-						outMatrix.b4 = matrix[0].b4 * vertex.BoneWeight[0]
-							+ matrix[1].b4 * vertex.BoneWeight[1]
-							+ matrix[2].b4 * vertex.BoneWeight[2]
-							+ matrix[3].b4 * vertex.BoneWeight[3];
-
-
-
-						outMatrix.c1 = matrix[0].c1 * vertex.BoneWeight[0]
-							+ matrix[1].c1 * vertex.BoneWeight[1]
-							+ matrix[2].c1 * vertex.BoneWeight[2]
-							+ matrix[3].c1 * vertex.BoneWeight[3];
-
-						outMatrix.c2 = matrix[0].c2 * vertex.BoneWeight[0]
-							+ matrix[1].c2 * vertex.BoneWeight[1]
-							+ matrix[2].c2 * vertex.BoneWeight[2]
-							+ matrix[3].c2 * vertex.BoneWeight[3];
-
-						outMatrix.c3 = matrix[0].c3 * vertex.BoneWeight[0]
-							+ matrix[1].c3 * vertex.BoneWeight[1]
-							+ matrix[2].c3 * vertex.BoneWeight[2]
-							+ matrix[3].c3 * vertex.BoneWeight[3];
-
-						outMatrix.c4 = matrix[0].c4 * vertex.BoneWeight[0]
-							+ matrix[1].c4 * vertex.BoneWeight[1]
-							+ matrix[2].c4 * vertex.BoneWeight[2]
-							+ matrix[3].c4 * vertex.BoneWeight[3];
+				outMatrix.b4 = matrix[0].b4 * vertex.BoneWeight[0]
+					+ matrix[1].b4 * vertex.BoneWeight[1]
+					+ matrix[2].b4 * vertex.BoneWeight[2]
+					+ matrix[3].b4 * vertex.BoneWeight[3];
 
 
 
-						outMatrix.d1 = matrix[0].d1 * vertex.BoneWeight[0]
-							+ matrix[1].d1 * vertex.BoneWeight[1]
-							+ matrix[2].d1 * vertex.BoneWeight[2]
-							+ matrix[3].d1 * vertex.BoneWeight[3];
+				outMatrix.c1 = matrix[0].c1 * vertex.BoneWeight[0]
+					+ matrix[1].c1 * vertex.BoneWeight[1]
+					+ matrix[2].c1 * vertex.BoneWeight[2]
+					+ matrix[3].c1 * vertex.BoneWeight[3];
 
-						outMatrix.d2 = matrix[0].d2 * vertex.BoneWeight[0]
-							+ matrix[1].d2 * vertex.BoneWeight[1]
-							+ matrix[2].d2 * vertex.BoneWeight[2]
-							+ matrix[3].d2 * vertex.BoneWeight[3];
+				outMatrix.c2 = matrix[0].c2 * vertex.BoneWeight[0]
+					+ matrix[1].c2 * vertex.BoneWeight[1]
+					+ matrix[2].c2 * vertex.BoneWeight[2]
+					+ matrix[3].c2 * vertex.BoneWeight[3];
 
-						outMatrix.d3 = matrix[0].d3 * vertex.BoneWeight[0]
-							+ matrix[1].d3 * vertex.BoneWeight[1]
-							+ matrix[2].d3 * vertex.BoneWeight[2]
-							+ matrix[3].d3 * vertex.BoneWeight[3];
+				outMatrix.c3 = matrix[0].c3 * vertex.BoneWeight[0]
+					+ matrix[1].c3 * vertex.BoneWeight[1]
+					+ matrix[2].c3 * vertex.BoneWeight[2]
+					+ matrix[3].c3 * vertex.BoneWeight[3];
 
-						outMatrix.d4 = matrix[0].d4 * vertex.BoneWeight[0]
-							+ matrix[1].d4 * vertex.BoneWeight[1]
-							+ matrix[2].d4 * vertex.BoneWeight[2]
-							+ matrix[3].d4 * vertex.BoneWeight[3];
-
-					}
-
-					vertex.DeformPosition = vertex.Position;
-					vertex.DeformPosition *= outMatrix;
+				outMatrix.c4 = matrix[0].c4 * vertex.BoneWeight[0]
+					+ matrix[1].c4 * vertex.BoneWeight[1]
+					+ matrix[2].c4 * vertex.BoneWeight[2]
+					+ matrix[3].c4 * vertex.BoneWeight[3];
 
 
-					//法線変換用に移動成分を削除
-					outMatrix.a4 = 0.0f;
-					outMatrix.b4 = 0.0f;
-					outMatrix.c4 = 0.0f;
 
-					vertex.DeformNormal = vertex.Normal;
-					vertex.DeformNormal *= outMatrix;
-				}
+				outMatrix.d1 = matrix[0].d1 * vertex.BoneWeight[0]
+					+ matrix[1].d1 * vertex.BoneWeight[1]
+					+ matrix[2].d1 * vertex.BoneWeight[2]
+					+ matrix[3].d1 * vertex.BoneWeight[3];
+
+				outMatrix.d2 = matrix[0].d2 * vertex.BoneWeight[0]
+					+ matrix[1].d2 * vertex.BoneWeight[1]
+					+ matrix[2].d2 * vertex.BoneWeight[2]
+					+ matrix[3].d2 * vertex.BoneWeight[3];
+
+				outMatrix.d3 = matrix[0].d3 * vertex.BoneWeight[0]
+					+ matrix[1].d3 * vertex.BoneWeight[1]
+					+ matrix[2].d3 * vertex.BoneWeight[2]
+					+ matrix[3].d3 * vertex.BoneWeight[3];
+
+				outMatrix.d4 = matrix[0].d4 * vertex.BoneWeight[0]
+					+ matrix[1].d4 * vertex.BoneWeight[1]
+					+ matrix[2].d4 * vertex.BoneWeight[2]
+					+ matrix[3].d4 * vertex.BoneWeight[3];
+
 			}
+
+			vertex.DeformPosition = vertex.Position;
+			vertex.DeformPosition *= outMatrix;
+
+
+			//法線変換用に移動成分を削除
+			outMatrix.a4 = 0.0f;
+			outMatrix.b4 = 0.0f;
+			outMatrix.c4 = 0.0f;
+
+			vertex.DeformNormal = vertex.Normal;
+			vertex.DeformNormal *= outMatrix;
 		}
 	}
 
 }
 
+
+void CSkinModel::AnimationBlend()
+{
+	// アニメーションデータ取得									↓どのアニメ―ション？
+	aiAnimation* pAnimationCurrent = m_pScene->mAnimations[m_CurrentAnimId];
+	aiAnimation* pAnimationTarget = m_pScene->mAnimations[m_TargetAnimId];
+
+
+	for (auto c = 0; c < pAnimationCurrent->mNumChannels; c++) {
+
+		// 現在フレームのアニメーション行列の回転・平行移動成分を取得
+		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_AnimationFrame);
+
+		// ノードアニメーション取得
+		aiNodeAnim* pNodeAnimCurrent = pAnimationCurrent->mChannels[c];
+		aiNodeAnim* pNodeAnimTarget = pAnimationTarget->mChannels[c];
+		BONE* pBone = &m_Bone[pNodeAnimCurrent->mNodeName.C_Str()];
+
+		aiQuaternion rotCurrent, rotTarget, rotBlend;
+		aiVector3D posCurrent, posTarget, posBlend;
+
+		rotCurrent = pNodeAnimCurrent->mRotationKeys[CurrentFrame % pNodeAnimCurrent->mNumRotationKeys].mValue;
+		posCurrent = pNodeAnimCurrent->mPositionKeys[CurrentFrame % pNodeAnimCurrent->mNumPositionKeys].mValue;
+		rotTarget = pNodeAnimTarget->mRotationKeys[CurrentFrame % pNodeAnimTarget->mNumRotationKeys].mValue;
+		posTarget = pNodeAnimTarget->mPositionKeys[CurrentFrame % pNodeAnimTarget->mNumPositionKeys].mValue;
+
+
+		// 回転をブレンド
+		aiQuaternion::Interpolate(rotBlend, rotCurrent, rotTarget, m_PerBlend);
+
+		// ポジションをブレンド
+		aiVector3D_Lerp(posBlend, posCurrent, posTarget, m_PerBlend);
+
+		// 行列にしてクォータニオンとして格納
+		pBone->AnimationMatrix = aiMatrix4x4(
+			aiVector3D(1.0f, 1.0f, 1.0f), // 拡大縮小
+			rotBlend,					  // 回転
+			posBlend                      // 移動
+		);
+	}
+
+
+	// ブレンド値を更新
+	m_PerBlend += 0.05;
+
+	if (m_PerBlend >= 1.0f) {
+
+		m_IsAnimationBlending = false;
+		m_CurrentAnimId = m_TargetAnimId;
+		m_PerBlend = 0.0f;
+	}
+
+}
+
+
+void CSkinModel::Animation()
+{
+	// アニメーションデータ取得									↓どのアニメ―ション？
+	aiAnimation* pAnimationCurrent = m_pScene->mAnimations[m_CurrentAnimId];
+
+
+	for (auto c = 0; c < pAnimationCurrent->mNumChannels; c++) {
+
+		// 現在フレームのアニメーション行列の回転・平行移動成分を取得
+		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_AnimationFrame);
+
+		// ノードアニメーション取得
+		aiNodeAnim* pNodeAnimCurrent = pAnimationCurrent->mChannels[c];
+		BONE* pBone = &m_Bone[pNodeAnimCurrent->mNodeName.C_Str()];
+
+		aiQuaternion rotCurrent;
+		aiVector3D posCurrent;
+
+		rotCurrent = pNodeAnimCurrent->mRotationKeys[CurrentFrame % pNodeAnimCurrent->mNumRotationKeys].mValue;
+		posCurrent = pNodeAnimCurrent->mPositionKeys[CurrentFrame % pNodeAnimCurrent->mNumPositionKeys].mValue;
+
+		// 行列にしてクォータニオンとして格納
+		pBone->AnimationMatrix = aiMatrix4x4(
+			aiVector3D(1.0f, 1.0f, 1.0f), // 拡大縮小
+			rotCurrent,					  // 回転
+			posCurrent                      // 移動
+		);
+	}
+}
+
+//************************************************
+// ボーン行列更新
+//************************************************
 void CSkinModel::UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix)
 {
 	BONE* pBone = &m_Bone[pNode->mName.C_Str()];
@@ -521,6 +627,7 @@ void CSkinModel::UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix)
 	pBone->Matrix = worldMatrix;
 	pBone->Matrix *= pBone->OffsetMatrix;
 
+	pBone->Position = Vector3(pBone->Matrix.c1, pBone->Matrix.c2, pBone->Matrix.c3);
 
 	for (int n = 0; n < pNode->mNumChildren; n++) {
 
@@ -528,7 +635,96 @@ void CSkinModel::UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix)
 	}
 }
 
-XMFLOAT4X4 LoadAiMatrix4x4(aiMatrix4x4* _martrix_ai)
+//************************************************
+// 名前からノードをゲット
+//************************************************
+aiNode* CSkinModel::GetBoneNode(aiNode* pNode, const char* _name)
+{
+	string thisNodeName = pNode->mName.C_Str();
+	string Name = _name;
+
+	if (thisNodeName.compare(Name) == 0) {
+		return pNode;
+	}
+
+	// 子探索
+	for (int i = 0; i < pNode->mNumChildren; i++) {
+
+		aiNode* node = GetBoneNode(pNode->mChildren[i], _name);
+
+		if (node != NULL) {
+
+			return node;
+		}
+	}
+
+	return NULL;
+}
+
+
+//************************************************
+// 名前からワールド座標をゲット
+//************************************************
+Vector3 CSkinModel::GetWorldPosition(const char* _bone_name)
+{
+	aiNode* pNode = GetBoneNode(m_pScene->mRootNode , _bone_name);
+
+	return GetPosLocalToWorld(pNode);
+}
+
+
+//************************************************
+// 親との相対位置をゲット
+//************************************************
+Vector3 CSkinModel::GetPosLocalToWorld(aiNode* pNode)
+{
+	return m_Bone[pNode->mName.C_Str()].Position;
+}
+
+
+void CSkinModel::SetAnimation(bool _next) {
+
+	m_PerBlend = 0.0f;
+	m_TargetAnimId = m_CurrentAnimId;
+	m_TargetAnimId += _next ? 1 : -1;
+
+	if (m_TargetAnimId == m_pScene->mNumAnimations) {
+		m_TargetAnimId = 0;
+	}
+	else if (m_TargetAnimId < 0) {
+		m_TargetAnimId = m_pScene->mNumAnimations - 1;
+	}
+}
+
+void CSkinModel::SetAnimation(int _id, float _startBlendNum) {
+
+	if (m_IsAnimationBlending)return;
+	if (m_TargetAnimId == _id)return;
+
+	m_IsAnimationBlending = true;
+
+	m_PerBlend = _startBlendNum;
+	m_TargetAnimId = _id;
+}
+
+
+
+void CSkinModel::aiVector3D_Lerp(aiVector3D& _blendVec, const aiVector3D _vec1, const aiVector3D _vec2, float _blend)
+{
+	XMVECTOR startPos, endPos, currentPos;
+	startPos = XMLoadFloat3(&XMFLOAT3(_vec1.x, _vec1.y, _vec1.z));
+	endPos = XMLoadFloat3(&XMFLOAT3(_vec2.x, _vec2.y, _vec2.z));
+	currentPos = XMVectorLerp(startPos, endPos, _blend);
+	XMFLOAT3 vec3dCurrent;
+	XMStoreFloat3(&vec3dCurrent, currentPos);
+	_blendVec = aiVector3D(vec3dCurrent.x, vec3dCurrent.y, vec3dCurrent.z);
+}
+
+
+//************************************************
+// コンバート（aiMatrix4x4　-> XMFLOAT4X4）
+//************************************************
+XMFLOAT4X4 CSkinModel::LoadAiMatrix4x4(aiMatrix4x4* _martrix_ai)
 {
 	aiMatrix4x4 ai_matrix = *_martrix_ai;
 	ai_matrix.Transpose();
@@ -543,11 +739,15 @@ XMFLOAT4X4 LoadAiMatrix4x4(aiMatrix4x4* _martrix_ai)
 	return convMatrix;
 }
 
-void StoreAiMatrix4x4(XMFLOAT4X4* _matrix_ai, aiMatrix4x4& _martrix_ai)
-{
-	XMFLOAT4X4 mtx = *_matrix_ai;
 
-	_martrix_ai =
+//************************************************
+// コンバート（XMFLOAT4X4　-> aiMatrix4x4）
+//************************************************
+void CSkinModel::StoreAiMatrix4x4(XMFLOAT4X4* _matrix, aiMatrix4x4& _matrix_ai)
+{
+	XMFLOAT4X4 mtx = *_matrix;
+
+	_matrix_ai =
 	{
 		mtx._11, mtx._12, mtx._13, mtx._14,
 		mtx._21, mtx._22, mtx._23, mtx._24,
@@ -556,7 +756,7 @@ void StoreAiMatrix4x4(XMFLOAT4X4* _matrix_ai, aiMatrix4x4& _martrix_ai)
 	};
 }
 
-FileType ChackFileType(std::string pFileType)
+FileType CSkinModel::ChackFileType(std::string pFileType)
 {
 	if (pFileType.compare("fbx") == 0 || pFileType.compare("FBX") == 0)	return E_FBX;
 	else if (pFileType.compare("obj") == 0 || pFileType.compare("OBJ") == 0)	return E_OBJ;
@@ -564,7 +764,7 @@ FileType ChackFileType(std::string pFileType)
 	else return E_NONE;
 }
 
-void WritteName(aiNode* pNode)
+void CSkinModel::WritteName(aiNode* pNode)
 {
 	if (pNode->mParent != nullptr) {
 		outputfile << "(親)" << pNode->mParent->mName.data << " => " << pNode->mName.data << "\n";

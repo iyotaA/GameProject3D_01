@@ -9,6 +9,19 @@ struct VERTEX_3D
     XMFLOAT4 Diffuse;
     XMFLOAT2 TexCoord;
 };
+struct VERTEX_3D_TEX2
+{
+	Vector3  Position;
+	Vector3  Normal;
+    XMFLOAT4 Diffuse;
+    XMFLOAT2 TexCoord;
+	float    BlendNum;
+};
+
+struct CONSTANT
+{
+	XMFLOAT4X4 matrix;
+};
 
 
 // êFç\ë¢ëÃ
@@ -73,6 +86,13 @@ enum
 	SHADER_PS_MAX
 };
 
+enum
+{
+	SHADER_VS_DEFOULT,
+	SHADER_VS_MULTI_TEX,
+	SHADER_VS_MAX
+};
+
 
 class CVertexBuffer;
 class CIndexBuffer;
@@ -81,36 +101,6 @@ class CTexture;
 
 class CRenderer
 {
-private:
-
-	static D3D_FEATURE_LEVEL		m_FeatureLevel;
-
-	static ID3D11Device*			m_D3DDevice;
-	static ID3D11DeviceContext*		m_ImmediateContext;
-	static IDXGISwapChain*			m_SwapChain;
-	static ID3D11RenderTargetView*	m_RenderTargetView;
-	static ID3D11DepthStencilView*	m_DepthStencilView;
-
-
-
-	static ID3D11VertexShader*		m_VertexShader;
-	static ID3D11PixelShader**		m_PixelShader;
-	static ID3D11InputLayout*		m_VertexLayout;
-	static ID3D11Buffer*			m_WorldBuffer;
-	static ID3D11Buffer*			m_ViewBuffer;
-	static ID3D11Buffer*			m_ProjectionBuffer;
-	static ID3D11Buffer*			m_MaterialBuffer;
-	static ID3D11Buffer*			m_LightBuffer;
-	static ID3D11DepthStencilState* m_DepthStateEnable;
-	static ID3D11DepthStencilState* m_DepthStateDisable;
-
-/*
-	static XMMATRIX				m_WorldMatrix;
-	static XMMATRIX				m_ViewMatrix;
-	static XMMATRIX				m_ProjectionMatrix;
-*/
-
-
 public:
 	static void Init();
 	static void Uninit();
@@ -124,6 +114,7 @@ public:
 	static void SetProjectionMatrix(XMMATRIX * ProjectionMatrix);
 	static void SetMaterial(MATERIAL Material);
 	static void SetShaderPS(int elem);
+	static void SetShaderVS(int elem);
 	static void SetLight(LIGHT Light);
 	static void SetVertexBuffers( ID3D11Buffer* VertexBuffer );
 	static void SetIndexBuffer( ID3D11Buffer* IndexBuffer );
@@ -131,9 +122,38 @@ public:
 	static void SetTexture(CTexture* Texture, unsigned int Slot);
 	static void SetTexture(CTexture** Texture, unsigned int Slot, unsigned int NumTextures);
 	static void DrawIndexed( unsigned int IndexCount, unsigned int StartIndexLocation, int BaseVertexLocation );
+	static void SetRasterizerState(D3D11_FILL_MODE _fill_mode, D3D11_CULL_MODE _cull_mode);
 
 	static ID3D11Device* GetDevice( void ){ return m_D3DDevice; }
 	static ID3D11DeviceContext* GetDeviceContext( void ){ return m_ImmediateContext; }
+
+private:
+
+	static D3D_FEATURE_LEVEL		m_FeatureLevel;
+
+	static ID3D11Device* m_D3DDevice;
+	static ID3D11DeviceContext* m_ImmediateContext;
+	static IDXGISwapChain* m_SwapChain;
+	static ID3D11RenderTargetView* m_RenderTargetView;
+	static ID3D11DepthStencilView* m_DepthStencilView;
+
+
+	static ID3D11VertexShader** m_VertexShader;
+	static ID3D11PixelShader** m_PixelShader;
+	static ID3D11InputLayout** m_VertexLayout;
+	static ID3D11Buffer* m_WorldBuffer;
+	static ID3D11Buffer* m_ViewBuffer;
+	static ID3D11Buffer* m_ProjectionBuffer;
+	static ID3D11Buffer* m_MaterialBuffer;
+	static ID3D11Buffer* m_LightBuffer;
+	static ID3D11DepthStencilState* m_DepthStateEnable;
+	static ID3D11DepthStencilState* m_DepthStateDisable;
+
+	/*
+		static XMMATRIX				m_WorldMatrix;
+		static XMMATRIX				m_ViewMatrix;
+		static XMMATRIX				m_ProjectionMatrix;
+	*/
 
 };
 

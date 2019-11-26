@@ -4,7 +4,6 @@
 #include "manager.h"
 #include "renderer.h"
 #include "sound.h"
-#include "imGui_all.h"
 
 // ƒOƒ[ƒoƒ‹•Ï” ////////////////////////////////////
 const char* CLASS_NAME = "DX11AppClass";

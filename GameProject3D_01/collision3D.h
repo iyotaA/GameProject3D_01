@@ -4,27 +4,24 @@
 // 球型コリジョン
 class CCollisionSphere
 {
-private:
-	Vector3	m_CenterPos;
-	float		m_Radius;
-
 public:
 	CCollisionSphere() : m_CenterPos(Vector3(0.0f, 0.0f, 0.0f)), m_Radius(1.0f){}
+	CCollisionSphere(Vector3 _pos, float _radius) : m_CenterPos(_pos), m_Radius(_radius){}
 
 	void SetCenter(Vector3* center) { m_CenterPos = *center; }
 	void SetRadius(float radius) { m_Radius = radius; }
 	Vector3 GetCenter(void) { return m_CenterPos; }
 	float GetRadius(void) { return m_Radius; }
+
+private:
+	Vector3	m_CenterPos;
+	float	m_Radius;
+
 };
 
 // CCollisionOBB(Vector3 _pos, Dir3Vector _vec3, Vector3 _len)
 class CCollisionOBB
 {
-private:
-	Vector3    m_Pos;              // 位置
-	Vector3X3  m_NormaDirect;	   // 方向ベクトル
-	Vector3    m_fLength;          // 各軸方向の長さ
-
 public:
 	CCollisionOBB(Vector3 _pos, Vector3X3 _vec3, Vector3 _len):
 		m_Pos(_pos),
@@ -46,6 +43,7 @@ public:
 	}
 
 	// 指定軸番号の方向ベクトルを取得
+	// 0 : right / 1 : up / 2 : front
 	Vector3 GetDirect(int elem) {
 
 		if (elem == 0)
@@ -62,6 +60,13 @@ public:
 	Vector3 GetLen_W() { return m_fLength; }
 	// 位置を取得
 	Vector3 GetPos_W() { return m_Pos; }
+
+private:
+	Vector3    m_Pos;              // 位置
+	Vector3X3  m_NormaDirect;	   // 方向ベクトル
+	Vector3    m_fLength;          // 各軸方向の長さ
+
+
 };
 
 
@@ -73,10 +78,6 @@ public:
 /////////////////////////////////////////////////////////////////
 class CCollision3DJudge
 {
-private:
-	// 分離軸に投影された軸成分から投影線分長を算出
-	static float LenSegOnSeparateAxis(Vector3* Sep, Vector3* e1, Vector3* e2, Vector3* e3 = 0);
-
 public:
 	// 球と球の衝突判定
 	static bool Collision3D_Spher_Spher(CCollisionSphere* pSA, CCollisionSphere* pSB);
@@ -86,6 +87,11 @@ public:
 
 	// OBBとOBBの衝突判定
 	static bool Collision3D_OBB_OBB(CCollisionOBB& obb1, CCollisionOBB& obb2);
+
+private:
+	// 分離軸に投影された軸成分から投影線分長を算出
+	static float LenSegOnSeparateAxis(Vector3* Sep, Vector3* e1, Vector3* e2, Vector3* e3 = 0);
+
 };
 
 #endif // !COLLISION3D_H_

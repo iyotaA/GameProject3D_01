@@ -3,11 +3,30 @@
 
 #define CAMERA_MOVE_SPEED (0.05f)
 
-class CCamera : public CGameObject
+class CCamera
 {
+public:
+	void Init();
+	void Uninit();
+	void Update();
+	void Project();
+	void DrawGUI();
+
+	XMFLOAT4X4 GetViewMatrix() { return m_ViewMatrix; }
+	XMFLOAT4X4 GetProjectionMatrix() { return m_ProjectionMatrix; }
+
+	Vector3X3* GetDir3Vector() { return &m_DirVec; }
+	bool GetVisivility(XMFLOAT3* position);
+	bool GetIsBindAtObject() { return m_BindAtObject; }
+
+	void SetAt(CGameObject* pPlayer);
+	void SetPos(Vector3* pPos);
+	void AddPos(Vector3* pAddPos);
+
 private:
 
-	CGameObject* m_pAtObject;
+	Vector3 m_Position, m_Rotation;
+	CGameObject* m_pAtPoint;
 	RECT		 m_Viewport;
 	Vector3X3    m_DirVec;
 	Vector3      m_At;
@@ -28,18 +47,6 @@ private:
 	void Tilt();
 	void Move();
 
-public:
-	void Init();
-	void Uninit();
-	void Update();
-	void Draw();
-	void DrawGUI();
-
-	Vector3X3* GetDir3Vector() { return &m_DirVec; }
-	bool GetVisivility(XMFLOAT3* position);
-	bool GetIsBindAtObject(){ return m_BindAtObject; }
-
-	void SetAt(CGameObject* pPlayer);
 };
 
 #endif

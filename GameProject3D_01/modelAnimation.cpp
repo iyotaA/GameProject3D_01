@@ -212,7 +212,7 @@ void CModelAnimation::Update(int frame)
 	//PlayAnimation(m_Scene->mRootNode);
 
 }
-
+//
 //void CModelAnimation::Update(int frame)
 //{
 //	if (m_Blend >= 1.0f) {

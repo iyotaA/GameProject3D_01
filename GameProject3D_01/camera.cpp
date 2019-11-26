@@ -1,12 +1,9 @@
 
 // インクルード ////////////////////////////////////
-#include "game_objects_all.h"
-#include "scene.h"
-#include "title.h"
-#include "game.h"
-#include "result.h"
-#include "tutorial.h"
-
+#include "main.h"
+#include "gameObject.h"
+#include "camera.h"
+#include "camera_manager.h"
 
 void CCamera::Init()
 {
@@ -20,26 +17,8 @@ void CCamera::Init()
 	m_Viewport.right  = SCREEN_WIDTH;
 	m_Viewport.bottom = SCREEN_HEIGHT;
 
-	// 前ベクトル初期化
-	m_DirVec.front = Vector3(0.0f, 0.0f, 1.0f);
-	m_DirVec.front.Normalize();
-
-	// 右ベクトル初期化
-	m_DirVec.up    = Vector3(0.0f, 1.0f, 0.0f);
-	m_DirVec.right = m_DirVec.up.VCross(m_DirVec.front);
-	m_DirVec.right.Normalize();
-
-	// 上ベクトル初期化
-	m_DirVec.up = m_DirVec.front.VCross(m_DirVec.right);
-	m_DirVec.up.Normalize();
-
-	// 少しだけ下を向く
-	XMMATRIX rotationMtx;
-	rotationMtx    = XMMatrixRotationAxis(m_DirVec.right, XMConvertToRadians(15.0f));
-	m_DirVec.up    = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-	m_DirVec.up    = XMVector3Normalize(m_DirVec.up);
+	// Front_Up_Rightベクトル初期化
+	m_DirVec.SetFrontUpRight(Vector3(0.0f, 0.0f, 1.0f));
 
 	/* カメラ情報初期化 */
 	m_LengthToAt     = 5.0f;
@@ -93,7 +72,7 @@ void CCamera::Update()
 }
 
 
-void CCamera::Draw()
+void CCamera::Project()
 {
 	// ビューポート設定
 	D3D11_VIEWPORT dxViewport;
@@ -132,10 +111,8 @@ void CCamera::Draw()
 	//	);
 	//}
 
-	Vector3 position  = m_Position;
-
 	// ビューマトリクス設定
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixLookAtLH(position, m_At, m_DirVec.up));
+	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixLookAtLH(m_Position, m_At, m_DirVec.up));
 	CRenderer::SetViewMatrix(&XMLoadFloat4x4(&m_ViewMatrix));
 
 	// プロジェクションマトリクス設定
@@ -257,10 +234,10 @@ void CCamera::Tilt()
 
 void CCamera::Move()
 {
-	if (m_pAtObject != NULL)
+	if (m_pAtPoint != NULL)
 	{
 		if (m_BindAtObject) {
-			m_At = Vector3(m_pAtObject->GetPosition()->x, m_pAtObject->GetPosition()->y + 2.0f, m_pAtObject->GetPosition()->z);
+			m_At = Vector3(m_pAtPoint->GetPosition()->x, m_pAtPoint->GetPosition()->y + 2.0f, m_pAtPoint->GetPosition()->z);
 			return;
 		}
 	}
@@ -295,10 +272,10 @@ void CCamera::Move()
 	}
 }
 
-void CCamera::SetAt(CGameObject* pPlayer)
+void CCamera::SetAt(CGameObject* pAt)
 {
-	if (pPlayer) {
-		m_pAtObject = pPlayer;
+	if (pAt) {
+		m_pAtPoint = pAt;
 		XMFLOAT3 front;
 		XMStoreFloat3(&front, m_DirVec.front);
 		front.x *= m_LengthToAt;
@@ -306,12 +283,12 @@ void CCamera::SetAt(CGameObject* pPlayer)
 		front.z *= m_LengthToAt;
 
 		// カメラの初期位置
-		m_Position.x = m_pAtObject->GetPosition()->x - front.x;
-		m_Position.y = m_pAtObject->GetPosition()->y - front.y;
-		m_Position.z = m_pAtObject->GetPosition()->z - front.z;
+		m_Position.x = m_pAtPoint->GetPosition()->x - front.x;
+		m_Position.y = m_pAtPoint->GetPosition()->y - front.y;
+		m_Position.z = m_pAtPoint->GetPosition()->z - front.z;
 	}
 	else {
-		m_pAtObject = NULL;
+		m_pAtPoint = NULL;
 		XMFLOAT3 front;
 		XMStoreFloat3(&front, m_DirVec.front);
 		front.x *= m_LengthToAt;
@@ -326,5 +303,17 @@ void CCamera::SetAt(CGameObject* pPlayer)
 		m_Position.y = 10.0f;
 		m_Position.z = -10.0f;
 	}
+}
+
+
+void CCamera::SetPos(Vector3* pPos)
+{
+	m_Position = *pPos;
+}
+
+
+void CCamera::AddPos(Vector3* pAddPos)
+{
+	m_Position += *pAddPos;
 }
 

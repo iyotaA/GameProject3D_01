@@ -2,13 +2,11 @@
 #define SCENE_H_
 
 #include "collision3D.h"
-#include "stl.h"
 #include "debug_primitive.h"
 #include "gameObject.h"
 #include "model.h"
 #include "modelAnimation.h"
 #include "player.h"
-#include "camera.h"
 #include "polygon3d.h"
 #include "polygon.h"
 #include "field.h"
@@ -24,11 +22,6 @@
 
 class CScene
 {
-public:
-
-protected:
-	std::list<CGameObject*> m_GameObject[CManager::E_Max];
-
 public:
 	CScene() {}
 	virtual ~CScene(){}
@@ -137,6 +130,10 @@ public:
 	{
 		GameObject->SetDestroy();
 	}
+
+protected:
+	std::list<CGameObject*> m_GameObject[CManager::E_Max];
+
 };
 
 #endif // !SCENE_H_

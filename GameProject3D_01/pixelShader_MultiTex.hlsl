@@ -33,11 +33,12 @@ void main( in  float4 inPosition		: POSITION0,
 						 in  float4 inNormal		: NORMAL0,
 						 in  float2 inTexCoord		: TEXCOORD0,
 						 in  float4 inDiffuse		: COLOR0,
+						 in  float  inBlendNum		: BLENDNUM0,
 
 						 out float4 outDiffuse		: SV_Target )
 {
 
-    outDiffuse = Texture[0].Sample(Sampler, inTexCoord) * inDiffuse.r + Texture[1].Sample(Sampler, inTexCoord) * (1.0f - inDiffuse.r);
+    outDiffuse = Texture[0].Sample(Sampler, inTexCoord) * inBlendNum + Texture[1].Sample(Sampler, inTexCoord) * (1.0f - inBlendNum);
 
 	outDiffuse *= inDiffuse;
 

@@ -4,15 +4,12 @@
 
 class CResult : public CScene
 {
-private:
-	int FrameCount;
-
 public:
 	void Init()
 	{
-		// カメラの初期化
-		CCamera* camera;
-		camera = AddGameObject<CCamera>(CManager::E_Camera);
+		//// カメラの初期化
+		//CCamera* camera;
+		//camera = AddGameObject<CCamera>(CManager::E_Camera);
 
 		// フィールドの初期化
 		AddGameObject<CField>(CManager::E_Background);
@@ -97,6 +94,10 @@ public:
 		ImGui::Text("Result");
 		ImGui::End();
 	}
+
+private:
+	int FrameCount;
+
 };
 
 #endif // !RESULT_H
