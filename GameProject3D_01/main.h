@@ -40,4 +40,5 @@ using namespace std;
 HWND GetWindow();
 void DrawFPS();
 
+
 #endif

@@ -24,7 +24,7 @@ public:
 		player = AddGameObject<CPlayer>(CManager::E_3D);
 		//player->SetCamera(camera);	// カメラセット
 
-		CCamera* camera = CCameraManager::GetCamera(0);		// 注視点
+		CCamera* camera = CCameraManager::GetCamera();		// 注視点
 		camera->SetAt(player);
 
 		// 数字の初期化

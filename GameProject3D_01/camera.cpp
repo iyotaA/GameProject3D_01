@@ -2,11 +2,13 @@
 // インクルード ////////////////////////////////////
 #include "main.h"
 #include "gameObject.h"
-#include "camera.h"
 #include "camera_manager.h"
+#include "camera.h"
 
-void CCamera::Init()
+void CCamera::Init(unsigned int _id)
 {
+	m_CameraId = _id;
+
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 5.0f, -10.0f);
 	m_Rotation = Vector3(XMConvertToRadians(15.0f), 0.0f, 0.0f);
@@ -40,33 +42,40 @@ void CCamera::Uninit()
 
 void CCamera::Update()
 {
-	// 視点移動
-	Move();
-
-	// カメラの移動可能範囲か？
-	if (IsRange()) {
-
-		Pan();// 視点遷移左右（注視オブジェクトがある場合注視点回転）
-
-		Tilt();// 視点遷移上下（注視オブジェクトがある場合注視点回転）
+	// 追従移動
+	if (m_pAtPoint != NULL)
+	{
+		if (m_BindAtObject) {
+			m_At = Vector3(m_pAtPoint->GetPosition()->x, m_pAtPoint->GetPosition()->y + 2.0f, m_pAtPoint->GetPosition()->z);
+		}
 	}
 
-	// 前フレームとの回転差分
-	Vector3 rotationValue =
-		Vector3(m_Position.x - m_At.x, m_Position.y - m_At.y, m_Position.z - m_At.z);
+	{// 横回転
+		XMMATRIX rotationMtx;
+		rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
+		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+		m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
+		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+		m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+	}
 
-	// 回転差分から回転角度計算
-	m_Rotation = Vector3(
-		XMConvertToRadians(atan2f(rotationValue.y, rotationValue.x)),
-		XMConvertToRadians(atan2f(rotationValue.z, rotationValue.x)),
-		XMConvertToRadians(atan2f(rotationValue.y, rotationValue.x))
-	);
+	{// 縦回転
+		XMMATRIX rotationMtx;
+		rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
+		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+	}
+
 
 	// カメラの位置更新
 	Vector3 vFront = m_DirVec.front * m_LengthToAt;
 	m_Position = Vector3(m_At.x - vFront.x, m_At.y + 1.0f - vFront.y, m_At.z - vFront.z);
 
-	// 慣性（徐々にスピードダウン）
+	// 回転の慣性（徐々にスピードダウン）
 	m_SpinVerticall *= 0.92f;
 	m_SpinHorizontal *= 0.92f;
 }
@@ -85,35 +94,14 @@ void CCamera::Project()
 
 	CRenderer::GetDeviceContext()->RSSetViewports(1, &dxViewport);
 
-	// インバースビューマトリクス設定
-	XMMATRIX invMtx = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
-	invMtx *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	XMStoreFloat4x4(&m_InvViewMatrix, invMtx);
-
-	 Vector3 cameraFront = m_DirVec.front;
-
-	//if (m_pPlayer != nullptr) {
-	//	m_At = XMLoadFloat3(
-	//		&XMFLOAT3(
-	//			m_pPlayer->GetPosition().x,
-	//			m_pPlayer->GetPosition().y + 1.0f,
-	//			m_pPlayer->GetPosition().z
-	//		)
-	//	);
-	//}
-	//else {
-	//	m_At = XMLoadFloat3(
-	//		&XMFLOAT3(
-	//			m_Position.x + cameraFront.x * m_LengthToAt,
-	//			m_Position.y + cameraFront.y * m_LengthToAt,
-	//			m_Position.z + cameraFront.z * m_LengthToAt
-	//		)
-	//	);
-	//}
-
 	// ビューマトリクス設定
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixLookAtLH(m_Position, m_At, m_DirVec.up));
+	XMMATRIX viewMtx;
+	viewMtx = XMMatrixLookAtLH(m_Position, m_At, m_DirVec.up);
+	XMStoreFloat4x4(&m_ViewMatrix, viewMtx);
 	CRenderer::SetViewMatrix(&XMLoadFloat4x4(&m_ViewMatrix));
+
+	// ビュー逆行列
+	XMStoreFloat4x4(&m_InvViewMatrix, XMMatrixInverse(NULL, viewMtx));
 
 	// プロジェクションマトリクス設定
 	XMStoreFloat4x4(&m_ProjectionMatrix ,XMMatrixPerspectiveFovLH(1.0f, dxViewport.Width / dxViewport.Height, 0.1f, 1000.0f));
@@ -148,10 +136,11 @@ bool CCamera::GetVisivility(XMFLOAT3* position)
 void CCamera::DrawGUI()
 {
 	ImGui::Begin("System");
-	ImGuiID Window_System_Id = ImGui::GetID("System");
 
-	if (ImGui::CollapsingHeader("Camera"))
+	if (ImGui::CollapsingHeader("FocusCamera"))
 	{
+		ImGui::Text("Camera [ %d ]", m_CameraId);
+
 		ImGui::Columns(2);
 		{
 			ImGui::SliderFloat("LengthToAt", &m_LengthToAt, 1.0f, 200.0f);
@@ -162,7 +151,7 @@ void CCamera::DrawGUI()
 
 		ImGui::Spacing();
 
-		ImGuiID Window_Camera_Id = ImGui::GetID("Camera");
+		ImGuiID Window_Camera_Id = ImGui::GetID("FocusCamera");
 
 		{
 			ImGui::NextColumn();
@@ -196,78 +185,57 @@ bool CCamera::IsRange()
 	else return false;
 }
 
-void CCamera::Pan()
+void CCamera::Pan(CCameraManager::CameraRotate _rotate_dir)
 {
-	if (CInput::GetKeyPress(VK_LEFT)) {
+	if (_rotate_dir == CCameraManager::RotateLeft) {
 		m_SpinHorizontal -= m_RotateSpeed;
 	}
-	if (CInput::GetKeyPress(VK_RIGHT)) {
+	if (_rotate_dir == CCameraManager::RotateRight) {
 		m_SpinHorizontal += m_RotateSpeed;
 	}
 
-	XMMATRIX rotationMtx;
-	rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
-	m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-	m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
-	m_DirVec.up = XMVector3Normalize(m_DirVec.up);
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-	m_DirVec.right = XMVector3Normalize(m_DirVec.right);
 }
 
-void CCamera::Tilt()
+void CCamera::Tilt(CCameraManager::CameraRotate _rotate_dir)
 {
-	if (CInput::GetKeyPress(VK_UP)) {
+	if (_rotate_dir == CCameraManager::RotateUp) {
 		m_SpinVerticall -= m_RotateSpeed;
 	}
-	if (CInput::GetKeyPress(VK_DOWN)) {
+	if (_rotate_dir == CCameraManager::RotateDown) {
 		m_SpinVerticall += m_RotateSpeed;
 	}
 
-	XMMATRIX rotationMtx;
-	rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
-	m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-	m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-	m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-	m_DirVec.up = XMVector3Normalize(m_DirVec.up);
 }
 
-void CCamera::Move()
+void CCamera::Move(CCameraManager::CameraMove _move_dir)
 {
-	if (m_pAtPoint != NULL)
-	{
-		if (m_BindAtObject) {
-			m_At = Vector3(m_pAtPoint->GetPosition()->x, m_pAtPoint->GetPosition()->y + 2.0f, m_pAtPoint->GetPosition()->z);
-			return;
-		}
-	}
 
 	float speed = CAMERA_MOVE_SPEED * m_MoveSpeedScale;
 
-	if (CInput::GetKeyPress('W')) {
+	if (_move_dir == CCameraManager::MoveForward) {
 		m_At.x += m_DirVec.front.x * speed;
 		m_At.y += m_DirVec.front.y * speed;
 		m_At.z += m_DirVec.front.z * speed;
 	}
-	if (CInput::GetKeyPress('A')) {
+	if (_move_dir == CCameraManager::MoveLeft) {
 		m_At.x -= m_DirVec.right.x * speed;
 		m_At.y -= m_DirVec.right.y * speed;
 		m_At.z -= m_DirVec.right.z * speed;
 	}
-	if (CInput::GetKeyPress('S')) {
+	if (_move_dir == CCameraManager::MoveBack) {
 		m_At.x -= m_DirVec.front.x * speed;
 		m_At.y -= m_DirVec.front.y * speed;
 		m_At.z -= m_DirVec.front.z * speed;
 	}
-	if (CInput::GetKeyPress('D')) {
+	if (_move_dir == CCameraManager::MoveRight) {
 		m_At.x += m_DirVec.right.x * speed;
 		m_At.y += m_DirVec.right.y * speed;
 		m_At.z += m_DirVec.right.z * speed;
 	}
-	if (CInput::GetKeyPress('Q')) {
+	if (_move_dir == CCameraManager::MoveDown) {
 		m_At.y -= speed;
 	}
-	if (CInput::GetKeyPress('E')) {
+	if (_move_dir == CCameraManager::MoveUp) {
 		m_At.y += speed;
 	}
 }
