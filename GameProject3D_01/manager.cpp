@@ -25,9 +25,14 @@ void CManager::Init()
 
 	//カメラの生成
 	CCameraManager::CreateCamera();
+	CCameraManager::CreateCamera();
 
 	// シーンの初期化
 	SetScene<CGame>();
+
+	//カメラマネージャーの設定
+	CCameraManager::SetCurrentCameraId(0);
+	CCameraManager::Init();
 
 	// imgui初期化
 	CImgui::Init();

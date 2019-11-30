@@ -6,7 +6,7 @@
 class CCamera
 {
 public:
-	void Init();
+	void Init(unsigned int _id);
 	void Uninit();
 	void Update();
 	void Project();
@@ -18,10 +18,14 @@ public:
 	Vector3X3* GetDir3Vector() { return &m_DirVec; }
 	bool GetVisivility(XMFLOAT3* position);
 	bool GetIsBindAtObject() { return m_BindAtObject; }
+	float GetRotateSpeed() { return m_RotateSpeed; }
 
 	void SetAt(CGameObject* pPlayer);
 	void SetPos(Vector3* pPos);
 	void AddPos(Vector3* pAddPos);
+	void Pan(CCameraManager::CameraRotate _rotate_dir);
+	void Tilt(CCameraManager::CameraRotate _rotate_dir);
+	void Move(CCameraManager::CameraMove _move_dir);
 
 private:
 
@@ -35,6 +39,7 @@ private:
 	XMFLOAT4X4 m_ProjectionMatrix;
 	XMFLOAT4X4 m_InvViewMatrix;
 
+	unsigned int m_CameraId;
 	float		m_LengthToAt;
 	float		m_SpinVerticall;
 	float		m_SpinHorizontal;
@@ -43,9 +48,6 @@ private:
 	bool		m_BindAtObject;
 
 	bool IsRange();
-	void Pan();
-	void Tilt();
-	void Move();
 
 };
 

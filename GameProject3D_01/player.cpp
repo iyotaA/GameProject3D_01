@@ -21,7 +21,7 @@ void CPlayer::Init()
 	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f);
 
 	// トランスフォーム初期化
-	m_Position = Vector3(0.0f, 10.0f, 0.0f);
+	m_Position = Vector3(0.0f, 0.0f, 0.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -101,7 +101,7 @@ void CPlayer::DrawCollisionGrid()
 	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
 
-	color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
 
 
@@ -237,7 +237,7 @@ void CPlayer::Move()
 	// 前フレームのポジション
 	Vector3 prevPos = m_Position;
 
-	CCamera* camera = CCameraManager::GetCamera(0);
+	CCamera* camera = CCameraManager::GetCamera();
 
 	if (!camera->GetIsBindAtObject())return;
 
@@ -345,9 +345,15 @@ void CPlayer::Action()
 
 void CPlayer::UpdateCollision()
 {
+	// マトリクス設定
+	XMMATRIX world;
+	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
+	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
-	Vector3 myPos = m_pModel->GetWorldPosition("Head");
-	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_Position + myPos));
+	Vector3 myPos = m_pModel->GetWorldPosition(&world, "Head");
+	m_DamageManager->GetCollisionSphere()->SetCenter(&myPos);
+	m_DamageManager->GetCollisionSphere()->SetRadius(0.5f);
 	m_CollisionSphere->SetCenter(&m_Position);
 
 	Vector3X3 obbColSize;

@@ -25,9 +25,9 @@ struct BONE
 {
 	// std::string　Name; ボーンの名前を取得できるよ
 	aiMatrix4x4 Matrix;
+	aiMatrix4x4 WorldMatrix;
 	aiMatrix4x4 AnimationMatrix;
 	aiMatrix4x4 OffsetMatrix;
-	Vector3		Position;
 };
 
 //struct MESH
@@ -45,14 +45,14 @@ public:
 	void Unload();
 	void Draw(XMMATRIX* world);
 	void update(int addAnimationFrame);
-	Vector3 GetWorldPosition(const char* _bone_name);
+	Vector3 GetWorldPosition( XMMATRIX* _world,const char* _bone_name);
 
 	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
 	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }
 
 	// 引数 / _next : true = Next / _next : false = Back
 	void SetAnimation(bool _next);
-	void SetAnimation(int _id, float _startBlendNum);
+	void SetAnimation(const unsigned int _id, const float _startBlendNum);
 
 	char GetCurrentAnimId() { return m_CurrentAnimId; }
 	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
@@ -92,13 +92,17 @@ private:
 	void UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix);
 	void AnimationBlend();
 	void Animation();
-	Vector3 GetPosLocalToWorld(aiNode* pNode);
+	void GetPosLocalToWorld( aiNode* pNode, XMMATRIX* _world, const char* _targetName );
 	aiNode* GetBoneNode(aiNode* pNode, const char* _name);
 
 	//変換系 ////////////////////////////////////
 	void aiVector3D_Lerp(aiVector3D& _blendVec, const aiVector3D _vec1, const aiVector3D _vec2, float _blend);
 	XMFLOAT4X4 LoadAiMatrix4x4(aiMatrix4x4* _martrix_ai);
 	void StoreAiMatrix4x4(XMFLOAT4X4* _matrix_ai, aiMatrix4x4& _martrix_ai);
+
+	XMMATRIX PickupOffset(const XMMATRIX& mWorld);
+	XMMATRIX PickupScaling(const XMMATRIX& mWorld);
+	XMMATRIX PickupRotation(const XMMATRIX& mWorld);
 
 	//ファイル操作・チェック ////////////////////////////////////
 	FileType ChackFileType(std::string pFileType);

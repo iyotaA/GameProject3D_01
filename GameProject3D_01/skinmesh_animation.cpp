@@ -36,6 +36,7 @@ static ofstream outputfile(F);
 void CSkinModel::Load(char* pFileName, float size)
 {
 	m_pScene = aiImportFile(pFileName, aiProcessPreset_TargetRealtime_MaxQuality);
+	m_pScene->mMeshes[0]->mBones[0];
 	if (m_pScene == NULL)
 	{
 		assert(false);
@@ -624,10 +625,9 @@ void CSkinModel::UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix)
 	aiMatrix4x4 worldMatrix;
 	worldMatrix = matrix;
 	worldMatrix *= pBone->AnimationMatrix;
+	pBone->WorldMatrix = worldMatrix;
 	pBone->Matrix = worldMatrix;
 	pBone->Matrix *= pBone->OffsetMatrix;
-
-	pBone->Position = Vector3(pBone->Matrix.c1, pBone->Matrix.c2, pBone->Matrix.c3);
 
 	for (int n = 0; n < pNode->mNumChildren; n++) {
 
@@ -665,20 +665,40 @@ aiNode* CSkinModel::GetBoneNode(aiNode* pNode, const char* _name)
 //************************************************
 // 名前からワールド座標をゲット
 //************************************************
-Vector3 CSkinModel::GetWorldPosition(const char* _bone_name)
+XMMATRIX g_TargetMatrix;
+Vector3 CSkinModel::GetWorldPosition(XMMATRIX* _world, const char* _bone_name)
 {
-	aiNode* pNode = GetBoneNode(m_pScene->mRootNode , _bone_name);
+	XMMATRIX mtxWorld = XMMatrixIdentity();
+	mtxWorld *= *_world;
+	GetPosLocalToWorld(m_pScene->mRootNode,&mtxWorld, _bone_name);
+	XMVECTOR position = { 0.0f, 0.0f, 0.0f, 0.0f };
+	position = XMVector3Transform(position, g_TargetMatrix);
 
-	return GetPosLocalToWorld(pNode);
+	return position;
 }
 
 
 //************************************************
 // 親との相対位置をゲット
 //************************************************
-Vector3 CSkinModel::GetPosLocalToWorld(aiNode* pNode)
+void CSkinModel::GetPosLocalToWorld(aiNode* pNode, XMMATRIX* _world, const char* _targetName)
 {
-	return m_Bone[pNode->mName.C_Str()].Position;
+	// 回転成分を取得
+	XMMATRIX mtxWorld = PickupRotation(XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].WorldMatrix)));
+	mtxWorld *= XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].OffsetMatrix));
+	mtxWorld *= *_world;
+
+	// 対象のノードだったらターゲット行列にセット
+	string name = _targetName;
+	if (name.compare(pNode->mName.C_Str()) == 0) {
+		g_TargetMatrix = mtxWorld;
+		return;
+	}
+
+	// 子ノードにアクセス
+	for (int i = 0; i < pNode->mNumChildren; i++) {
+		GetPosLocalToWorld(pNode->mChildren[i], &mtxWorld, _targetName);
+	}
 }
 
 
@@ -696,15 +716,17 @@ void CSkinModel::SetAnimation(bool _next) {
 	}
 }
 
-void CSkinModel::SetAnimation(int _id, float _startBlendNum) {
+void CSkinModel::SetAnimation(const unsigned int _id, const float _startBlendNum) {
 
 	if (m_IsAnimationBlending)return;
 	if (m_TargetAnimId == _id)return;
 
 	m_IsAnimationBlending = true;
 
-	m_PerBlend = _startBlendNum;
-	m_TargetAnimId = _id;
+	m_PerBlend =(_startBlendNum > 1.0f) ? 1.0f : _startBlendNum;
+	m_PerBlend =(_startBlendNum < 0.0f) ? 0.0f : _startBlendNum;
+
+	m_TargetAnimId = (_id >= m_pScene->mNumAnimations) ? 0 : _id;
 }
 
 
@@ -778,4 +800,33 @@ void CSkinModel::WritteName(aiNode* pNode)
 		WritteName(pNode->mChildren[child]);
 	}
 }
+
+
+// World行列から平行移動成分だけ抽出
+XMMATRIX CSkinModel::PickupOffset(const XMMATRIX& mWorld)
+{
+	return XMMatrixTranslation(mWorld.r[3].m128_f32[0], mWorld.r[3].m128_f32[1], mWorld.r[3].m128_f32[2]);
+}
+
+// World行列から拡縮成分だけ抽出
+XMMATRIX CSkinModel::PickupScaling(const XMMATRIX& mWorld)
+{
+	return XMMatrixScaling(
+		XMVector3Length(XMVECTOR{ mWorld.r[0].m128_f32[0],mWorld.r[0].m128_f32[1],mWorld.r[0].m128_f32[2] }).m128_f32[0],
+		XMVector3Length(XMVECTOR{ mWorld.r[1].m128_f32[0],mWorld.r[1].m128_f32[1],mWorld.r[1].m128_f32[2] }).m128_f32[0],
+		XMVector3Length(XMVECTOR{ mWorld.r[2].m128_f32[0],mWorld.r[2].m128_f32[1],mWorld.r[2].m128_f32[2] }).m128_f32[0]
+	);
+}
+
+// ワールド行列から回転成分のみを抽出する
+XMMATRIX CSkinModel::PickupRotation(const XMMATRIX& mWorld)
+{
+	XMMATRIX mOffset = PickupOffset(mWorld);
+	XMMATRIX mScaling = PickupScaling(mWorld);
+
+	XMVECTOR det;
+	// 左からScaling、右からOffsetの逆行列をそれぞれかける。
+	return XMMatrixInverse(&det, mScaling) * mWorld * XMMatrixInverse(&det, mOffset);
+}
+
 

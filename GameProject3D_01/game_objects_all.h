@@ -7,8 +7,8 @@
 #include "debug_primitive.h"
 #include "damage.h"
 #include "gameObject.h"
-#include "camera.h"
 #include "camera_manager.h"
+#include "camera.h"
 
 
 #endif // !GAME_OBJECTS_ALL_H_
