@@ -102,8 +102,7 @@ void CSkinModel::Load(char* pFileName, float size)
 	LoadMesh(m_pScene->mRootNode);
 
 
-	aiNode* pNode = m_pScene->mRootNode;
-	WritteName(pNode);
+	WritteName(m_pScene->mRootNode);
 	outputfile.close();
 
 
@@ -665,12 +664,16 @@ aiNode* CSkinModel::GetBoneNode(aiNode* pNode, const char* _name)
 //************************************************
 // 名前からワールド座標をゲット
 //************************************************
-XMMATRIX g_TargetMatrix;
+static XMMATRIX g_TargetMatrix;
 Vector3 CSkinModel::GetWorldPosition(XMMATRIX* _world, const char* _bone_name)
 {
-	XMMATRIX mtxWorld = XMMatrixIdentity();
+	g_TargetMatrix = XMMatrixIdentity();
+
+	XMMATRIX mtxWorld = XMMatrixScaling(m_Size, m_Size, m_Size);
 	mtxWorld *= *_world;
-	GetPosLocalToWorld(m_pScene->mRootNode,&mtxWorld, _bone_name);
+	GetPosLocalToWorld(m_pScene->mRootNode, &mtxWorld, _bone_name);
+	//g_TargetMatrix = g_TargetMatrix * XMMatrixScaling(m_Size, m_Size, m_Size);
+	//g_TargetMatrix *= *_world;
 	XMVECTOR position = { 0.0f, 0.0f, 0.0f, 0.0f };
 	position = XMVector3Transform(position, g_TargetMatrix);
 
@@ -684,8 +687,13 @@ Vector3 CSkinModel::GetWorldPosition(XMMATRIX* _world, const char* _bone_name)
 void CSkinModel::GetPosLocalToWorld(aiNode* pNode, XMMATRIX* _world, const char* _targetName)
 {
 	// 回転成分を取得
-	XMMATRIX mtxWorld = PickupRotation(XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].WorldMatrix)));
-	mtxWorld *= XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].OffsetMatrix));
+	XMMATRIX mtxWorld = XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].WorldMatrix));//PickupRotation(XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].AnimationMatrix)));
+	if (pNode->mParent) {
+		mtxWorld *= XMMatrixInverse(NULL, XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mParent->mName.C_Str()].Matrix)));
+	}
+	else {
+		mtxWorld *= XMMatrixInverse(NULL, *_world);
+	}
 	mtxWorld *= *_world;
 
 	// 対象のノードだったらターゲット行列にセット

@@ -61,6 +61,7 @@ private:
 	// ＜::: 変数群 :::＞ //
 	static std::vector<CCamera*> m_pCamera; // カメラポインタ
 	static unsigned int m_CurrentId;
+	static XMFLOAT2 m_InputRightStick;
 	//static CTerrain* m_TerrianAccesser;
 
 	CCameraManager() = default;

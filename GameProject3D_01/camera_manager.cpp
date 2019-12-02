@@ -6,6 +6,7 @@
 
 std::vector<CCamera*> CCameraManager::m_pCamera;
 unsigned int		  CCameraManager::m_CurrentId;
+XMFLOAT2			  CCameraManager::m_InputRightStick;
 //CTerrain*			  CCameraManager::m_TerrianAccesser;
 
 
@@ -123,6 +124,7 @@ void CCameraManager::Move()
 // 指定カメラ回転
 void CCameraManager::Rotate()
 {
+	m_InputRightStick = CInput::GetGamepadRightStick();
 
 	if (CInput::GetKeyPress(VK_LEFT)) {
 		m_pCamera[m_CurrentId]->Pan(RotateLeft);
@@ -134,6 +136,18 @@ void CCameraManager::Rotate()
 		m_pCamera[m_CurrentId]->Tilt(RotateUp);
 	}
 	if (CInput::GetKeyPress(VK_DOWN)) {
+		m_pCamera[m_CurrentId]->Tilt(RotateDown);
+	}
+	if (m_InputRightStick.x <= -16383.0f) {
+		m_pCamera[m_CurrentId]->Pan(RotateLeft);
+	}
+	if (m_InputRightStick.x >= 16383.0f) {
+		m_pCamera[m_CurrentId]->Pan(RotateRight);
+	}
+	if (m_InputRightStick.y >= 16383.0f) {
+		m_pCamera[m_CurrentId]->Tilt(RotateUp);
+	}
+	if (m_InputRightStick.y <= -16383.0f) {
 		m_pCamera[m_CurrentId]->Tilt(RotateDown);
 	}
 
@@ -153,18 +167,25 @@ void CCameraManager::DrawGUI()
 
 	ImGuiID Window_Camera_Id = ImGui::GetID("FocusCamera");
 
-	ImGui::BeginChildFrame(Window_Camera_Id, ImVec2(120, 30));
+	if (ImGui::CollapsingHeader("FocusCamera"))
+	{
+		// 入力値
+		ImGui::InputFloat2("Input", (float*)&m_InputRightStick);
 
-	ImGui::InputInt("Id", (int*)&m_CurrentId);
+		// カメラ番号
+		ImGui::InputInt("Id", (int*)&m_CurrentId);
+		{
+			if (m_CurrentId >= m_pCamera.size()) {
+				m_CurrentId = 0;
+			}
+			else if (m_CurrentId < 0) {
+				m_CurrentId = m_pCamera.size() - 1;
+			}
+		}
 
-	ImGui::EndChildFrame();
+		// カメラステータス
+		m_pCamera[m_CurrentId]->DrawGUI();
+	}
 
 	ImGui::End();
-
-	if (m_CurrentId >= m_pCamera.size()) {
-		m_CurrentId = 0;
-	}
-	else if (m_CurrentId < 0) {
-		m_CurrentId = m_pCamera.size() - 1;
-	}
 }
