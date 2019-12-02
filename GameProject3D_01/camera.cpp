@@ -107,9 +107,6 @@ void CCamera::Project()
 	XMStoreFloat4x4(&m_ProjectionMatrix ,XMMatrixPerspectiveFovLH(1.0f, dxViewport.Width / dxViewport.Height, 0.1f, 1000.0f));
 
 	CRenderer::SetProjectionMatrix(&XMLoadFloat4x4(&m_ProjectionMatrix));
-
-	// ImGui
-	DrawGUI();
 }
 
 bool CCamera::GetVisivility(XMFLOAT3* position)
@@ -135,37 +132,28 @@ bool CCamera::GetVisivility(XMFLOAT3* position)
 
 void CCamera::DrawGUI()
 {
-	ImGui::Begin("System");
+	ImGui::Text("Camera [ %d ]", m_CameraId);
 
-	if (ImGui::CollapsingHeader("FocusCamera"))
+	ImGui::Columns(2);
 	{
-		ImGui::Text("Camera [ %d ]", m_CameraId);
-
-		ImGui::Columns(2);
-		{
-			ImGui::SliderFloat("LengthToAt", &m_LengthToAt, 1.0f, 200.0f);
-			ImGui::SliderFloat("RotateSpeed", &m_RotateSpeed, 0.001f, 0.01f);
-			ImGui::SliderFloat("MoveSpeed", &m_MoveSpeedScale, 1.0f, 20.0f);
-			ImGui::Checkbox("BindAt", &m_BindAtObject);
-		}
-
-		ImGui::Spacing();
-
-		ImGuiID Window_Camera_Id = ImGui::GetID("FocusCamera");
-
-		{
-			ImGui::NextColumn();
-			ImGui::BeginChildFrame(Window_Camera_Id, ImVec2(ImGui::GetColumnWidth(0), 100));
-
-			ImGui::Text("PosX = %.1f", m_Position.x);
-			ImGui::Text("PosY = %.1f", m_Position.y);
-			ImGui::Text("PosZ = %.1f", m_Position.z);
-
-			ImGui::EndChildFrame();
-		}
+		ImGui::SliderFloat("LengthToAt", &m_LengthToAt, 1.0f, 200.0f);
+		ImGui::SliderFloat("RotateSpeed", &m_RotateSpeed, 0.001f, 0.01f);
+		ImGui::SliderFloat("MoveSpeed", &m_MoveSpeedScale, 1.0f, 20.0f);
+		ImGui::Checkbox("BindAt", &m_BindAtObject);
 	}
 
-	ImGui::End();
+	ImGui::Spacing();
+
+	ImGuiID Window_Camera_Id = ImGui::GetID("FocusCamera");
+
+	{
+		ImGui::NextColumn();
+		ImGui::BeginChildFrame(Window_Camera_Id, ImVec2(ImGui::GetColumnWidth(0), 100));
+
+		ImGui::InputFloat3("AtPosition", (float*)&m_At);
+
+		ImGui::EndChildFrame();
+	}
 }
 
 bool CCamera::IsRange()

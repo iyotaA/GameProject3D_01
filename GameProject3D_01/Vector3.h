@@ -29,6 +29,8 @@ struct Vector3 : public XMFLOAT3 {
 
 	inline bool    operator == (const Vector3& _r) const { return x == _r.x && y == _r.y && z == _r.z; }
 	inline bool    operator != (const Vector3& _r) const { return x != _r.x || y != _r.y || z != _r.z; }
+	inline bool    operator <= (const Vector3& _r) const { return x <= _r.x || y <= _r.y || z <= _r.z; }
+	inline bool    operator >= (const Vector3& _r) const { return x >= _r.x || y >= _r.y || z >= _r.z; }
 	inline Vector3 operator *  (const float _r) const { return Vector3(x * _r, y * _r, z * _r); }
 	inline Vector3 operator /  (const float _r) const { return Vector3(x / _r, y / _r, z / _r); }
 	inline Vector3 operator +  (const Vector3 _r) const { return Vector3(x + _r.x, y + _r.y, z + _r.z); }

@@ -18,7 +18,7 @@ public:
 	CDamage* GetDamageManager(void) { return m_DamageManager; }
 
 private:
-	const float m_DefaultSpeed = 0.01f;
+	const float m_DefaultSpeed = 0.017f;
 
 	CSkinModel*       m_pModel;
 	Vector3X3         m_DirVec;
@@ -26,6 +26,7 @@ private:
 	CCollisionOBB*    m_CollisionOBB;
 	CDamage*          m_DamageManager;
 	Vector3			  m_MoveDistance;
+	Vector3			  m_BonePosition;
 	float             m_MoveSpeed;
 	bool			  m_IsCollision;
 	bool			  m_IsPressMovingEntry;

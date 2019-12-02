@@ -15,6 +15,7 @@
 #include "manager.h"
 #include "renderer.h"
 #include "sound.h"
+#include <Xinput.h>
 #include "input.h"
 
 #include "imGui_all.h"

@@ -7,7 +7,7 @@
 #include "result.h"
 #include "tutorial.h"
 #include "skinmesh_animation.h"
-
+#include "main.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
@@ -21,7 +21,7 @@ void CPlayer::Init()
 	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f);
 
 	// トランスフォーム初期化
-	m_Position = Vector3(0.0f, 0.0f, 0.0f);
+	m_Position = Vector3(42.0f, 0.0f, -70.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -37,6 +37,7 @@ void CPlayer::Init()
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
 
 	m_MoveDistance = Vector3(0.0f, 0.0f, 0.0f);
+	m_BonePosition = Vector3(0.0f, 0.0f, 0.0f);
 	m_MoveSpeed = m_DefaultSpeed;
 	m_IsCollision = false;
 	m_IsPressMovingEntry = false;
@@ -174,6 +175,7 @@ void CPlayer:: DrawGUI()
 		ImGuiID Window_Player_Id = ImGui::GetID("Player");
 
 		ImVec2 s = ImGui::GetWindowSize();
+		ImGui::InputFloat3("BonePosition", (float*)&m_BonePosition);
 
 		m_DamageManager->DebugDraw();
 
@@ -243,21 +245,28 @@ void CPlayer::Move()
 
 	Vector3 cameraFront = camera->GetDir3Vector()->front;
 	Vector3 cameraRight = camera->GetDir3Vector()->right;
+	XMFLOAT2 inputNum = CInput::GetGamepadLeftStick();
 	Vector3 moveDistance = Vector3(0.0f, 0.0f, 0.0f);
+
+	// 移動入力されたか？
+	m_IsPressMovingEntry = CInput::GetIsInputStick(LEFT_STICK) || CInput::GetKeyPress('W') || CInput::GetKeyPress('A') || CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
+
+	moveDistance += cameraRight * inputNum.x;
+	moveDistance += cameraFront * inputNum.y;
 
 	if (CInput::GetKeyPress('W')) {
 		moveDistance.x += cameraFront.x;
 		moveDistance.z += cameraFront.z;
 	}
+	else if (CInput::GetKeyPress('S')) {
+		moveDistance.x -= cameraFront.x;
+		moveDistance.z -= cameraFront.z;
+	}
 	if (CInput::GetKeyPress('A')) {
 		moveDistance.x -= cameraRight.x;
 		moveDistance.z -= cameraRight.z;
 	}
-	if (CInput::GetKeyPress('S')) {
-		moveDistance.x -= cameraFront.x;
-		moveDistance.z -= cameraFront.z;
-	}
-	if (CInput::GetKeyPress('D')) {
+	else if (CInput::GetKeyPress('D')) {
 		moveDistance.x += cameraRight.x;
 		moveDistance.z += cameraRight.z;
 	}
@@ -302,9 +311,6 @@ void CPlayer::Move()
 
 	// 重力加算
 	AddGlavity();
-
-	// 移動入力されたか？
-	m_IsPressMovingEntry = CInput::GetKeyPress('W') || CInput::GetKeyPress('A') || CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
 
 	if (m_IsPressMovingEntry) {
 		m_pModel->SetAnimation(2, 0.0f);
@@ -351,9 +357,9 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
-	Vector3 myPos = m_pModel->GetWorldPosition(&world, "Head");
-	m_DamageManager->GetCollisionSphere()->SetCenter(&myPos);
-	m_DamageManager->GetCollisionSphere()->SetRadius(0.5f);
+	m_BonePosition = m_pModel->GetWorldPosition(&world, "RightHandIndex4_end");
+	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
+	m_DamageManager->GetCollisionSphere()->SetRadius(1.0f);
 	m_CollisionSphere->SetCenter(&m_Position);
 
 	Vector3X3 obbColSize;
