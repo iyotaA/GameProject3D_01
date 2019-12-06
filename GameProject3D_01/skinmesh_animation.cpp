@@ -14,8 +14,11 @@
 #include "input.h"
 #include "texture.h"
 #include "gameObject.h"
+#include "shader_all.h"
 #include "skinmesh_animation.h"
 #include "modelAnimation.h"
+#include "camera_manager.h"
+#include "camera.h"
 
 #define F "asset/Node.txt"
 
@@ -142,6 +145,8 @@ void CSkinModel::Load(char* pFileName, float size)
 	//}
 
 	//DrawMesh(m_pScene->mRootNode, &aiMatrix4x4());
+
+	m_Shader = ShaderManager::GetShader<CShaderDefault>();
 }
 
 
@@ -262,7 +267,19 @@ void CSkinModel::Draw(XMMATRIX* world)
 	// XMMATRIXs—ñ‚Ì‡¬
 	_world = XMMatrixScaling(m_Size, m_Size, m_Size) * _world;
 
-	CRenderer::SetWorldMatrix(&_world);
+	XMFLOAT4X4 world_4x4;
+	XMStoreFloat4x4(&world_4x4, _world);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	m_Shader->SetLight(LIGHT());
+	m_Shader->SetMaterial(MATERIAL());
+	m_Shader->Set();
+
+	//CRenderer::SetWorldMatrix(&_world);
 
 	if (m_DrawAtLine) {
 		CRenderer::SetRasterizerState(D3D11_FILL_WIREFRAME, D3D11_CULL_NONE);
@@ -354,7 +371,6 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
 		//CRenderer::GetDeviceContext()->DrawIndexedInstanced(m_Mesh[mesh_index].IndexNum, 100, 0, 0, 0);
-		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
 	}
 
 

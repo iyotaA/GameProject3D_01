@@ -16,14 +16,14 @@ ID3D11RenderTargetView*  CRenderer::m_RenderTargetView = NULL;
 ID3D11DepthStencilView*  CRenderer::m_DepthStencilView = NULL;
 
 
-ID3D11VertexShader**      CRenderer::m_VertexShader     = NULL;
-ID3D11PixelShader**       CRenderer::m_PixelShader      = NULL;
-ID3D11InputLayout**       CRenderer::m_VertexLayout     = NULL;
-ID3D11Buffer*			 CRenderer::m_WorldBuffer      = NULL;
-ID3D11Buffer*			 CRenderer::m_ViewBuffer       = NULL;
-ID3D11Buffer*			 CRenderer::m_ProjectionBuffer = NULL;
-ID3D11Buffer*			 CRenderer::m_MaterialBuffer   = NULL;
-ID3D11Buffer*			 CRenderer::m_LightBuffer      = NULL;
+//ID3D11VertexShader**      CRenderer::m_VertexShader     = NULL;
+//ID3D11PixelShader**       CRenderer::m_PixelShader      = NULL;
+//ID3D11InputLayout**       CRenderer::m_VertexLayout     = NULL;
+//ID3D11Buffer*			 CRenderer::m_WorldBuffer      = NULL;
+//ID3D11Buffer*			 CRenderer::m_ViewBuffer       = NULL;
+//ID3D11Buffer*			 CRenderer::m_ProjectionBuffer = NULL;
+//ID3D11Buffer*			 CRenderer::m_MaterialBuffer   = NULL;
+//ID3D11Buffer*			 CRenderer::m_LightBuffer      = NULL;
 
 
 ID3D11DepthStencilState* CRenderer::m_DepthStateEnable;
@@ -173,162 +173,162 @@ void CRenderer::Init()
 	m_ImmediateContext->PSSetSamplers( 0, 1, &samplerState );
 
 
-	// 頂点シェーダ生成
-	{
-		m_VertexShader = new ID3D11VertexShader * [SHADER_VS_MAX];
-		m_VertexLayout = new ID3D11InputLayout * [SHADER_VS_MAX];
+	//// 頂点シェーダ生成
+	//{
+	//	m_VertexShader = new ID3D11VertexShader * [SHADER_VS_MAX];
+	//	m_VertexLayout = new ID3D11InputLayout * [SHADER_VS_MAX];
 
 
-		{
-			FILE* file;
-			long int fsize;
+	//	{
+	//		FILE* file;
+	//		long int fsize;
 
-			file = fopen("asset/shader/vertexShader.cso", "rb");
-			fsize = _filelength(_fileno(file));
-			unsigned char* buffer = new unsigned char[fsize];
-			fread(buffer, fsize, 1, file);
-			fclose(file);
+	//		file = fopen("asset/shader/vertexShader.cso", "rb");
+	//		fsize = _filelength(_fileno(file));
+	//		unsigned char* buffer = new unsigned char[fsize];
+	//		fread(buffer, fsize, 1, file);
+	//		fclose(file);
 
-			m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader[SHADER_VS_DEFOULT]);
-
-
-			// 入力レイアウト生成
-			D3D11_INPUT_ELEMENT_DESC layout[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			};
-			UINT numElements = ARRAYSIZE(layout);
-
-			m_D3DDevice->CreateInputLayout(layout,
-				numElements,
-				buffer,
-				fsize,
-				&m_VertexLayout[SHADER_VS_DEFOULT]);
-		delete[] buffer;
-
-		}
-
-		{
-			FILE* file;
-			long int fsize;
-
-			file = fopen("asset/shader/vertexShader_SH31.cso", "rb");
-			fsize = _filelength(_fileno(file));
-			unsigned char* buffer = new unsigned char[fsize];
-			fread(buffer, fsize, 1, file);
-			fclose(file);
-
-			m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader[SHADER_VS_MULTI_TEX]);
-
-			// 入力レイアウト生成
-			D3D11_INPUT_ELEMENT_DESC layout[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "BLENDNUM", 0, DXGI_FORMAT_R32_FLOAT, 0, 4 * 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			};
-			UINT numElements = ARRAYSIZE(layout);
-
-			m_D3DDevice->CreateInputLayout(layout,
-				numElements,
-				buffer,
-				fsize,
-				&m_VertexLayout[SHADER_VS_MULTI_TEX]);
-		}
-	}
+	//		m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader[SHADER_VS_DEFOULT]);
 
 
+	//		// 入力レイアウト生成
+	//		D3D11_INPUT_ELEMENT_DESC layout[] =
+	//		{
+	//			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//		};
+	//		UINT numElements = ARRAYSIZE(layout);
 
-	// ピクセルシェーダ生成
-	{
-		m_PixelShader = new ID3D11PixelShader*[SHADER_PS_MAX];
+	//		m_D3DDevice->CreateInputLayout(layout,
+	//			numElements,
+	//			buffer,
+	//			fsize,
+	//			&m_VertexLayout[SHADER_VS_DEFOULT]);
+	//	delete[] buffer;
 
-		FILE* file;
-		long int fsize;
+	//	}
 
-		file = fopen("asset/shader/pixelShader.cso", "rb");
-		fsize = _filelength(_fileno(file));
-		unsigned char* buffer = new unsigned char[fsize];
-		fread(buffer, fsize, 1, file);
-		fclose(file);
+	//	{
+	//		FILE* file;
+	//		long int fsize;
 
-		m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader[SHADER_PS_DEFOULT]);
+	//		file = fopen("asset/shader/vertexShader_SH31.cso", "rb");
+	//		fsize = _filelength(_fileno(file));
+	//		unsigned char* buffer = new unsigned char[fsize];
+	//		fread(buffer, fsize, 1, file);
+	//		fclose(file);
 
-		delete[] buffer;
+	//		m_D3DDevice->CreateVertexShader(buffer, fsize, NULL, &m_VertexShader[SHADER_VS_MULTI_TEX]);
 
-		file = fopen("asset/shader/pixelShader_MultiTex.cso", "rb");
-		fsize = _filelength(_fileno(file));
+	//		// 入力レイアウト生成
+	//		D3D11_INPUT_ELEMENT_DESC layout[] =
+	//		{
+	//			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//			{ "BLENDNUM", 0, DXGI_FORMAT_R32_FLOAT, 0, 4 * 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//		};
+	//		UINT numElements = ARRAYSIZE(layout);
 
-		buffer = new unsigned char[fsize];
-		fread(buffer, fsize, 1, file);
-		fclose(file);
-
-		m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader[SHADER_PS_MULTI_TEX]);
-
-		delete[] buffer;
-
-	}
+	//		m_D3DDevice->CreateInputLayout(layout,
+	//			numElements,
+	//			buffer,
+	//			fsize,
+	//			&m_VertexLayout[SHADER_VS_MULTI_TEX]);
+	//	}
+	//}
 
 
 
+	//// ピクセルシェーダ生成
+	//{
+	//	m_PixelShader = new ID3D11PixelShader*[SHADER_PS_MAX];
 
-	// 定数バッファ生成
-	D3D11_BUFFER_DESC hBufferDesc;
-	hBufferDesc.ByteWidth = sizeof(CONSTANT);
-	hBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	hBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	hBufferDesc.CPUAccessFlags = 0;
-	hBufferDesc.MiscFlags = 0;
-	hBufferDesc.StructureByteStride = sizeof(float);
+	//	FILE* file;
+	//	long int fsize;
 
-	m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_WorldBuffer );
-	m_ImmediateContext->VSSetConstantBuffers( 0, 1, &m_WorldBuffer);
+	//	file = fopen("asset/shader/pixelShader.cso", "rb");
+	//	fsize = _filelength(_fileno(file));
+	//	unsigned char* buffer = new unsigned char[fsize];
+	//	fread(buffer, fsize, 1, file);
+	//	fclose(file);
 
-	m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_ViewBuffer );
-	m_ImmediateContext->VSSetConstantBuffers( 1, 1, &m_ViewBuffer );
+	//	m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader[SHADER_PS_DEFOULT]);
 
-	m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_ProjectionBuffer );
-	m_ImmediateContext->VSSetConstantBuffers( 2, 1, &m_ProjectionBuffer );
+	//	delete[] buffer;
+
+	//	file = fopen("asset/shader/pixelShader_MultiTex.cso", "rb");
+	//	fsize = _filelength(_fileno(file));
+
+	//	buffer = new unsigned char[fsize];
+	//	fread(buffer, fsize, 1, file);
+	//	fclose(file);
+
+	//	m_D3DDevice->CreatePixelShader(buffer, fsize, NULL, &m_PixelShader[SHADER_PS_MULTI_TEX]);
+
+	//	delete[] buffer;
+
+	//}
 
 
-	hBufferDesc.ByteWidth = sizeof(MATERIAL);
-
-	m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_MaterialBuffer );
-	m_ImmediateContext->VSSetConstantBuffers( 3, 1, &m_MaterialBuffer );
 
 
-	hBufferDesc.ByteWidth = sizeof(LIGHT);
+	//// 定数バッファ生成
+	//D3D11_BUFFER_DESC hBufferDesc;
+	//hBufferDesc.ByteWidth = sizeof(CONSTANT);
+	//hBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	//hBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//hBufferDesc.CPUAccessFlags = 0;
+	//hBufferDesc.MiscFlags = 0;
+	//hBufferDesc.StructureByteStride = sizeof(float);
 
-	m_D3DDevice->CreateBuffer(&hBufferDesc, NULL, &m_LightBuffer);
-	m_ImmediateContext->VSSetConstantBuffers( 4, 1, &m_LightBuffer );
+	//m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_WorldBuffer );
+	//m_ImmediateContext->VSSetConstantBuffers( 0, 1, &m_WorldBuffer);
+
+	//m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_ViewBuffer );
+	//m_ImmediateContext->VSSetConstantBuffers( 1, 1, &m_ViewBuffer );
+
+	//m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_ProjectionBuffer );
+	//m_ImmediateContext->VSSetConstantBuffers( 2, 1, &m_ProjectionBuffer );
+
+
+	//hBufferDesc.ByteWidth = sizeof(MATERIAL);
+
+	//m_D3DDevice->CreateBuffer( &hBufferDesc, NULL, &m_MaterialBuffer );
+	//m_ImmediateContext->VSSetConstantBuffers( 3, 1, &m_MaterialBuffer );
+
+
+	//hBufferDesc.ByteWidth = sizeof(LIGHT);
+
+	//m_D3DDevice->CreateBuffer(&hBufferDesc, NULL, &m_LightBuffer);
+	//m_ImmediateContext->VSSetConstantBuffers( 4, 1, &m_LightBuffer );
 
 
 	// シェーダーセット
-	SetShaderVS(SHADER_VS_DEFOULT);
-	SetShaderPS(SHADER_PS_DEFOULT);
+	//SetShaderVS(SHADER_VS_DEFOULT);
+	//SetShaderPS(SHADER_PS_DEFOULT);
 
 
 	// ライト初期化
-	LIGHT light;
-	Vector3 dir = Vector3(0.0f, -1.0f, 1.0f);
-	dir.Normalize();
-	light.Direction = XMFLOAT4(dir.x, dir.y, dir.z, 0.0f);
-	light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	light.Ambient = COLOR(0.6f, 0.6f, 0.6f, 1.0f);
-	SetLight(light);
+	//LIGHT light;
+	//Vector3 dir = Vector3(0.0f, -1.0f, 1.0f);
+	//dir.Normalize();
+	//light.Direction = XMFLOAT4(dir.x, dir.y, dir.z, 0.0f);
+	//light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	//light.Ambient = COLOR(0.6f, 0.6f, 0.6f, 1.0f);
+	//SetLight(light);
 
 
-	// マテリアル初期化
-	MATERIAL material;
-	ZeroMemory( &material, sizeof(material) );
-	material.Diffuse = COLOR( 1.0f, 1.0f, 1.0f, 1.0f );
-	material.Ambient = COLOR( 1.0f, 1.0f, 1.0f, 1.0f );
-	SetMaterial( material );
+	//// マテリアル初期化
+	//MATERIAL material;
+	//ZeroMemory( &material, sizeof(material) );
+	//material.Diffuse = COLOR( 1.0f, 1.0f, 1.0f, 1.0f );
+	//material.Ambient = COLOR( 1.0f, 1.0f, 1.0f, 1.0f );
+	//SetMaterial( material );
 }
 
 
@@ -336,18 +336,18 @@ void CRenderer::Init()
 void CRenderer::Uninit()
 {
 	// オブジェクト解放
-	if ( m_WorldBuffer )		m_WorldBuffer->Release();
-	if ( m_ViewBuffer )			m_ViewBuffer->Release();
-	if ( m_ProjectionBuffer )	m_ProjectionBuffer->Release();
+	//if ( m_WorldBuffer )		m_WorldBuffer->Release();
+	//if ( m_ViewBuffer )			m_ViewBuffer->Release();
+	//if ( m_ProjectionBuffer )	m_ProjectionBuffer->Release();
 
-	if( m_MaterialBuffer )		m_MaterialBuffer->Release();
+	//if( m_MaterialBuffer )		m_MaterialBuffer->Release();
 
-	if( m_VertexLayout[0] )		m_VertexLayout[0]->Release();
-	if( m_VertexLayout[1] )		m_VertexLayout[1]->Release();
-	if( m_VertexShader[0] )		m_VertexShader[0]->Release();
-	if( m_VertexShader[1] )		m_VertexShader[1]->Release();
-	if( m_PixelShader[0] )		m_PixelShader[0]->Release();
-	if( m_PixelShader[1] )		m_PixelShader[1]->Release();
+	//if( m_VertexLayout[0] )		m_VertexLayout[0]->Release();
+	//if( m_VertexLayout[1] )		m_VertexLayout[1]->Release();
+	//if( m_VertexShader[0] )		m_VertexShader[0]->Release();
+	//if( m_VertexShader[1] )		m_VertexShader[1]->Release();
+	//if( m_PixelShader[0] )		m_PixelShader[0]->Release();
+	//if( m_PixelShader[1] )		m_PixelShader[1]->Release();
 
 	if( m_ImmediateContext )	m_ImmediateContext->ClearState();
 	if( m_RenderTargetView )	m_RenderTargetView->Release();
@@ -389,74 +389,74 @@ void CRenderer::SetDepthEnable( bool Enable )
 
 void CRenderer::SetWorldViewProjection2D()
 {
-	XMMATRIX world;
-	world = XMMatrixIdentity();
-	m_ImmediateContext->UpdateSubresource(m_WorldBuffer, 0, NULL, &XMMatrixTranspose(world), 0, 0);
+	//XMMATRIX world;
+	//world = XMMatrixIdentity();
+	//m_ImmediateContext->UpdateSubresource(m_WorldBuffer, 0, NULL, &XMMatrixTranspose(world), 0, 0);
 
-	XMMATRIX view;
-	view = XMMatrixIdentity();
-	m_ImmediateContext->UpdateSubresource(m_ViewBuffer, 0, NULL, &XMMatrixTranspose(view), 0, 0);
+	//XMMATRIX view;
+	//view = XMMatrixIdentity();
+	//m_ImmediateContext->UpdateSubresource(m_ViewBuffer, 0, NULL, &XMMatrixTranspose(view), 0, 0);
 
-	XMMATRIX projection;
-	projection = XMMatrixOrthographicOffCenterLH( 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 0.0f, 1.0f );
-	m_ImmediateContext->UpdateSubresource( m_ProjectionBuffer, 0, NULL, &XMMatrixTranspose(projection), 0, 0 );
-
-}
-
-
-void CRenderer::SetWorldMatrix( XMMATRIX *WorldMatrix )
-{
-	XMMATRIX world;
-	world = *WorldMatrix;
-	m_ImmediateContext->UpdateSubresource(m_WorldBuffer, 0, NULL, &XMMatrixTranspose(world), 0, 0);
+	//XMMATRIX projection;
+	//projection = XMMatrixOrthographicOffCenterLH( 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 0.0f, 1.0f );
+	//m_ImmediateContext->UpdateSubresource( m_ProjectionBuffer, 0, NULL, &XMMatrixTranspose(projection), 0, 0 );
 
 }
 
-void CRenderer::SetViewMatrix( XMMATRIX *ViewMatrix )
-{
-	XMMATRIX view;
-	view = *ViewMatrix;
-	m_ImmediateContext->UpdateSubresource(m_ViewBuffer, 0, NULL, &XMMatrixTranspose(view), 0, 0);
-}
 
-void CRenderer::SetProjectionMatrix( XMMATRIX *ProjectionMatrix )
-{
-	XMMATRIX projection;
-	projection = *ProjectionMatrix;
-	m_ImmediateContext->UpdateSubresource(m_ProjectionBuffer, 0, NULL, &XMMatrixTranspose(projection), 0, 0);
-}
-
-
-void CRenderer::SetMaterial( MATERIAL Material )
-{
-
-	m_ImmediateContext->UpdateSubresource( m_MaterialBuffer, 0, NULL, &Material, 0, 0 );
-
-}
-
-void CRenderer::SetShaderPS(int elem)
-{
-	// シェーダ設定
-	m_ImmediateContext->PSSetShader(m_PixelShader[elem], NULL, 0);
-}
-
-
-void CRenderer::SetShaderVS(int elem)
-{
-	// 入力レイアウト設定
-	m_ImmediateContext->IASetInputLayout(m_VertexLayout[elem]);
-
-	// シェーダ設定
-	m_ImmediateContext->VSSetShader(m_VertexShader[elem], NULL, 0);
-}
-
-
-void CRenderer::SetLight(LIGHT Light)
-{
-
-	m_ImmediateContext->UpdateSubresource(m_LightBuffer, 0, NULL, &Light, 0, 0);
-
-}
+//void CRenderer::SetWorldMatrix( XMMATRIX *WorldMatrix )
+//{
+//	XMMATRIX world;
+//	world = *WorldMatrix;
+//	m_ImmediateContext->UpdateSubresource(m_WorldBuffer, 0, NULL, &XMMatrixTranspose(world), 0, 0);
+//
+//}
+//
+//void CRenderer::SetViewMatrix( XMMATRIX *ViewMatrix )
+//{
+//	XMMATRIX view;
+//	view = *ViewMatrix;
+//	m_ImmediateContext->UpdateSubresource(m_ViewBuffer, 0, NULL, &XMMatrixTranspose(view), 0, 0);
+//}
+//
+//void CRenderer::SetProjectionMatrix( XMMATRIX *ProjectionMatrix )
+//{
+//	XMMATRIX projection;
+//	projection = *ProjectionMatrix;
+//	m_ImmediateContext->UpdateSubresource(m_ProjectionBuffer, 0, NULL, &XMMatrixTranspose(projection), 0, 0);
+//}
+//
+//
+//void CRenderer::SetMaterial( MATERIAL Material )
+//{
+//
+//	m_ImmediateContext->UpdateSubresource( m_MaterialBuffer, 0, NULL, &Material, 0, 0 );
+//
+//}
+//
+//void CRenderer::SetShaderPS(int elem)
+//{
+//	// シェーダ設定
+//	m_ImmediateContext->PSSetShader(m_PixelShader[elem], NULL, 0);
+//}
+//
+//
+//void CRenderer::SetShaderVS(int elem)
+//{
+//	// 入力レイアウト設定
+//	m_ImmediateContext->IASetInputLayout(m_VertexLayout[elem]);
+//
+//	// シェーダ設定
+//	m_ImmediateContext->VSSetShader(m_VertexShader[elem], NULL, 0);
+//}
+//
+//
+//void CRenderer::SetLight(LIGHT Light)
+//{
+//
+//	m_ImmediateContext->UpdateSubresource(m_LightBuffer, 0, NULL, &Light, 0, 0);
+//
+//}
 
 
 void CRenderer::SetRasterizerState(D3D11_FILL_MODE _fill_mode, D3D11_CULL_MODE _cull_mode)

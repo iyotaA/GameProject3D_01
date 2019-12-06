@@ -4,7 +4,10 @@
 #include "renderer.h"
 #include "texture.h"
 #include "gameObject.h"
+#include "shader_all.h"
 #include "terrain.h"
+#include "camera_manager.h"
+#include "camera.h"
 
 #define GRID_SIZE 1.0f
 
@@ -20,6 +23,9 @@ void CTerrain::Init()
 	m_Texture = new CTexture*[m_TextureNum];
 	m_Texture[0] = new CTexture();
 	m_Texture[1] = new CTexture();
+
+	// シェーダー読み込み //////
+	m_Shader = ShaderManager::GetShader<CShaderDefault>();
 
 	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
 	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
@@ -48,7 +54,18 @@ void CTerrain::Update()
 void CTerrain::Draw()
 {
 	XMMATRIX world = XMMatrixIdentity();
-	CRenderer::SetWorldMatrix(&world);
+
+	XMFLOAT4X4 world_4x4;
+	XMStoreFloat4x4(&world_4x4, world);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	m_Shader->SetLight(LIGHT());
+	m_Shader->SetMaterial(MATERIAL());
+	m_Shader->Set();
 
 	DrawBuffers();
 	DrawGUI();
@@ -307,14 +324,11 @@ void CTerrain::DrawBuffers()
 
 	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	CRenderer::SetShaderPS(SHADER_PS_MULTI_TEX);
 	CRenderer::SetTexture(m_Texture, 0, m_TextureNum);
 
 	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_FRONT);
 	CRenderer::DrawIndexed(m_indexCount, 0, 0);
 	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
-
-	CRenderer::SetShaderPS(SHADER_PS_DEFOULT);
 }
 
 void CTerrain::DrawGUI()

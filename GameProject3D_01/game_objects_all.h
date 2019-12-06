@@ -4,6 +4,7 @@
 #include "main.h"
 #include "collision3D.h"
 #include "stl.h"
+#include "shader_all.h"
 #include "debug_primitive.h"
 #include "damage.h"
 #include "gameObject.h"

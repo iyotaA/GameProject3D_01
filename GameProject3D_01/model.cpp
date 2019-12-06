@@ -12,7 +12,7 @@
 
 void CModel::Draw(XMMATRIX* pWorld)
 {
-	CRenderer::SetWorldMatrix(pWorld);
+	//CRenderer::SetWorldMatrix(pWorld);
 
 	// 頂点バッファ設定
 	CRenderer::SetVertexBuffers( m_VertexBuffer );
@@ -23,7 +23,7 @@ void CModel::Draw(XMMATRIX* pWorld)
 	for( unsigned short i = 0; i < m_SubsetNum; i++ )
 	{
 		// マテリアル設定
-		CRenderer::SetMaterial( m_SubsetArray[i].Material.Material );
+		//CRenderer::SetMaterial( m_SubsetArray[i].Material.Material );
 
 		// テクスチャ設定
 		CRenderer::SetTexture( m_SubsetArray[i].Material.Texture );

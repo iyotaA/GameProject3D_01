@@ -46,6 +46,7 @@ private:
 	HeightMapType*  m_heightMap = nullptr;
 	VERTEX_3D_TEX2* m_Vertex = nullptr;
 	CTexture**      m_Texture = nullptr;
+	CShaderDefault* m_Shader = nullptr;
 
 	// デバッグ用
 	XMFLOAT3 PlayerArea = XMFLOAT3(0.0f, 0.0f, 0.0f);

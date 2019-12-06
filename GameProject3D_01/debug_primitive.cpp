@@ -6,8 +6,13 @@
 #include "texture.h"
 #include "collision3D.h"
 #include "stl.h"
+#include "shader_all.h"
 #include "debug_primitive.h"
 #include "imGui_all.h"
+
+#include "gameObject.h"
+#include "camera_manager.h"
+#include "camera.h"
 
 //=================================================================================
 // É}ÉNÉçíËã`
@@ -18,6 +23,7 @@ std::vector<VERTEX_3D>	CDebugPrimitive::m_Vertices;
 std::vector<WORD>       CDebugPrimitive::m_Indices;
 ID3D11Buffer*			CDebugPrimitive::m_VertexBufer;
 ID3D11Buffer*			CDebugPrimitive::m_IndexBufer;
+CShaderDefault*			CDebugPrimitive::m_Shader;
 unsigned int			CDebugPrimitive::m_CircleCount;
 unsigned int            CDebugPrimitive::m_CubeCount;
 bool					CDebugPrimitive::m_IsDisplayed;
@@ -28,6 +34,8 @@ void CDebugPrimitive::DebugPrimitive_Init(void)
 	m_CircleCount = 0;
 	m_CubeCount = 0;
 	m_IsDisplayed = false;
+
+	m_Shader = ShaderManager::GetShader<CShaderDefault>();
 }
 
 void CDebugPrimitive::DebugPrimitive_Uninit(void)
@@ -91,7 +99,17 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 
 	XMMATRIX world;
 	world = XMMatrixIdentity();
-	CRenderer::SetWorldMatrix(&world);
+	XMFLOAT4X4 world_4x4;
+	XMStoreFloat4x4(&world_4x4, world);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	m_Shader->SetLight(LIGHT());
+	m_Shader->SetMaterial(MATERIAL());
+	m_Shader->Set();
 
 	UINT Stride = sizeof(VERTEX_3D);
 	UINT offdet = 0;

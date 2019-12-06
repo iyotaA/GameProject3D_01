@@ -133,7 +133,7 @@ void CModelAnimation::DrawMesh(aiNode* node, XMMATRIX* Matrix)
 	//world *= XMLoadFloat4x4((XMFLOAT4X4*)& matrix);
 
 	world *= *Matrix;
-	CRenderer::SetWorldMatrix(&world);
+	//CRenderer::SetWorldMatrix(&world);
 
 	// Ž©•ª•`‰æ
 	for (int n = 0; n < node->mNumMeshes; n++) {

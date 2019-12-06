@@ -98,7 +98,7 @@ void CCamera::Project()
 	XMMATRIX viewMtx;
 	viewMtx = XMMatrixLookAtLH(m_Position, m_At, m_DirVec.up);
 	XMStoreFloat4x4(&m_ViewMatrix, viewMtx);
-	CRenderer::SetViewMatrix(&XMLoadFloat4x4(&m_ViewMatrix));
+	//CRenderer::SetViewMatrix(&XMLoadFloat4x4(&m_ViewMatrix));
 
 	// ビュー逆行列
 	XMStoreFloat4x4(&m_InvViewMatrix, XMMatrixInverse(NULL, viewMtx));
@@ -106,7 +106,7 @@ void CCamera::Project()
 	// プロジェクションマトリクス設定
 	XMStoreFloat4x4(&m_ProjectionMatrix ,XMMatrixPerspectiveFovLH(1.0f, dxViewport.Width / dxViewport.Height, 0.1f, 1000.0f));
 
-	CRenderer::SetProjectionMatrix(&XMLoadFloat4x4(&m_ProjectionMatrix));
+	//CRenderer::SetProjectionMatrix(&XMLoadFloat4x4(&m_ProjectionMatrix));
 }
 
 bool CCamera::GetVisivility(XMFLOAT3* position)
