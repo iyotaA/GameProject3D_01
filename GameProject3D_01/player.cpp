@@ -6,6 +6,7 @@
 #include "game.h"
 #include "result.h"
 #include "tutorial.h"
+#include "shader_all.h"
 #include "skinmesh_animation.h"
 #include "main.h"
 

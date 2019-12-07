@@ -6,6 +6,7 @@
 #include "game.h"
 #include "result.h"
 #include "tutorial.h"
+#include "shader_all.h"
 
 // グローバル変数 ////////////////////////////////////
 CScene*	CManager::m_Scene;
@@ -20,12 +21,15 @@ void CManager::Init()
 	// インプットの初期化
 	CInput::Init();
 
-	// コリジョングリッド初期化
-	CDebugPrimitive::DebugPrimitive_Init();
-
 	//カメラの生成
 	CCameraManager::CreateCamera();
 	CCameraManager::CreateCamera();
+
+	// シェーダーの初期化
+	ShaderManager::Init();
+
+	// コリジョングリッド初期化
+	CDebugPrimitive::DebugPrimitive_Init();
 
 	// シーンの初期化
 	SetScene<CGame>();
@@ -49,11 +53,14 @@ void CManager::Uninit()
 	m_Scene->Uninit();
 	delete m_Scene;
 
-	// カメラ破壊
-	CCameraManager::DeleteCamera();
-
 	// コリジョングリッド終了処理
 	CDebugPrimitive::DebugPrimitive_Uninit();
+
+	// シェーダーの終了処理
+	ShaderManager::Uninit();
+
+	// カメラ破壊
+	CCameraManager::DeleteCamera();
 
 	// インプットの終了処理
 	CInput::Uninit();

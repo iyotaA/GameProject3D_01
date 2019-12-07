@@ -2,6 +2,7 @@
 #define SCENE_H_
 
 #include "collision3D.h"
+#include "shader_all.h"
 #include "debug_primitive.h"
 #include "gameObject.h"
 #include "model.h"
@@ -18,6 +19,7 @@
 #include "2dAnimation.h"
 #include "number.h"
 #include "score.h"
+#include "shader_all.h"
 #include "terrain.h"
 
 class CScene

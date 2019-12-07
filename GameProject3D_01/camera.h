@@ -15,10 +15,11 @@ public:
 	XMFLOAT4X4 GetViewMatrix() { return m_ViewMatrix; }
 	XMFLOAT4X4 GetProjectionMatrix() { return m_ProjectionMatrix; }
 
-	Vector3X3* GetDir3Vector() { return &m_DirVec; }
-	bool GetVisivility(XMFLOAT3* position);
-	bool GetIsBindAtObject() { return m_BindAtObject; }
-	float GetRotateSpeed() { return m_RotateSpeed; }
+	Vector3X3* const GetDir3Vector() { return &m_DirVec; }
+	Vector3 GetPosition() const { return m_Position; }
+	float GetRotateSpeed() const { return m_RotateSpeed; }
+	bool GetIsBindAtObject() const { return m_BindAtObject; }
+	bool GetVisivility(XMFLOAT3* position) const;
 
 	void SetAt(CGameObject* pPlayer);
 	void SetPos(Vector3* pPos);

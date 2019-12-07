@@ -133,13 +133,13 @@ void CModelAnimation::DrawMesh(aiNode* node, XMMATRIX* Matrix)
 	//world *= XMLoadFloat4x4((XMFLOAT4X4*)& matrix);
 
 	world *= *Matrix;
-	CRenderer::SetWorldMatrix(&world);
+	//CRenderer::SetWorldMatrix(&world);
 
 	// Ž©•ª•`‰æ
 	for (int n = 0; n < node->mNumMeshes; n++) {
 		unsigned int m = node->mMeshes[n];
-		CRenderer::SetVertexBuffers(m_Mesh[node->mMeshes[n]].VertexBuffer);
-		CRenderer::SetIndexBuffer(m_Mesh[node->mMeshes[n]].IndexBuffer);
+		//CRenderer::SetVertexBuffers(m_Mesh[node->mMeshes[n]].VertexBuffer);
+		//CRenderer::SetIndexBuffer(m_Mesh[node->mMeshes[n]].IndexBuffer);
 		CRenderer::DrawIndexed(m_Mesh[node->mMeshes[n]].IndexNum, 0, 0);
 	}
 

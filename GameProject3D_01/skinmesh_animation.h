@@ -68,9 +68,11 @@ private:
 	std::unordered_map<std::string, CTexture*>	m_Texture;
 	std::unordered_map<std::string, BONE>		m_Bone;
 	std::vector<DEFORM_VERTEX>* m_pDeformVertex = NULL;
+
 	const aiScene* m_pScene = NULL;	// パーシング後のデータ格納用
 	MESH* m_Mesh = nullptr;
 	FileType m_FileType;
+	CShaderDefault* m_Shader;
 	float    m_AnimationFrame = 0.0f;
 	float    m_Size;
 

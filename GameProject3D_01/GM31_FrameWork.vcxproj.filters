@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="ソース ファイル\Shader">
-      <UniqueIdentifier>{aaae455c-2117-4b0c-89fc-fd5ac159cff5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\GameObject">
       <UniqueIdentifier>{a68ad31a-0736-4884-a6aa-0482c9131155}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,18 @@
     </Filter>
     <Filter Include="ソース ファイル\MyTypeClass">
       <UniqueIdentifier>{ca17c882-461e-40af-8b90-59883c29fa96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{f3a3b764-079d-4dd1-8e05-e01177998007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader\cpp">
+      <UniqueIdentifier>{dcbcbfa7-7677-4c5e-ac04-2fab770056a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader\h">
+      <UniqueIdentifier>{9a4c2244-f459-4aa0-bfb7-12eb9fa6e952}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader\hlsl">
+      <UniqueIdentifier>{9bcec31f-5f8f-4bf6-949a-ab832a070df9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,17 +132,32 @@
     <ClCompile Include="modelAnimation.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="skinmesh_animation.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="terrain.cpp">
       <Filter>ソース ファイル\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="collision3D.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="shader_base.cpp">
+      <Filter>shader\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_default.cpp">
+      <Filter>shader\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_manager.cpp">
+      <Filter>shader\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_per_pixel_light.cpp">
+      <Filter>shader\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_multi_texture.cpp">
+      <Filter>shader\cpp</Filter>
     </ClCompile>
     <ClCompile Include="camera_manager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="collision3D.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="skinmesh_animation.cpp">
+      <Filter>ソース ファイル\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -254,9 +278,6 @@
     <ClInclude Include="score.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="skinmesh_animation.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="terrain.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
@@ -266,28 +287,55 @@
     <ClInclude Include="game_objects_all.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="stl.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>ソース ファイル\MyTypeClass</Filter>
     </ClInclude>
     <ClInclude Include="camera_manager.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
+    <ClInclude Include="shader_base.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_default.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_manager.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_all.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_per_pixel_light.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_multi_texture.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="skinmesh_animation.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="stl.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="pixelShader.hlsl">
-      <Filter>ソース ファイル\Shader</Filter>
+    <FxCompile Include="shader3DDefaultPS.hlsl">
+      <Filter>shader\hlsl</Filter>
     </FxCompile>
-    <FxCompile Include="vertexShader.hlsl">
-      <Filter>ソース ファイル\Shader</Filter>
+    <FxCompile Include="shader3DDefaultVS.hlsl">
+      <Filter>shader\hlsl</Filter>
     </FxCompile>
-    <FxCompile Include="pixelShader_MultiTex.hlsl">
-      <Filter>ソース ファイル\Shader</Filter>
+    <FxCompile Include="shader3DPerPixelLightingPS.hlsl">
+      <Filter>shader\hlsl</Filter>
     </FxCompile>
-    <FxCompile Include="vertexShader_MultiTex.hlsl">
-      <Filter>ソース ファイル\Shader</Filter>
+    <FxCompile Include="shader3DPerPixelLightingVS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DMultiTexturePS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DMultiTextureVS.hlsl">
+      <Filter>shader\hlsl</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

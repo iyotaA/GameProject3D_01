@@ -13,6 +13,7 @@ private:
 	ID3D11Buffer*	m_VertexBufer = NULL;
 	ID3D11Buffer*	m_IndexBufer = NULL;
 	CTexture*		m_Texture = NULL;
+	CShaderDefault* m_Shader;
 	int				m_IndexNum;
 
 };

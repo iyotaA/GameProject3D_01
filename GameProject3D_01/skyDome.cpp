@@ -4,7 +4,12 @@
 #include "renderer.h"
 #include "texture.h"
 #include "gameObject.h"
+#include "shader_all.h"
 #include "skyDome.h"
+
+#include "camera_manager.h"
+#include "camera.h"
+
 
 #define Radius		(400.0f)
 #define Height		(300.0f)
@@ -133,6 +138,9 @@ void CSkyDome::Init()
 	m_Texture = new CTexture();
 	m_Texture->LoadSTB("asset/image/cloud000.png");
 
+	// シェーダー読み込み //////
+	m_Shader = ShaderManager::GetShader<CShaderDefault>();
+
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 0.0f, 0.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
@@ -157,7 +165,23 @@ void CSkyDome::Draw()
 	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	CRenderer::SetWorldMatrix(&world);
+	XMFLOAT4X4 world_4x4;
+	XMStoreFloat4x4(&world_4x4, world);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	m_Shader->SetLight(LIGHT());
+
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_Shader->SetMaterial(material);
+	m_Shader->Set();
 
 	UINT Stride = sizeof(VERTEX_3D);
 	UINT offdet = 0;

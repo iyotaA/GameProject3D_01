@@ -135,7 +135,7 @@ void CWall::Draw()
 	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
 	world *= XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_Rotation.x), XMConvertToRadians(m_Rotation.y), XMConvertToRadians(m_Rotation.z));
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	CRenderer::SetWorldMatrix(&world);
+	//CRenderer::SetWorldMatrix(&world);
 
 	UINT Stride = sizeof(VERTEX_3D);
 	UINT offdet = 0;

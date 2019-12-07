@@ -17,13 +17,15 @@ public:
 	static void DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const XMFLOAT4* _color);
 
 private:
-	static std::vector<VERTEX_3D> m_Vertices;
-	static std::vector<WORD>      m_Indices;
-	static ID3D11Buffer*	      m_VertexBufer;
-	static ID3D11Buffer*	      m_IndexBufer;
-	static unsigned int           m_CircleCount;	// サークル描画数
-	static unsigned int           m_CubeCount;	// 立方体描画数
-	static bool				      m_IsDisplayed;  // 表示するか？
+	static std::vector<VERTEX_3D>	m_Vertices;
+	static std::vector<WORD>		m_Indices;
+	static ID3D11Buffer*			m_VertexBufer;
+	static ID3D11Buffer*			m_IndexBufer;
+	static CShaderDefault*			m_Shader;
+
+	static unsigned int				m_CircleCount;	// サークル描画数
+	static unsigned int				m_CubeCount;	// 立方体描画数
+	static bool						m_IsDisplayed;  // 表示するか？
 
 };
 

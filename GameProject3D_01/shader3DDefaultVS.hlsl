@@ -5,17 +5,24 @@
 //*****************************************************************************
 
 // マトリクスバッファ
-cbuffer WorldBuffer : register( b0 )
+cbuffer MatrixBuffer : register(b0)
 {
 	matrix World;
-}
-cbuffer ViewBuffer : register( b1 )
-{
 	matrix View;
-}
-cbuffer ProjectionBuffer : register( b2 )
-{
 	matrix Projection;
+}
+
+// ライトバッファ
+struct LIGHT
+{
+	float4		Direction;
+	float4		Diffuse;
+	float4		Ambient;
+};
+
+cbuffer LightBuffer : register(b1)
+{
+	LIGHT		Light;
 }
 
 // マテリアルバッファ
@@ -29,24 +36,12 @@ struct MATERIAL
 	float3		Dummy;//16bit境界用
 };
 
-cbuffer MaterialBuffer : register( b3 )
+cbuffer MaterialBuffer : register(b2)
 {
 	MATERIAL	Material;
 }
 
 
-// ライトバッファ
-struct LIGHT
-{
-	float4		Direction;
-	float4		Diffuse;
-	float4		Ambient;
-};
-
-cbuffer LightBuffer : register( b4 )
-{
-	LIGHT		Light;
-}
 
 struct InputData
 {
@@ -79,7 +74,7 @@ void main(
 	wvp = mul(wvp, Projection);
 
 	outData.Position = mul(inData.Position, wvp);
-	outData.Normal   = inData.Normal;
+	outData.Normal = inData.Normal;
 	outData.TexCoord = inData.TexCoord;
 
 	float4 worldNormal, normal;
