@@ -14,11 +14,11 @@ void CModel::Draw(XMMATRIX* pWorld)
 {
 	//CRenderer::SetWorldMatrix(pWorld);
 
-	// 頂点バッファ設定
-	CRenderer::SetVertexBuffers( m_VertexBuffer );
+	//// 頂点バッファ設定
+	//CRenderer::SetVertexBuffers( m_VertexBuffer );
 
-	// インデックスバッファ設定
-	CRenderer::SetIndexBuffer( m_IndexBuffer );
+	//// インデックスバッファ設定
+	//CRenderer::SetIndexBuffer( m_IndexBuffer );
 
 	for( unsigned short i = 0; i < m_SubsetNum; i++ )
 	{

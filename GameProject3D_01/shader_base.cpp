@@ -4,12 +4,7 @@
 
 void ShaderBase::SetMaterial(MATERIAL Material)
 {
-	MATERIAL material;
-	ZeroMemory(&material, sizeof(material));
-	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	CRenderer::GetDeviceContext()->UpdateSubresource(m_MaterialBuffer, 0, NULL, &material, 0, 0);
+	CRenderer::GetDeviceContext()->UpdateSubresource(m_MaterialBuffer, 0, NULL, &Material, 0, 0);
 }
 
 void ShaderBase::SetLight(LIGHT Light)

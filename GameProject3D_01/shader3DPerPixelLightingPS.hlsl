@@ -15,7 +15,7 @@ struct LIGHT
 	float4		Diffuse;
 	float4		Ambient;
 };
-cbuffer LightBuffer : register(b2)
+cbuffer LightBuffer : register(b1)
 {
 	LIGHT		Light;
 }
@@ -31,7 +31,7 @@ struct MATERIAL
 	float		Shininess;
 	float3		Dummy;//16bit‹«ŠE—p
 };
-cbuffer MaterialBuffer : register(b1)
+cbuffer MaterialBuffer : register(b2)
 {
 	MATERIAL	Material;
 }
@@ -52,6 +52,7 @@ struct PS_IN
 	float2 uv		: TEXCOORD0;
 	float3 posW		: POSITION1;
 	float3 nomalW	: NORMAL0;
+	float4 color	: COLOR0;
 };
 
 
@@ -77,6 +78,9 @@ float4 main(PS_IN pin) : SV_TARGET
 	s = pow(s, 10);	// ‹«ŠE‚Ú‚©‚µ
 	float4 speqular = float4(s, s, s, 1.0f);
 
+	float4 outDiffuse = pin.color * Material.Diffuse * light * Light.Diffuse;
+	outDiffuse += pin.color * Material.Ambient * Light.Ambient;
+	outDiffuse = float4(Texture.Sample(Sampler, pin.uv).rgb * light + speqular.rgb, 1.0f) * outDiffuse;
 
-	return float4(Texture.Sample(Sampler, pin.uv).rgb * light + speqular.rgb, 1.0f);
+	return outDiffuse;
 }

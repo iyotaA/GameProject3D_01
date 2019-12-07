@@ -9,19 +9,6 @@ struct VERTEX_3D
     XMFLOAT4 Diffuse;
     XMFLOAT2 TexCoord;
 };
-struct VERTEX_3D_TEX2
-{
-	Vector3  Position;
-	Vector3  Normal;
-    XMFLOAT4 Diffuse;
-    XMFLOAT2 TexCoord;
-	float    BlendNum;
-};
-
-struct CONSTANT
-{
-	XMFLOAT4X4 matrix;
-};
 
 
 // 色構造体
@@ -42,6 +29,7 @@ struct COLOR
 	float a;
 };
 
+
 // マテリアル構造体
 struct MATERIAL
 {
@@ -52,8 +40,6 @@ struct MATERIAL
 	float		Shininess;
 	float		Dummy[3];//16bit境界用
 };
-
-
 
 
 // マテリアル構造体
@@ -79,23 +65,7 @@ struct LIGHT
 	COLOR		Ambient;
 };
 
-enum
-{
-	SHADER_PS_DEFOULT,
-	SHADER_PS_MULTI_TEX,
-	SHADER_PS_MAX
-};
 
-enum
-{
-	SHADER_VS_DEFOULT,
-	SHADER_VS_MULTI_TEX,
-	SHADER_VS_MAX
-};
-
-
-class CVertexBuffer;
-class CIndexBuffer;
 class CTexture;
 
 
@@ -109,15 +79,6 @@ public:
 
 	static void SetDepthEnable(bool Enable);
 	static void SetWorldViewProjection2D();
-	//static void SetWorldMatrix(XMMATRIX * WorldMatrix);
-	//static void SetViewMatrix(XMMATRIX * ViewMatrix);
-	//static void SetProjectionMatrix(XMMATRIX * ProjectionMatrix);
-	//static void SetMaterial(MATERIAL Material);
-	//static void SetShaderPS(int elem);
-	//static void SetShaderVS(int elem);
-	//static void SetLight(LIGHT Light);
-	static void SetVertexBuffers( ID3D11Buffer* VertexBuffer );
-	static void SetIndexBuffer( ID3D11Buffer* IndexBuffer );
 	static void SetTexture( CTexture* Texture );
 	static void SetTexture(CTexture* Texture, unsigned int Slot);
 	static void SetTexture(CTexture** Texture, unsigned int Slot, unsigned int NumTextures);
@@ -136,16 +97,6 @@ private:
 	static IDXGISwapChain*          m_SwapChain;
 	static ID3D11RenderTargetView*  m_RenderTargetView;
 	static ID3D11DepthStencilView*  m_DepthStencilView;
-
-
-	//static ID3D11VertexShader**     m_VertexShader;
-	//static ID3D11PixelShader**      m_PixelShader;
-	//static ID3D11InputLayout**      m_VertexLayout;
-	//static ID3D11Buffer*            m_WorldBuffer;
-	//static ID3D11Buffer*            m_ViewBuffer;
-	//static ID3D11Buffer*            m_ProjectionBuffer;
-	//static ID3D11Buffer*            m_MaterialBuffer;
-	//static ID3D11Buffer*            m_LightBuffer;
 	static ID3D11DepthStencilState* m_DepthStateEnable;
 	static ID3D11DepthStencilState* m_DepthStateDisable;
 

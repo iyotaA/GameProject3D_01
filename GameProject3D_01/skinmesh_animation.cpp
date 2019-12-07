@@ -276,8 +276,6 @@ void CSkinModel::Draw(XMMATRIX* world)
 	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
 	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
 	m_Shader->SetLight(LIGHT());
-	m_Shader->SetMaterial(MATERIAL());
-	m_Shader->Set();
 
 	//CRenderer::SetWorldMatrix(&_world);
 
@@ -306,16 +304,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		unsigned int mesh_index = pNode->mMeshes[mesh];
 		m_Mesh[mesh_index].IndexNum = pMesh->mNumFaces * 3;
 
-		// マテリアル取得
-		const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
-		assert(mat);
-		aiColor4D diffuse;
-		aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
-
-		// テクスチャ取得
-		aiString path;
-		mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-
+		// メッシュごとの頂点群を取得
 		VERTEX_3D* vertices = nullptr;
 		vertices = new VERTEX_3D[pMesh->mNumVertices];
 		assert(vertices);
@@ -339,7 +328,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 				assert(pVertex);
 
 				// 頂点情報格納
-				vertices[id].Diffuse  = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
+				vertices[id].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 				vertices[id].Normal   = Vector3(pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
 				vertices[id].Position = Vector3(pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
 				vertices[id].TexCoord = pMesh->HasTextureCoords(0) ? XMFLOAT2(pMesh->mTextureCoords[0][id].x, 1.0f - pMesh->mTextureCoords[0][id].y) : XMFLOAT2(0.0f, 0.0f);
@@ -363,9 +352,32 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		//m_Texture[pNode->mName.C_Str()]->LoadSTB(path.C_Str());
 		CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
 
-		CRenderer::SetVertexBuffers( m_Mesh[mesh_index].VertexBuffer );
+		{
+			// マテリアル取得
+			const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
+			assert(mat);
+			aiColor4D diffuse, ambient;
+			aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
+			aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, &ambient);	// ディフーズカラー取得
 
-		CRenderer::SetIndexBuffer( m_Mesh[mesh_index].IndexBuffer );
+			// テクスチャ取得
+			aiString path;
+			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+
+			MATERIAL material;
+			material.Ambient = COLOR(ambient.r, ambient.g, ambient.b, ambient.a);
+			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+
+			m_Shader->SetMaterial(material);
+			m_Shader->Set();
+		}
+
+		{
+			UINT Stride = sizeof(VERTEX_3D);
+			UINT offdet = 0;
+			CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_Mesh[mesh_index].VertexBuffer, &Stride, &offdet);	// バーテクスバッファセット
+			CRenderer::GetDeviceContext()->IASetIndexBuffer(m_Mesh[mesh_index].IndexBuffer, DXGI_FORMAT_R16_UINT, 0);		// インデックスバッファセット
+		}
 
 		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

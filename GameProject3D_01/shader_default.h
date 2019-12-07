@@ -1,12 +1,6 @@
 #ifndef SHADER_DEFAULT_H_
 #define SHADER_DEFAULT_H_
 
-struct CONSTANT_D
-{
-	XMFLOAT4X4 WorldMatrix;
-	XMFLOAT4X4 ViewMatrix;
-	XMFLOAT4X4 ProjectionMatrix;
-};
 
 class CShaderDefault : public ShaderBase
 {
@@ -23,7 +17,16 @@ public:
 	void SetProjectionMatrix(XMFLOAT4X4* _ProjectionMatrix){ m_Constant.ProjectionMatrix = Transpose(_ProjectionMatrix); }
 
 private:
-	CONSTANT_D	m_Constant;
+
+	// コンスタントバッファのデータ群
+	struct CONSTANT
+	{
+		XMFLOAT4X4 WorldMatrix;
+		XMFLOAT4X4 ViewMatrix;
+		XMFLOAT4X4 ProjectionMatrix;
+	};
+
+	CONSTANT	m_Constant;
 
 };
 

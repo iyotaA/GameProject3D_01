@@ -22,6 +22,7 @@ struct OutputData
 	float2 uv		: TEXCOORD0;
 	float3 posW		: POSITION1;
 	float3 nomalW	: NORMAL0;
+	float4 color	: COLOR0;
 };
 
 
@@ -43,6 +44,9 @@ void main(in InputData vi, out OutputData vo)
 
 	// UV
 	vo.uv = vi.uv;
+
+	// color
+	vo.color = vi.color;
 
 	return;
 }

@@ -25,7 +25,7 @@ void CTerrain::Init()
 	m_Texture[1] = new CTexture();
 
 	// シェーダー読み込み //////
-	m_Shader = ShaderManager::GetShader<CShaderDefault>();
+	m_Shader = ShaderManager::GetShader<CShaderMultiTexture>();
 
 	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
 	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
@@ -63,8 +63,16 @@ void CTerrain::Draw()
 	m_Shader->SetWorldMatrix(&world_4x4);
 	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
 	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	XMFLOAT4 camera_pos = XMFLOAT4(camera->GetPosition().x, camera->GetPosition().y, camera->GetPosition().z, 1.0f);
+	m_Shader->SetCameraPosition(&camera_pos);
 	m_Shader->SetLight(LIGHT());
-	m_Shader->SetMaterial(MATERIAL());
+
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_Shader->SetMaterial(material);
 	m_Shader->Set();
 
 	DrawBuffers();
@@ -180,13 +188,15 @@ bool CTerrain::InitializeBuffers()
 					V = 1.0f;
 				}
 
+				int blend = ((int)m_heightMap[m_terrainHeight * z + x].y <= 0) ? 1 :(int)m_heightMap[m_terrainHeight * z + x].y;
+
 				m_Vertex[m_terrainHeight * z + x] = {
 
 					Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
 					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 					XMFLOAT2(x, z),
-					(rand() % 101) * 0.01f
+					max((rand() % blend) * (1.0f / blend), m_heightMap[m_terrainHeight * z + x].y / 10.0f)
 				};
 			}
 		}

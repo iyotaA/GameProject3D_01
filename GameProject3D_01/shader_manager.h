@@ -4,28 +4,12 @@
 class ShaderManager
 {
 public:
-	enum
-	{
-		SHADER_DEFOULT,
-		SHADER_PER_PIXEL,
-	};
-
 
 	// シェーダーマネージャー初期化
 	static void Init();
 
 	// 全てのシェーダーの終了処理
-	static void Uninit()
-	{
-		for (ShaderBase* shader : m_Shaders) {
-
-			shader->Uninit();
-			delete shader;
-		}
-
-		// リストのクリア
-		m_Shaders.clear();
-	}
+	static void Uninit();
 
 	// テンプレートクラス（追加）
 	template <typename T>
@@ -49,6 +33,14 @@ public:
 			}
 		}
 	}
+
+	// インスタンスを取得
+	static ShaderManager& GetInstance() {
+
+		ShaderManager instance;
+		return instance;
+	}
+
 
 private:
 	static std::vector<ShaderBase*>	m_Shaders;

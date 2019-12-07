@@ -138,8 +138,8 @@ void CModelAnimation::DrawMesh(aiNode* node, XMMATRIX* Matrix)
 	// Ž©•ª•`‰æ
 	for (int n = 0; n < node->mNumMeshes; n++) {
 		unsigned int m = node->mMeshes[n];
-		CRenderer::SetVertexBuffers(m_Mesh[node->mMeshes[n]].VertexBuffer);
-		CRenderer::SetIndexBuffer(m_Mesh[node->mMeshes[n]].IndexBuffer);
+		//CRenderer::SetVertexBuffers(m_Mesh[node->mMeshes[n]].VertexBuffer);
+		//CRenderer::SetIndexBuffer(m_Mesh[node->mMeshes[n]].IndexBuffer);
 		CRenderer::DrawIndexed(m_Mesh[node->mMeshes[n]].IndexNum, 0, 0);
 	}
 

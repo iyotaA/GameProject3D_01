@@ -174,7 +174,13 @@ void CSkyDome::Draw()
 	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
 	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
 	m_Shader->SetLight(LIGHT());
-	m_Shader->SetMaterial(MATERIAL());
+
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_Shader->SetMaterial(material);
 	m_Shader->Set();
 
 	UINT Stride = sizeof(VERTEX_3D);

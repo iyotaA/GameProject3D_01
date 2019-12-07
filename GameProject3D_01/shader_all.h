@@ -3,6 +3,8 @@
 
 #include "shader_base.h"
 #include "shader_default.h"
+#include "shader_per_pixel_light.h"
+#include "shader_multi_texture.h"
 #include "shader_manager.h"
 
 

@@ -109,7 +109,7 @@ void CCamera::Project()
 	//CRenderer::SetProjectionMatrix(&XMLoadFloat4x4(&m_ProjectionMatrix));
 }
 
-bool CCamera::GetVisivility(XMFLOAT3* position)
+bool CCamera::GetVisivility(XMFLOAT3* position)const
 {
 	XMFLOAT3 pos = *position;
 

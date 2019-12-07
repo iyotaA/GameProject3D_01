@@ -1,9 +1,9 @@
 #include "main.h"
 #include "shader_base.h"
-#include "shader_default.h"
+#include "shader_per_pixel_light.h"
 #include <io.h>
 
-void CShaderDefault::Init(const char* VertexShader, const char* PixelShader)
+void CShaderPerPixelLight::Init(const char* VertexShader, const char* PixelShader)
 {
 	// 頂点シェーダ生成
 	{
@@ -81,7 +81,7 @@ void CShaderDefault::Init(const char* VertexShader, const char* PixelShader)
 	}
 }
 
-void CShaderDefault::Uninit()
+void CShaderPerPixelLight::Uninit()
 {
 	if (m_LightBuffer)		m_LightBuffer->Release();
 	if (m_MaterialBuffer)	m_MaterialBuffer->Release();
@@ -92,7 +92,7 @@ void CShaderDefault::Uninit()
 	if (m_VertexShader)		m_VertexShader->Release();
 }
 
-void CShaderDefault::Set()
+void CShaderPerPixelLight::Set()
 {
 	// シェーダ設定
 	CRenderer::GetDeviceContext()->VSSetShader(m_VertexShader, NULL, 0);
@@ -108,9 +108,10 @@ void CShaderDefault::Set()
 
 	// 定数バッファ設定
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
+	CRenderer::GetDeviceContext()->PSSetConstantBuffers(0, 1, &m_ConstantBuffer);
 
-	CRenderer::GetDeviceContext()->VSSetConstantBuffers(1, 1, &m_LightBuffer);
+	CRenderer::GetDeviceContext()->PSSetConstantBuffers(1, 1, &m_LightBuffer);
 
-	CRenderer::GetDeviceContext()->VSSetConstantBuffers(2, 1, &m_MaterialBuffer);
+	CRenderer::GetDeviceContext()->PSSetConstantBuffers(2, 1, &m_MaterialBuffer);
 }
 

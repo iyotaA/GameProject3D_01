@@ -1,9 +1,9 @@
 #include "main.h"
 #include "shader_base.h"
-#include "shader_default.h"
+#include "shader_multi_texture.h"
 #include <io.h>
 
-void CShaderDefault::Init(const char* VertexShader, const char* PixelShader)
+void CShaderMultiTexture::Init(const char* VertexShader, const char* PixelShader)
 {
 	// 頂点シェーダ生成
 	{
@@ -28,6 +28,7 @@ void CShaderDefault::Init(const char* VertexShader, const char* PixelShader)
 				{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 4 * 3,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 4 * 6,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 4 * 10, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "BLENDNUM", 0, DXGI_FORMAT_R32_FLOAT,          0, 4 * 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			};
 			UINT numElements = ARRAYSIZE(layout);
 
@@ -78,10 +79,13 @@ void CShaderDefault::Init(const char* VertexShader, const char* PixelShader)
 
 		hBufferDesc.ByteWidth = sizeof(LIGHT);
 		CRenderer::GetDevice()->CreateBuffer(&hBufferDesc, NULL, &m_LightBuffer);
+
+		hBufferDesc.ByteWidth = sizeof(XMFLOAT4);
+		CRenderer::GetDevice()->CreateBuffer(&hBufferDesc, NULL, &m_CameraPositionBuffer);
 	}
 }
 
-void CShaderDefault::Uninit()
+void CShaderMultiTexture::Uninit()
 {
 	if (m_LightBuffer)		m_LightBuffer->Release();
 	if (m_MaterialBuffer)	m_MaterialBuffer->Release();
@@ -92,7 +96,7 @@ void CShaderDefault::Uninit()
 	if (m_VertexShader)		m_VertexShader->Release();
 }
 
-void CShaderDefault::Set()
+void CShaderMultiTexture::Set()
 {
 	// シェーダ設定
 	CRenderer::GetDeviceContext()->VSSetShader(m_VertexShader, NULL, 0);
@@ -105,6 +109,7 @@ void CShaderDefault::Set()
 
 	// 定数バッファ更新
 	CRenderer::GetDeviceContext()->UpdateSubresource(m_ConstantBuffer, 0, NULL, &m_Constant, 0, 0);
+	CRenderer::GetDeviceContext()->UpdateSubresource(m_CameraPositionBuffer, 0, NULL, &m_CameraPosition, 0, 0);
 
 	// 定数バッファ設定
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
@@ -112,5 +117,7 @@ void CShaderDefault::Set()
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(1, 1, &m_LightBuffer);
 
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(2, 1, &m_MaterialBuffer);
+
+	CRenderer::GetDeviceContext()->PSSetConstantBuffers(0, 1, &m_CameraPositionBuffer);
 }
 
