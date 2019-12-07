@@ -14,7 +14,7 @@ void ShaderBase::SetLight(LIGHT Light)
 	dir.Normalize();
 	light.Direction = XMFLOAT4(dir.x, dir.y, dir.z, 0.0f);
 	light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	light.Ambient = COLOR(0.6f, 0.6f, 0.6f, 1.0f);
+	light.Ambient = COLOR(0.8f, 0.8f, 0.8f, 1.0f);
 
 	CRenderer::GetDeviceContext()->UpdateSubresource(m_LightBuffer, 0, NULL, &light, 0, 0);
 }

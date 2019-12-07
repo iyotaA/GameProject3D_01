@@ -18,7 +18,7 @@ SamplerState	Sampler : register( s0 );
 //インプット
 struct InputData
 {
-	float3 pos		  : POSITION0;
+	float4 position	  : POSITION0;
 	float2 uv		  : TEXCOORD0;
 	float4 diffuse    : COLOR0;
 	float  blendNum   : BLENDNUM0;
@@ -39,10 +39,11 @@ void main( in InputData vi, out float4 outDiffuse : SV_Target )
     outDiffuse = color1 + color2;
 	outDiffuse *= vi.diffuse;
 
-	// カメラからの距離で霞ませる
-	float3 d = distance(vi.pos, CameraPosition.xyz);
-	float leng = length(d);
-	outDiffuse.a = 2.0f - leng * 0.005f;
-	outDiffuse.a = saturate(outDiffuse.a);
+	outDiffuse.a = 1.0f;
+	return;
 
+	// カメラからの距離で霞ませる
+	float3 d = distance( CameraPosition.xyz, vi.position.xyz);
+	float leng = length(d);
+	outDiffuse.a = saturate(1.0f - leng * 0.0005f);
 }

@@ -22,7 +22,7 @@ void CPlayer::Init()
 	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f);
 
 	// トランスフォーム初期化
-	m_Position = Vector3(42.0f, 0.0f, -70.0f);
+	m_Position = Vector3(90.0f, 0.0f, -160.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
