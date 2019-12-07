@@ -9,7 +9,7 @@
 #include "camera_manager.h"
 #include "camera.h"
 
-#define GRID_SIZE 1.0f
+#define GRID_SIZE 1.5f
 
 
 void CTerrain::Init()
@@ -140,9 +140,9 @@ bool CTerrain::LoadHeightMap(char* filename)
 
 			index = (m_terrainHeight * z) + x;
 
-			m_heightMap[index].x = (float)x - offset_x;
-			m_heightMap[index].y = (float)height / 15.0f; // NormalizeHeight
-			m_heightMap[index].z = (float)z - offset_z;
+			m_heightMap[index].x = (float)x * GRID_SIZE - offset_x;
+			m_heightMap[index].y = (float)height / 15.0f * GRID_SIZE; // NormalizeHeight
+			m_heightMap[index].z = (float)z * GRID_SIZE - offset_z;
 
 			k += 3;
 		}
@@ -196,7 +196,7 @@ bool CTerrain::InitializeBuffers()
 					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 					XMFLOAT2(x, z),
-					max((rand() % blend) * (1.0f / blend), m_heightMap[m_terrainHeight * z + x].y / 10.0f)
+					max((rand() % blend) * (1.0f / blend), m_heightMap[m_terrainHeight * z + x].y / (10.0f * GRID_SIZE))
 				};
 			}
 		}

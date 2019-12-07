@@ -53,7 +53,7 @@ struct InputData
 // アウトプット
 struct OutputData
 {
-	float3 pos		: POSITION0;
+	float4 position	: SV_POSITION;
 	float2 uv		: TEXCOORD0;
 	float4 diffuse  : COLOR0;
 	float  blendNum : BLENDNUM0;
@@ -63,15 +63,14 @@ struct OutputData
 //=============================================================================
 // 頂点シェーダ
 //=============================================================================
-void main( in  InputData vi, out OutputData vo, out float4 Position : SV_POSITION )
+void main( in  InputData vi, out OutputData vo )
 {
 	matrix wvp;
 	wvp = mul(World, View);
 	wvp = mul(wvp, Projection);
 
-	Position  = mul(vi.position, wvp);
-	vo.pos    = mul(vi.position, wvp);
-	vo.uv     = vi.uv;
+	vo.position = mul(vi.position, wvp);
+	vo.uv        = vi.uv;
 
 	float4 worldNormal, normal;
 	normal      = float4(vi.normal.xyz, 0.0);
