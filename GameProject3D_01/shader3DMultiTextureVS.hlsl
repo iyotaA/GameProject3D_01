@@ -63,24 +63,24 @@ struct OutputData
 //=============================================================================
 // 頂点シェーダ
 //=============================================================================
-void main( in  InputData vi, out OutputData vo )
+void main( in  InputData input, out OutputData output)
 {
 	matrix wvp;
 	wvp = mul(World, View);
 	wvp = mul(wvp, Projection);
 
-	vo.position = mul(vi.position, wvp);
-	vo.uv        = vi.uv;
+	output.position = mul(input.position, wvp);
+	output.uv        = input.uv;
 
 	float4 worldNormal, normal;
-	normal      = float4(vi.normal.xyz, 0.0);
+	normal      = float4(input.normal.xyz, 0.0);
 	worldNormal = mul(normal, World);
 	worldNormal = normalize(worldNormal);
 
 	float light = 0.5 - 0.5 * dot(Light.Direction.xyz, worldNormal.xyz);
 
-	vo.diffuse   = vi.diffuse * Material.Diffuse * light * Light.Diffuse;
-	vo.diffuse  += vi.diffuse * Material.Ambient * Light.Ambient;
-	vo.diffuse.a = vi.diffuse.a * Material.Diffuse.a;
-	vo.blendNum  = vi.blendNum;
+	output.diffuse   = input.diffuse * Material.Diffuse * light * Light.Diffuse;
+	output.diffuse  += input.diffuse * Material.Ambient * Light.Ambient;
+	output.diffuse.a = input.diffuse.a * Material.Diffuse.a;
+	output.blendNum  = input.blendNum;
 }

@@ -108,10 +108,9 @@ void CShaderPerPixelLight::Set()
 
 	// 定数バッファ設定
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
+
 	CRenderer::GetDeviceContext()->PSSetConstantBuffers(0, 1, &m_ConstantBuffer);
-
 	CRenderer::GetDeviceContext()->PSSetConstantBuffers(1, 1, &m_LightBuffer);
-
 	CRenderer::GetDeviceContext()->PSSetConstantBuffers(2, 1, &m_MaterialBuffer);
 }
 

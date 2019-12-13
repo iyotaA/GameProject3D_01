@@ -46,7 +46,7 @@ SamplerState Sampler : register(s0);
 
 
 
-struct PS_IN
+struct InputPS
 {
 	float4 pos		: POSITION0;
 	float2 uv		: TEXCOORD0;
@@ -56,18 +56,18 @@ struct PS_IN
 };
 
 
-float4 main(PS_IN pin) : SV_TARGET
+float4 main(InputPS input) : SV_TARGET
 {
 	float3 lightDir = {1.0f, -1.0f, 1.0f};
 	lightDir = normalize(lightDir);
 
 	// ハーフランバート
-	float light = (dot(-lightDir, pin.nomalW) + 1.0f) * 0.5f;
+	float light = (dot(-lightDir, input.nomalW) + 1.0f) * 0.5f;
 	light = saturate(light);
 
 	// スぺキュラ
-	float3 refv = reflect(lightDir, pin.nomalW);
-	float3 eyev = CameraPosition.xyz - pin.posW.xyz;
+	float3 refv = reflect(lightDir, input.nomalW);
+	float3 eyev = CameraPosition.xyz - input.posW.xyz;
 	refv = normalize(refv);	// 正規化
 	eyev = normalize(eyev);	// 正規化
 
@@ -78,9 +78,9 @@ float4 main(PS_IN pin) : SV_TARGET
 	s = pow(s, 10);	// 境界ぼかし
 	float4 speqular = float4(s, s, s, 1.0f);
 
-	float4 outDiffuse = pin.color * Material.Diffuse * light * Light.Diffuse;
-	outDiffuse += pin.color * Material.Ambient * Light.Ambient;
-	outDiffuse = float4(Texture.Sample(Sampler, pin.uv).rgb * light + speqular.rgb, 1.0f) * outDiffuse;
+	float4 outDiffuse = input.color * Material.Diffuse * light * Light.Diffuse;
+	outDiffuse += input.color * Material.Ambient * Light.Ambient;
+	outDiffuse = float4(Texture.Sample(Sampler, input.uv).rgb * light + speqular.rgb, 1.0f) * outDiffuse;
 
 	return outDiffuse;
 }

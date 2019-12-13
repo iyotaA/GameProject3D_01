@@ -23,12 +23,14 @@ void CTerrain::Init()
 	m_Texture = new CTexture*[m_TextureNum];
 	m_Texture[0] = new CTexture();
 	m_Texture[1] = new CTexture();
+	m_Texture[2] = new CTexture();
 
 	// シェーダー読み込み //////
-	m_Shader = ShaderManager::GetShader<CShaderMultiTexture>();
+	m_Shader = ShaderManager::GetShader<CShaderNormalMap>();
 
 	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
 	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
+	m_Texture[2]->LoadSTB("asset/image/NormalMap_dart.png");
 
 	result = InitializeBuffers();
 	assert(result);
@@ -56,7 +58,18 @@ void CTerrain::Draw()
 	XMMATRIX world = XMMatrixIdentity();
 
 	XMFLOAT4X4 world_4x4;
+	XMFLOAT4X4 mtxWIT4x4;
+	XMMATRIX mtxWIT;
+
+	// ワールド行列変換
 	XMStoreFloat4x4(&world_4x4, world);
+
+	// World * Inverse * Transpose
+	mtxWIT = XMMatrixInverse(nullptr, world);
+	mtxWIT = XMMatrixTranspose(mtxWIT);
+	XMStoreFloat4x4(&mtxWIT4x4, mtxWIT);
+
+	m_Shader->SetMtxWIT(&mtxWIT4x4);
 
 	CCamera* camera = CCameraManager::GetCamera();
 
@@ -175,7 +188,7 @@ bool CTerrain::InitializeBuffers()
 
 	// ヴァーテクス情報格納
 	{
-		m_Vertex = new VERTEX_3D_TEX2[m_vertexCount];
+		m_Vertex = new VERTEX_3D_NOMAL_MAP[m_vertexCount];
 
 		for (int z = 0; z < m_terrainHeight; z++) {
 			for (int x = 0; x < m_terrainWidth; x++) {
@@ -193,6 +206,8 @@ bool CTerrain::InitializeBuffers()
 				m_Vertex[m_terrainHeight * z + x] = {
 
 					Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
+					Vector3(0.0f, 0.0f, 1.0f),
+					Vector3(1.0f, 0.0f, 0.0f),
 					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 					XMFLOAT2(x, z),
@@ -266,7 +281,7 @@ bool CTerrain::InitializeBuffers()
 	}
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D_TEX2) * m_vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D_NOMAL_MAP) * m_vertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -325,7 +340,7 @@ void CTerrain::DrawBuffers()
 	unsigned int stride;
 	unsigned int offset;
 
-	stride = sizeof(VERTEX_3D_TEX2);
+	stride = sizeof(VERTEX_3D_NOMAL_MAP);
 	offset = 0;
 
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);

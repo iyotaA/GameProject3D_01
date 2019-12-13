@@ -25,7 +25,7 @@ public:
 	template <typename T>
 	static T* const GetShader()
 	{
-		for (ShaderBase* shader : m_Shaders) {
+		for (CShaderBase* shader : m_Shaders) {
 
 			// typeid()‚ÍŒ^‚ð’²‚×‚é
 			if (typeid(*shader) == typeid(T)) {
@@ -43,7 +43,7 @@ public:
 
 
 private:
-	static std::vector<ShaderBase*>	m_Shaders;
+	static std::vector<CShaderBase*>	m_Shaders;
 
 };
 

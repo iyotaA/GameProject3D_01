@@ -2,7 +2,7 @@
 #define SHADER_PER_PIXEL_LIGHT_H_
 
 
-class CShaderPerPixelLight : public ShaderBase
+class CShaderPerPixelLight : public CShaderBase
 {
 public:
 	CShaderPerPixelLight() {}

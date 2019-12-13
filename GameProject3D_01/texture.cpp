@@ -84,7 +84,7 @@ void CTexture::Load(const char *FileName)
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width = m_Size.x;
 	desc.Height = m_Size.y;
-	desc.MipLevels = 1;
+	desc.MipLevels = 0;
 	desc.ArraySize = 1;
 	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.SampleDesc.Count = 1;
@@ -107,7 +107,8 @@ void CTexture::Load(const char *FileName)
 	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
 	SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	SRVDesc.Texture2D.MipLevels = 1;
+	SRVDesc.Texture2D.MostDetailedMip = 0;
+	SRVDesc.Texture2D.MipLevels = 0;
 
 	hr = CRenderer::GetDevice()->CreateShaderResourceView(m_Texture, &SRVDesc, &m_ShaderResourceView);
 	if (FAILED(hr))
@@ -148,7 +149,7 @@ void CTexture::LoadSTB(const char *FileName)
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width = m_Size.x;
 	desc.Height = m_Size.y;
-	desc.MipLevels = 1;
+	desc.MipLevels = 0;
 	desc.ArraySize = 1;
 	if (bpp == 3) {
 		desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM;
@@ -159,19 +160,21 @@ void CTexture::LoadSTB(const char *FileName)
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 	D3D11_SUBRESOURCE_DATA initData;
 	initData.pSysMem = image;
 	initData.SysMemPitch = m_Size.x * bpp;
 	initData.SysMemSlicePitch = size;
 
-	auto hr = CRenderer::GetDevice()->CreateTexture2D(&desc, &initData, &m_Texture);
+	auto hr = CRenderer::GetDevice()->CreateTexture2D(&desc, NULL, &m_Texture);
 	if (FAILED(hr)) {
 		assert(false);
 	}
+	CRenderer::GetDeviceContext()->UpdateSubresource(m_Texture, 0, NULL, image, sizeof(unsigned char) * m_Size.x * bpp, 0);
+
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
 	if (bpp == 3) {
@@ -181,14 +184,16 @@ void CTexture::LoadSTB(const char *FileName)
 		SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	}
 	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	SRVDesc.Texture2D.MipLevels = 1;
-
+	SRVDesc.Texture2D.MostDetailedMip = 0;
+	SRVDesc.Texture2D.MipLevels = -1;
 
 	hr = CRenderer::GetDevice()->CreateShaderResourceView(m_Texture, &SRVDesc, &m_ShaderResourceView);
 	if (FAILED(hr))
 	{
 		assert(false);
 	}
+
+	CRenderer::GetDeviceContext()->GenerateMips(m_ShaderResourceView);
 
 	// ƒƒ‚ƒŠã‚Ì‰æ‘œƒf[ƒ^‚ğ”jŠü
 	stbi_image_free(image);
@@ -231,7 +236,7 @@ void CTexture::loadTextureFromMemory(const unsigned char* image, int len)
 	desc.MiscFlags = 0;
 
 	ZeroMemory(&initialData, sizeof(D3D11_SUBRESOURCE_DATA));
-	initialData.pSysMem = image;
+	initialData.pSysMem = pixels;
 	initialData.SysMemPitch = m_Size.x * bpp;
 	initialData.SysMemSlicePitch = m_Size.x * m_Size.y * bpp;
 

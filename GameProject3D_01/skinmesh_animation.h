@@ -25,7 +25,6 @@ struct BONE
 {
 	// std::string　Name; ボーンの名前を取得できるよ
 	aiMatrix4x4 Matrix;
-	aiMatrix4x4 WorldMatrix;
 	aiMatrix4x4 AnimationMatrix;
 	aiMatrix4x4 OffsetMatrix;
 };
@@ -94,7 +93,7 @@ private:
 	void UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix);
 	void AnimationBlend();
 	void Animation();
-	void GetPosLocalToWorld( aiNode* pNode, XMMATRIX* _world, const char* _targetName );
+	void GetBonePosition( aiNode* pNode, XMMATRIX* _world, const char* _targetName, XMMATRIX& _target );
 	aiNode* GetBoneNode(aiNode* pNode, const char* _name);
 
 	//変換系 ////////////////////////////////////

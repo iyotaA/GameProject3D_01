@@ -2,24 +2,24 @@
 #include "shader_base.h"
 
 
-void ShaderBase::SetMaterial(MATERIAL Material)
+void CShaderBase::SetMaterial(MATERIAL Material)
 {
 	CRenderer::GetDeviceContext()->UpdateSubresource(m_MaterialBuffer, 0, NULL, &Material, 0, 0);
 }
 
-void ShaderBase::SetLight(LIGHT Light)
+void CShaderBase::SetLight(LIGHT Light)
 {
 	LIGHT light;
 	Vector3 dir = Vector3(0.0f, -1.0f, 1.0f);
 	dir.Normalize();
 	light.Direction = XMFLOAT4(dir.x, dir.y, dir.z, 0.0f);
 	light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	light.Ambient = COLOR(0.8f, 0.8f, 0.8f, 1.0f);
+	light.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	CRenderer::GetDeviceContext()->UpdateSubresource(m_LightBuffer, 0, NULL, &light, 0, 0);
 }
 
-XMFLOAT4X4 ShaderBase::Transpose(XMFLOAT4X4* Matrix)
+XMFLOAT4X4 CShaderBase::Transpose(XMFLOAT4X4* Matrix)
 {
 	XMFLOAT4X4 outMatrix;
 

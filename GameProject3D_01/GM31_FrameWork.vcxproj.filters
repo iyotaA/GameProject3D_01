@@ -159,6 +159,12 @@
     <ClCompile Include="skinmesh_animation.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
+    <ClCompile Include="shader_normal_mapping.cpp">
+      <Filter>shader\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_water.cpp">
+      <Filter>shader\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="field.h">
@@ -317,6 +323,12 @@
     <ClInclude Include="stl.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
+    <ClInclude Include="shader_normal_mapping.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_water.h">
+      <Filter>shader\h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shader3DDefaultPS.hlsl">
@@ -335,6 +347,18 @@
       <Filter>shader\hlsl</Filter>
     </FxCompile>
     <FxCompile Include="shader3DMultiTextureVS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DNormalMappingPS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DNormalMappingVS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DWaterPS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DWaterVS.hlsl">
       <Filter>shader\hlsl</Filter>
     </FxCompile>
   </ItemGroup>

@@ -29,21 +29,25 @@ struct InputData
 //=============================================================================
 // ピクセルシェーダ
 //=============================================================================
-void main( in InputData vi, out float4 outDiffuse : SV_Target )
+float4 main( in InputData input ) : SV_Target
 {
-	vi.blendNum = saturate(vi.blendNum);
+	input.blendNum = saturate(input.blendNum);
 
-	float4 color1 = Texture[0].Sample(Sampler, vi.uv) * vi.blendNum;
-	float4 color2 = Texture[1].Sample(Sampler, vi.uv) * (1.0f - vi.blendNum);
+	float4 color1 = Texture[0].Sample(Sampler, input.uv) * input.blendNum;
+	float4 color2 = Texture[1].Sample(Sampler, input.uv) * (1.0f - input.blendNum);
+
+	float4 outDiffuse;
 
     outDiffuse = color1 + color2;
-	outDiffuse *= vi.diffuse;
+	outDiffuse *= input.diffuse;
 
 	outDiffuse.a = 1.0f;
-	return;
+	return outDiffuse;
 
 	// カメラからの距離で霞ませる
-	float3 d = distance( CameraPosition.xyz, vi.position.xyz);
+	float3 d = CameraPosition.xyz - input.position.xyz;
 	float leng = length(d);
-	outDiffuse.a = saturate(1.0f - leng * 0.0005f);
+	outDiffuse.a = saturate(1.0f - leng * 0.0002f);
+
+	return outDiffuse;
 }
