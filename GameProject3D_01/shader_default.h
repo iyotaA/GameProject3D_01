@@ -2,7 +2,7 @@
 #define SHADER_DEFAULT_H_
 
 
-class CShaderDefault : public ShaderBase
+class CShaderDefault : public CShaderBase
 {
 public:
 	CShaderDefault(){}

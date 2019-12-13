@@ -9,14 +9,12 @@ class CGame : public CScene
 public:
 	void Init()
 	{
-		//// カメラの初期化
-		//CCamera* camera;
-		//camera = AddGameObject<CCamera>(CManager::E_Camera);
 
 		// スカイドームの初期化
 		AddGameObject<CSkyDome>(CManager::E_Background);
 
 		// フィールドの初期化
+		//AddGameObject<CField>(CManager::E_Background);
 		AddGameObject<CTerrain>(CManager::E_Background);
 
 		//// プレイヤーの初期化

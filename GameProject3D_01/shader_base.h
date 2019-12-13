@@ -2,11 +2,11 @@
 #define SHADER_SUPER_H_
 
 
-class ShaderBase
+class CShaderBase
 {
 public:
-	ShaderBase(){}
-	~ShaderBase(){}
+	CShaderBase(){}
+	~CShaderBase(){}
 
 	virtual void Init( const char* VertexShader, const char* PixelShader ) = 0;
 	virtual void Uninit() = 0;

@@ -50,24 +50,30 @@ void CCamera::Update()
 		}
 	}
 
+
 	{// â°âÒì]
 		XMMATRIX rotationMtx;
 		rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
+
 		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-		m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
 		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+
+		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
 		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+
+		m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
 		m_DirVec.right = XMVector3Normalize(m_DirVec.right);
 	}
 
 	{// ècâÒì]
 		XMMATRIX rotationMtx;
 		rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
+
 		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+
 		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
 		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
 	}
 
 
@@ -181,7 +187,6 @@ void CCamera::Pan(CCameraManager::CameraRotate _rotate_dir)
 	if (_rotate_dir == CCameraManager::RotateRight) {
 		m_SpinHorizontal += m_RotateSpeed;
 	}
-
 }
 
 void CCamera::Tilt(CCameraManager::CameraRotate _rotate_dir)
@@ -192,7 +197,6 @@ void CCamera::Tilt(CCameraManager::CameraRotate _rotate_dir)
 	if (_rotate_dir == CCameraManager::RotateDown) {
 		m_SpinVerticall += m_RotateSpeed;
 	}
-
 }
 
 void CCamera::Move(CCameraManager::CameraMove _move_dir)

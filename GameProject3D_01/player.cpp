@@ -358,9 +358,9 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
-	m_BonePosition = m_pModel->GetWorldPosition(&world, "RightHandIndex4_end");
+	m_BonePosition = m_pModel->GetWorldPosition(&world, "LeftHandIndex4_end");
 	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
-	m_DamageManager->GetCollisionSphere()->SetRadius(1.0f);
+	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
 	m_CollisionSphere->SetCenter(&m_Position);
 
 	Vector3X3 obbColSize;

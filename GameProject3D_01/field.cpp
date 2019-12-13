@@ -4,32 +4,16 @@
 #include "texture.h"
 #include "gameObject.h"
 #include "shader_all.h"
-#include "terrain.h"
 #include "field.h"
+#include "camera_manager.h"
+#include "camera.h"
+
 
 #define SIZE		(2.0f)
-#define GridNumX	(15)
-#define GridNumZ	(15)
+#define GridNumX	(350)
+#define GridNumZ	(350)
+#define PlaneHeight (5.0f)
 
-float g_height[(GridNumX + 1) * (GridNumZ + 1)]{
-	//  0     1     2     3     4     5     6     7     8     9     10    11    12    13    14    15
-		0.0f, 0.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 0
-		0.0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 1
-		0.0f, 0.2f, 0.4f, 0.4f, 0.4f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 2
-		0.0f, 0.2f, 0.4f, 1.0f, 0.4f, 0.2f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 3
-		0.0f, 0.2f, 0.4f, 0.4f, 0.4f, 0.2f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 4
-		0.0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 5
-		0.0f, 0.0f, 0.2f, 0.2f, 0.2f, 1.0f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 6
-		0.0f, 0.0f, 0.0f, 0.2f, 0.0f, 0.0f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 7
-		0.0f, 0.0f, 0.2f, 0.2f, 0.2f, 0.0f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 8
-		0.0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 9
-		0.0f, 0.2f, 0.4f, 0.4f, 0.4f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 10
-		0.0f, 0.2f, 0.4f, 1.0f, 0.4f, 0.2f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 11
-		0.0f, 0.2f, 0.4f, 0.4f, 0.4f, 0.2f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 12
-		0.0f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 13
-		0.0f, 0.0f, 0.2f, 0.2f, 0.2f, 1.0f,	1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,   // 14
-		0.0f, 0.0f, 0.0f, 0.2f, 0.0f, 0.0f,	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,   // 15
-};
 
 void CField::Init()
 {
@@ -44,7 +28,7 @@ void CField::Init()
 
 	// ヴァーテクス情報格納
 	{
-		m_Vertex = new VERTEX_3D[VertexNum];
+		m_Vertex = new VERTEX_3D_WATER[VertexNum];
 
 		for (int z = 0; z < GridNumZ + 1; z++) {
 			for (int x = 0; x < GridNumX + 1; x++) {
@@ -57,17 +41,12 @@ void CField::Init()
 					V = 1.0f;
 				}
 
-
-				float y;
-
-				//y = rand() % 100 * 0.01f;
-				y = sinf(XMConvertToRadians(z * 30)) * 2.5f + 2.5f;
-				//y = g_height[x + (GridNumX + 1) * z];
-
 				m_Vertex[x + (GridNumX + 1) * z] = {
-					Vector3(x * SIZE - ShiftedAmount_x, g_height[x + (GridNumX + 1) * z], -z * SIZE + ShiftedAmount_z),
+					Vector3(x * SIZE - ShiftedAmount_x, PlaneHeight, -z * SIZE + ShiftedAmount_z),
+					Vector3(0.0f, 0.0f, 1.0f),
+					Vector3(1.0f, 0.0f, 0.0f),
 					Vector3(0.0f, 1.0f, 0.0f),
-					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+					XMFLOAT4(0.0f, 0.5f, 1.0f, 0.3f),
 					XMFLOAT2(x, z)
 				};
 			}
@@ -105,7 +84,7 @@ void CField::Init()
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(VERTEX_3D) * VertexNum;
+		bd.ByteWidth = sizeof(VERTEX_3D_WATER) * VertexNum;
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 
@@ -117,8 +96,8 @@ void CField::Init()
 
 	// インデックス情報格納
 	{
-		WORD* pIndex;
-		pIndex = new WORD[m_IndexNum];
+		UINT* pIndex;
+		pIndex = new UINT[m_IndexNum];
 		/* インデックス情報格納 */
 		for (int z = 0, i = 0; z < GridNumZ; z++) {
 			for (int x = 0; x < GridNumX + 1; x++) {
@@ -152,7 +131,7 @@ void CField::Init()
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(WORD) * m_IndexNum;
+		bd.ByteWidth = sizeof(UINT) * m_IndexNum;
 		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 
@@ -162,14 +141,21 @@ void CField::Init()
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_IndexBufer);
 	}
 
+	// 使用シェーダーセット
+	m_Shader = ShaderManager::GetShader<CShaderWater>();
+
 	// テクスチャ読み込み //////
-	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/image/field_dart1.png");
+	m_Texture = new CTexture*[m_TextureNum];
+	m_Texture[0] = new CTexture();
+	m_Texture[1] = new CTexture();
+	m_Texture[0]->LoadSTB("asset/image/white.png");
+	m_Texture[1]->LoadSTB("asset/image/NormalMap_dart.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 0.0f, 0.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
+
 }
 
 void CField::Uninit()
@@ -190,14 +176,48 @@ void CField::Draw()
 	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	//CRenderer::SetWorldMatrix(&world);
 
-	UINT Stride = sizeof(VERTEX_3D);
+	XMFLOAT4X4 world_4x4;
+	XMFLOAT4X4 mtxWIT4x4;
+	XMMATRIX mtxWIT;
+
+	// ワールド行列変換
+	XMStoreFloat4x4(&world_4x4, world);
+
+	// World * Inverse * Transpose
+	mtxWIT = XMMatrixInverse(nullptr, world);
+	mtxWIT = XMMatrixTranspose(mtxWIT);
+	XMStoreFloat4x4(&mtxWIT4x4, mtxWIT);
+
+	m_Shader->SetMtxWIT(&mtxWIT4x4);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	XMFLOAT4 camera_pos = XMFLOAT4(camera->GetPosition().x, camera->GetPosition().y, camera->GetPosition().z, 1.0f);
+	m_Shader->SetCameraPosition(&camera_pos);
+	m_Shader->SetLight(LIGHT());
+
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_Shader->SetMaterial(material);
+
+	static float value = 0;
+	m_Shader->SetIncrementValue(0);
+
+	m_Shader->SetSH();
+
+	UINT Stride = sizeof(VERTEX_3D_WATER);
 	UINT offdet = 0;
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBufer, &Stride, &offdet);	// バーテクスバッファセット
-	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_IndexBufer, DXGI_FORMAT_R16_UINT, 0);		// インデックスバッファセット
-	CRenderer::SetTexture(m_Texture);
-	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_IndexBufer, DXGI_FORMAT_R32_UINT, 0);		// インデックスバッファセット
+	CRenderer::SetTexture(m_Texture, 0, m_TextureNum);
+	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	CRenderer::GetDeviceContext()->DrawIndexed(m_IndexNum, 0, 0);
 }
 

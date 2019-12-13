@@ -11,7 +11,7 @@ struct VERTEX_3D_TEX2
 	float    BlendNum;
 };
 
-class CShaderMultiTexture : public ShaderBase
+class CShaderMultiTexture : public CShaderBase
 {
 public:
 	void Init(const char* VertexShader, const char* PixelShader);

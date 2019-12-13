@@ -17,7 +17,7 @@ public:
 	float GetHeight(XMFLOAT3* _position);
 
 private:
-	const unsigned int m_TextureNum = 2;
+	const unsigned int m_TextureNum = 3;
 
 	struct VertexType
 	{
@@ -44,9 +44,9 @@ private:
 	ID3D11Buffer*   m_vertexBuffer = nullptr;
 
 	HeightMapType*  m_heightMap = nullptr;
-	VERTEX_3D_TEX2* m_Vertex = nullptr;
+	VERTEX_3D_NOMAL_MAP* m_Vertex = nullptr;
 	CTexture**      m_Texture = nullptr;
-	CShaderMultiTexture* m_Shader = nullptr;
+	CShaderNormalMap* m_Shader = nullptr;
 
 	// デバッグ用
 	XMFLOAT3 PlayerArea = XMFLOAT3(0.0f, 0.0f, 0.0f);

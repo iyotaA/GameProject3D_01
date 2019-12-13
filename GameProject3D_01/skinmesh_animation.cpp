@@ -39,7 +39,7 @@ static ofstream outputfile(F);
 void CSkinModel::Load(char* pFileName, float size)
 {
 	m_pScene = aiImportFile(pFileName, aiProcessPreset_TargetRealtime_MaxQuality);
-	m_pScene->mMeshes[0]->mBones[0];
+
 	if (m_pScene == NULL)
 	{
 		assert(false);
@@ -121,28 +121,28 @@ void CSkinModel::Load(char* pFileName, float size)
 	//// テクスチャ取得
 	aiString path;
 
-	//for (int tex = 0; tex < m_pScene->mNumMaterials; tex++) {
+	for (int tex = 0; tex < m_pScene->mNumMaterials; tex++) {
 
-	//	if (m_pScene->mMaterials[tex]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+		if (m_pScene->mMaterials[tex]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
 
-	//		// fbxファイルの内部にテクスチャが入っているか否か
-	//		if (path.data[0] == '*') {
-	//			// fbxファイル内にテクスチャあり
-	//			int id = atoi(&path.data[1]);
-	//			m_Texture[path.data] = new CTexture();
-	//			m_Texture[path.data]->loadTextureFromMemory((const unsigned char*)m_pScene->mTextures[id]->pcData, m_pScene->mTextures[id]->mWidth);
-	//		}
-	//		else {
-	//			// fbxファイル外にテクスチャあり
-	//			//size_t pos = modelPath.find_last_of("\\/");				// モデルのパスの後ろから最初に出てきた"\\/"の場所を取得
-	//			//std::string texPath = (char*)& path.data;					// Textureのパス取得
-	//			//size_t texpos = texPath.find_last_of("\\/");				// Textureのパスの後ろから最初に出てきた"\\/"の場所を取得
-	//			//std::string texturePath = modelPath.substr(0, pos + 1);		// モデルと同じ場所のパスを取得
-	//			//texturePath += texPath.substr(texpos + 1, sizeof(texPath));	// モデルと同じ場所にあるテクスチャのパスに書き換え
-	//			//m_Texture[tex] = LoadTextureSTB(texturePath.c_str());		// 指定したパスのテクスチャを読み込む
-	//		}
-	//	}
-	//}
+			// fbxファイルの内部にテクスチャが入っているか否か
+			if (path.data[0] == '*') {
+				// fbxファイル内にテクスチャあり
+				int id = atoi(&path.data[1]);
+				m_Texture[path.data] = new CTexture();
+				m_Texture[path.data]->loadTextureFromMemory((const unsigned char*)m_pScene->mTextures[id]->pcData, m_pScene->mTextures[id]->mWidth);
+			}
+			else {
+				// fbxファイル外にテクスチャあり
+				//size_t pos = modelPath.find_last_of("\\/");				// モデルのパスの後ろから最初に出てきた"\\/"の場所を取得
+				//std::string texPath = (char*)& path.data;					// Textureのパス取得
+				//size_t texpos = texPath.find_last_of("\\/");				// Textureのパスの後ろから最初に出てきた"\\/"の場所を取得
+				//std::string texturePath = modelPath.substr(0, pos + 1);		// モデルと同じ場所のパスを取得
+				//texturePath += texPath.substr(texpos + 1, sizeof(texPath));	// モデルと同じ場所にあるテクスチャのパスに書き換え
+				//m_Texture[tex] = LoadTextureSTB(texturePath.c_str());		// 指定したパスのテクスチャを読み込む
+			}
+		}
+	}
 
 	//DrawMesh(m_pScene->mRootNode, &aiMatrix4x4());
 
@@ -277,6 +277,7 @@ void CSkinModel::Draw(XMMATRIX* world)
 	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
 	m_Shader->SetLight(LIGHT());
 
+
 	//CRenderer::SetWorldMatrix(&_world);
 
 	if (m_DrawAtLine) {
@@ -285,8 +286,25 @@ void CSkinModel::Draw(XMMATRIX* world)
 	else {
 		CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 	}
-	// 描画
-	DrawMesh(m_pScene->mRootNode);
+
+	// アニメーションデータもってない
+	if (!m_pScene->HasAnimations()) {
+
+		for (int mesh = 0; mesh < m_pScene->mNumMeshes; mesh++) {
+
+			// メッシュ1つ分取得
+			aiMesh* pMesh = m_pScene->mMeshes[mesh];
+
+			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			CRenderer::DrawIndexed(pMesh->mNumFaces * 3, 0, 0);
+		}
+
+	}
+	else {
+		// 描画
+		DrawMesh(m_pScene->mRootNode);
+	}
 
 	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 }
@@ -353,6 +371,10 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
 
 		{
+			//// テクスチャ取得
+			//aiString path;
+			//mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+
 			// マテリアル取得
 			const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
 			assert(mat);
@@ -360,16 +382,23 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 			aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
 			aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, &ambient);	// ディフーズカラー取得
 
-			// テクスチャ取得
-			aiString path;
-			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
 
 			MATERIAL material;
-			material.Ambient = COLOR(ambient.r, ambient.g, ambient.b, ambient.a);
 			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+
+			material.Ambient = COLOR(ambient.r, ambient.g, ambient.b, ambient.a);
 
 			m_Shader->SetMaterial(material);
 			m_Shader->Set();
+
+			aiString path;
+			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+			// fbxファイルの内部にテクスチャが入っているか否か
+			if (path.data[0] == '*') {
+				CRenderer::SetTexture(m_Texture[path.data], 0);
+			}
+
+
 		}
 
 		{
@@ -380,7 +409,6 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		}
 
 		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
 		//CRenderer::GetDeviceContext()->DrawIndexedInstanced(m_Mesh[mesh_index].IndexNum, 100, 0, 0, 0);
 	}
@@ -652,7 +680,6 @@ void CSkinModel::UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix)
 	aiMatrix4x4 worldMatrix;
 	worldMatrix = matrix;
 	worldMatrix *= pBone->AnimationMatrix;
-	pBone->WorldMatrix = worldMatrix;
 	pBone->Matrix = worldMatrix;
 	pBone->Matrix *= pBone->OffsetMatrix;
 
@@ -688,52 +715,50 @@ aiNode* CSkinModel::GetBoneNode(aiNode* pNode, const char* _name)
 	return NULL;
 }
 
-
 //************************************************
 // 名前からワールド座標をゲット
 //************************************************
-static XMMATRIX g_TargetMatrix;
 Vector3 CSkinModel::GetWorldPosition(XMMATRIX* _world, const char* _bone_name)
 {
-	g_TargetMatrix = XMMatrixIdentity();
+	XMMATRIX mtxWorld;
+	mtxWorld = *_world;
 
-	XMMATRIX mtxWorld = XMMatrixScaling(m_Size, m_Size, m_Size);
-	mtxWorld *= *_world;
-	GetPosLocalToWorld(m_pScene->mRootNode, &mtxWorld, _bone_name);
-	//g_TargetMatrix = g_TargetMatrix * XMMatrixScaling(m_Size, m_Size, m_Size);
-	//g_TargetMatrix *= *_world;
-	XMVECTOR position = { 0.0f, 0.0f, 0.0f, 0.0f };
-	position = XMVector3Transform(position, g_TargetMatrix);
+	//モデル空間のボーン位置（行列）
+	XMMATRIX targetMatrix = XMMatrixIdentity();
+	GetBonePosition(m_pScene->mRootNode, &XMMatrixIdentity(), _bone_name, targetMatrix);
 
-	return position;
+	// ワールド空間のボーン位置（行列）
+	targetMatrix = targetMatrix * XMMatrixScaling(m_Size, m_Size, m_Size) * *_world;
+
+	// ワールド空間のボーンの位置
+	XMVECTOR bonePosition = {0.0f, 0.0f, 0.0f, 0.0f};
+	bonePosition = XMVector3Transform(bonePosition, targetMatrix);
+
+	return bonePosition;
 }
 
 
 //************************************************
-// 親との相対位置をゲット
+// 指定したボーンのワールド行列を取得
 //************************************************
-void CSkinModel::GetPosLocalToWorld(aiNode* pNode, XMMATRIX* _world, const char* _targetName)
+void CSkinModel::GetBonePosition(aiNode* pNode, XMMATRIX* _world, const char* _targetName, XMMATRIX& _target)
 {
-	// 回転成分を取得
-	XMMATRIX mtxWorld = XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].WorldMatrix));//PickupRotation(XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].AnimationMatrix)));
-	if (pNode->mParent) {
-		mtxWorld *= XMMatrixInverse(NULL, XMLoadFloat4x4(&LoadAiMatrix4x4(&m_Bone[pNode->mParent->mName.C_Str()].Matrix)));
-	}
-	else {
-		mtxWorld *= XMMatrixInverse(NULL, *_world);
-	}
-	mtxWorld *= *_world;
+	// 親空間の姿勢行列
+	XMMATRIX mtxWorld = *_world;
+
+	// ローカル空間での姿勢行列 * 親空間の親姿勢行列 = 親空間のボーン姿勢
+	mtxWorld = XMLoadFloat4x4( &LoadAiMatrix4x4(&m_Bone[pNode->mName.C_Str()].AnimationMatrix)) * mtxWorld;
 
 	// 対象のノードだったらターゲット行列にセット
 	string name = _targetName;
 	if (name.compare(pNode->mName.C_Str()) == 0) {
-		g_TargetMatrix = mtxWorld;
+		_target = mtxWorld;
 		return;
 	}
 
 	// 子ノードにアクセス
 	for (int i = 0; i < pNode->mNumChildren; i++) {
-		GetPosLocalToWorld(pNode->mChildren[i], &mtxWorld, _targetName);
+		GetBonePosition(pNode->mChildren[i], &mtxWorld, _targetName, _target);
 	}
 }
 

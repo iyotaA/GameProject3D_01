@@ -29,24 +29,24 @@ struct OutputData
 ///////////////////////////////////////////////
 // メイン関数
 ///////////////////////////////////////////////
-void main(in InputData vi, out OutputData vo)
+void main(in InputData input, out OutputData output)
 {
 	matrix wvp;
 	wvp = mul(World, View);
 	wvp = mul(wvp, Projection);
-	vo.pos = mul(vi.pos, wvp);
+	output.pos = mul(input.pos, wvp);
 
-	vi.nomal.w = 0.0f;
-	vo.nomalW = mul(vi.nomal, MtxWIT).xyz;
+	input.nomal.w = 0.0f;
+	output.nomalW = mul(input.nomal, MtxWIT).xyz;
 
 	// ワールド座標取得
-	vo.posW = mul(vi.pos, World);
+	output.posW = mul(input.pos, World);
 
 	// UV
-	vo.uv = vi.uv;
+	output.uv = input.uv;
 
 	// color
-	vo.color = vi.color;
+	output.color = input.color;
 
 	return;
 }

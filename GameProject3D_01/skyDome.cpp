@@ -15,7 +15,7 @@
 #define Height		(300.0f)
 #define GridNumX	(500)
 #define GridNumZ	(60)
-#define RotateSpeed (0.05f)
+#define RotateSpeed (0.005f)
 
 void CSkyDome::Init()
 {
@@ -51,7 +51,7 @@ void CSkyDome::Init()
 						Vector3(Pos_x, height, Pos_z),
 						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-						XMFLOAT2((float)x * 2 / GridNumX + 0.01f, (float)(GridNumZ - z) / GridNumZ)
+						XMFLOAT2((float)x / GridNumX + 0.01f, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 				else if (x == GridNumX) {
@@ -59,7 +59,7 @@ void CSkyDome::Init()
 						Vector3(Pos_x, height, Pos_z),
 						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-						XMFLOAT2((float)x * 2 / GridNumX - 0.01f, (float)(GridNumZ - z) / GridNumZ)
+						XMFLOAT2((float)x / GridNumX - 0.01f, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 				else {
@@ -67,7 +67,7 @@ void CSkyDome::Init()
 						Vector3(Pos_x, height, Pos_z),
 						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-						XMFLOAT2((float)x * 2 / GridNumX, (float)(GridNumZ - z) / GridNumZ)
+						XMFLOAT2((float)x / GridNumX, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 			}
@@ -136,7 +136,7 @@ void CSkyDome::Init()
 
 	// テクスチャ読み込み /////
 	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/image/cloud000.png");
+	m_Texture->LoadSTB("asset/image/CGSkies_0101_free.png");
 
 	// シェーダー読み込み //////
 	m_Shader = ShaderManager::GetShader<CShaderDefault>();
