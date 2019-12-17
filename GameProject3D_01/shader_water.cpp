@@ -6,7 +6,6 @@
 
 void CShaderWater::Init(const char* _VertexShader, const char* _PixelShader)
 {
-
 	// 頂点シェーダ生成
 	{
 		FILE* file;
@@ -102,7 +101,6 @@ void CShaderWater::Uninit()
 
 void CShaderWater::SetSH()
 {
-
 	// シェーダ設定
 	CRenderer::GetDeviceContext()->VSSetShader(m_VertexShader, NULL, 0);
 	CRenderer::GetDeviceContext()->PSSetShader(m_PixelShader, NULL, 0);

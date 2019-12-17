@@ -24,6 +24,8 @@ std::vector<WORD>       CDebugPrimitive::m_Indices;
 ID3D11Buffer*			CDebugPrimitive::m_VertexBufer;
 ID3D11Buffer*			CDebugPrimitive::m_IndexBufer;
 CShaderDefault*			CDebugPrimitive::m_Shader;
+CTexture*				CDebugPrimitive::m_Texture;
+
 unsigned int			CDebugPrimitive::m_CircleCount;
 unsigned int            CDebugPrimitive::m_CubeCount;
 bool					CDebugPrimitive::m_IsDisplayed;
@@ -34,6 +36,9 @@ void CDebugPrimitive::DebugPrimitive_Init(void)
 	m_CircleCount = 0;
 	m_CubeCount = 0;
 	m_IsDisplayed = false;
+
+	m_Texture = new CTexture();
+	m_Texture->LoadSTB("asset/image/white.png");
 
 	m_Shader = ShaderManager::GetShader<CShaderDefault>();
 }
@@ -119,6 +124,8 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 
 	UINT Stride = sizeof(VERTEX_3D);
 	UINT offdet = 0;
+
+	CRenderer::SetTexture(m_Texture);
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBufer, &Stride, &offdet);	// バーテクスバッファセット
 	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_IndexBufer, DXGI_FORMAT_R16_UINT, 0);		// インデックスバッファセット
 	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);

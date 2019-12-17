@@ -40,7 +40,7 @@ struct BONE
 class CSkinModel
 {
 public:
-	void Load(char* pFileName, float size);
+	void Load(char* pFileName, float size, char* pTexture);
 	void Unload();
 	void Draw(XMMATRIX* world);
 	void update(int addAnimationFrame);
@@ -88,6 +88,7 @@ private:
 	// アニメーション・描画 ////////////////////////////////////
 	void DrawMesh(const aiNode* pNode);
 	void LoadMesh(const aiNode* pNode);
+	void LoadStaticMesh();
 	void CreateBone(aiNode* pNode);
 	void CalculateBoneMatrix();
 	void UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix);

@@ -81,7 +81,7 @@ void main(in  InputData input,	out OutputData output)
 
 	float light = 0.5 - 0.5 * dot(Light.Direction.xyz, worldNormal.xyz);
 
-	output.Diffuse = input.Diffuse * Material.Diffuse * light * Light.Diffuse;
-	output.Diffuse += input.Diffuse * Material.Ambient * Light.Ambient;
+	output.Diffuse   = input.Diffuse * Material.Diffuse * light * Light.Diffuse;
+	output.Diffuse  += input.Diffuse * Material.Ambient * Light.Ambient;
 	output.Diffuse.a = input.Diffuse.a * Material.Diffuse.a;
 }

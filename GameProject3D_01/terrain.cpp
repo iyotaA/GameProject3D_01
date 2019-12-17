@@ -30,7 +30,7 @@ void CTerrain::Init()
 
 	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
 	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
-	m_Texture[2]->LoadSTB("asset/image/NormalMap_dart.png");
+	m_Texture[2]->LoadSTB("asset/image/NormalMap.png");
 
 	result = InitializeBuffers();
 	assert(result);
@@ -86,6 +86,7 @@ void CTerrain::Draw()
 	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	m_Shader->SetMaterial(material);
+	m_Shader->SetSpequlerPow(0.1f);
 	m_Shader->Set();
 
 	DrawBuffers();
