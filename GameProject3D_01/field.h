@@ -12,13 +12,13 @@ public:
 	float GetHeight(XMFLOAT3* _position);
 
 private:
-	const int	      m_TextureNum = 2;
+	const int	      m_TextureNum = 3;
 
 	ID3D11Buffer*	  m_VertexBufer = NULL;
 	ID3D11Buffer*	  m_IndexBufer = NULL;
 	CTexture**		  m_Texture = NULL;
-	VERTEX_3D_WATER*  m_Vertex;
-	CShaderWater*     m_Shader;
+	VERTEX_3D_NOMAL_MAP*  m_Vertex;
+	CShaderNormalMap* m_Shader;
 	int				  m_IndexNum;
 
 };

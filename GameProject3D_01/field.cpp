@@ -9,10 +9,10 @@
 #include "camera.h"
 
 
-#define SIZE		(2.0f)
-#define GridNumX	(350)
-#define GridNumZ	(350)
-#define PlaneHeight (5.0f)
+#define SIZE		(4.0f)
+#define GridNumX	(175)
+#define GridNumZ	(175)
+#define PlaneHeight (1.0f)
 
 
 void CField::Init()
@@ -28,7 +28,7 @@ void CField::Init()
 
 	// ヴァーテクス情報格納
 	{
-		m_Vertex = new VERTEX_3D_WATER[VertexNum];
+		m_Vertex = new VERTEX_3D_NOMAL_MAP[VertexNum];
 
 		for (int z = 0; z < GridNumZ + 1; z++) {
 			for (int x = 0; x < GridNumX + 1; x++) {
@@ -83,10 +83,10 @@ void CField::Init()
 		// ヴァーテクスバッファ生成 //////
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
-		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(VERTEX_3D_WATER) * VertexNum;
+		bd.Usage = D3D11_USAGE_DYNAMIC;
+		bd.ByteWidth = sizeof(VERTEX_3D_NOMAL_MAP) * VertexNum;
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bd.CPUAccessFlags = 0;
+		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 		D3D11_SUBRESOURCE_DATA sd;
 		ZeroMemory(&sd, sizeof(sd));
@@ -142,14 +142,16 @@ void CField::Init()
 	}
 
 	// 使用シェーダーセット
-	m_Shader = ShaderManager::GetShader<CShaderWater>();
+	m_Shader = ShaderManager::GetShader<CShaderNormalMap>();
 
 	// テクスチャ読み込み //////
 	m_Texture = new CTexture*[m_TextureNum];
 	m_Texture[0] = new CTexture();
 	m_Texture[1] = new CTexture();
+	m_Texture[2] = new CTexture();
 	m_Texture[0]->LoadSTB("asset/image/white.png");
-	m_Texture[1]->LoadSTB("asset/image/NormalMap_dart.png");
+	m_Texture[1]->LoadSTB("asset/image/field_dart001.png");
+	m_Texture[2]->LoadSTB("asset/image/rock.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 0.0f, 0.0f);
@@ -167,7 +169,19 @@ void CField::Uninit()
 
 void CField::Update()
 {
+	int numVertices = (GridNumX + 1) * (GridNumZ + 1);
 
+	for (int i = 0; i < numVertices; i++) {
+		m_Vertex[i].TexCoord = XMFLOAT2(m_Vertex[i].TexCoord.x + 0.005f, m_Vertex[i].TexCoord.y + 0.0f);
+	}
+
+	// VertexBuffer書き換え
+	{
+		D3D11_MAPPED_SUBRESOURCE msr;
+		CRenderer::GetDeviceContext()->Map(m_VertexBufer, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+		memcpy(msr.pData, m_Vertex, sizeof(VERTEX_3D_NOMAL_MAP) * numVertices);
+		CRenderer::GetDeviceContext()->Unmap(m_VertexBufer, 0);
+	}
 }
 
 void CField::Draw()
@@ -206,13 +220,11 @@ void CField::Draw()
 	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	m_Shader->SetMaterial(material);
+	m_Shader->SetSpequlerPow(0.01f);
 
-	static float value = 0;
-	m_Shader->SetIncrementValue(0);
+	m_Shader->Set();
 
-	m_Shader->SetSH();
-
-	UINT Stride = sizeof(VERTEX_3D_WATER);
+	UINT Stride = sizeof(VERTEX_3D_NOMAL_MAP);
 	UINT offdet = 0;
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBufer, &Stride, &offdet);	// バーテクスバッファセット
 	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_IndexBufer, DXGI_FORMAT_R32_UINT, 0);		// インデックスバッファセット

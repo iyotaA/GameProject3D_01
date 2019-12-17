@@ -79,7 +79,6 @@ void CShaderNormalMap::Init( const char* _VertexShader, const char* _PixelShader
 		hBufferDesc.ByteWidth = sizeof(CONSTANT);
 		CRenderer::GetDevice()->CreateBuffer(&hBufferDesc, NULL, &m_ConstantBuffer);
 
-
 		hBufferDesc.ByteWidth = sizeof(MATERIAL);
 		CRenderer::GetDevice()->CreateBuffer(&hBufferDesc, NULL, &m_MaterialBuffer);
 

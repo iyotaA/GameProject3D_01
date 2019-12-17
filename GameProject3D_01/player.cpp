@@ -19,7 +19,7 @@ void CPlayer::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f);
+	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f, "asset/image/white.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(90.0f, 0.0f, -160.0f);
@@ -275,8 +275,6 @@ void CPlayer::Move()
 	moveDistance.Normalize();
 	m_MoveDistance += moveDistance * m_MoveSpeed;
 
-	m_Position += m_MoveDistance;
-	m_MoveDistance *= 0.85f;
 
 
 	// 移動範囲制限
@@ -286,10 +284,29 @@ void CPlayer::Move()
 	//if (m_Position.z - m_CollisionSphere->GetRadius() < -15.0) m_Position.z = -15.0f + m_CollisionSphere->GetRadius();
 
 
-	XMFLOAT3 MovedDir;
+
+
+	std::vector<CEnemy*> game_obj = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
+	for (CEnemy*  obj : game_obj) {
+
+		// コリジョン判定
+		if (CCollision3DJudge::Collision3D_Spher_Spher(m_CollisionSphere, obj->GetCollisionSphere())) {
+
+			m_Position = prevPos;
+		}
+		else {
+			m_Position += m_MoveDistance;
+			m_MoveDistance *= 0.85f;
+		}
+
+	}
+
+	Vector3 MovedDir;
 	MovedDir.x = m_Position.x - prevPos.x;
 	MovedDir.y = 0.0f;
 	MovedDir.z = m_Position.z - prevPos.z;
+
+
 
 	if ((fabs(MovedDir.x) > 0.001f) || (fabs(MovedDir.z) > 0.001f)) {
 

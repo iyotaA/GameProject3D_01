@@ -24,4 +24,5 @@ float4 main(in InputData input) : SV_Target
 	outDiffuse *= input.diffuse;
 
 	return outDiffuse;
+	//return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

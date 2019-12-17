@@ -1,4 +1,5 @@
 // 定数バッファ
+// 32ビットづつじゃ無いとバグる
 cbuffer ConstantBuffer:register(b0)
 {
 	matrix World;
@@ -6,6 +7,8 @@ cbuffer ConstantBuffer:register(b0)
 	matrix Projection;
 	matrix MtxWIT;
 	float4 CameraPosition;
+	float  SpequlerPow;
+	float3 Dummy;
 }
 
 // マテリアルバッファ
@@ -79,7 +82,7 @@ float4 main(in InputData input) : SV_TARGET
 	// ノーマライズ
 	normalW = normalize(normalW).xyz;
 
-	float3 lightDir = { 1.0f, -1.0f, 1.0f };
+	float3 lightDir = { 1.0f, -1.0f, -1.0f };
 	lightDir = normalize(lightDir).xyz;
 
 	//// ハーフランバート
@@ -93,15 +96,16 @@ float4 main(in InputData input) : SV_TARGET
 	eyev = normalize(eyev);	// 正規化
 
 	// スペキュラー
-	float  s = pow(saturate(dot(refv, eyev)), 10);
-	float4 speqular = float4(float3(s, s, s) * 0.2f, 1.0f);
+	float  s = pow(saturate(dot(refv, eyev)),10);
+	float4 speqular = float4(float3(s, s, s) * SpequlerPow, 1.0f);
 
-	// 出力色
+	// 出力色1
+	speqular *= input.blendNum;
 	float4 color0 = gTextures[0].Sample(gSampler, input.uv) * input.blendNum;
 	color0 = color0 * light + speqular;
 
+	// 出力色2
 	float4 color1 = gTextures[1].Sample(gSampler, input.uv) * (1.0f - input.blendNum);
-	//color1 = color1 * light + speqular;
 
 	float4 outDiffuse = color0 + color1;
 	outDiffuse *= input.color;

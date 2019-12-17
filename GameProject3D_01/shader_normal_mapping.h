@@ -30,6 +30,7 @@ public:
 	void SetProjectionMatrix(XMFLOAT4X4* ProjectionMatrix) { m_Constant.ProjectionMatrix = Transpose( ProjectionMatrix ); }
 	void SetMtxWIT(XMFLOAT4X4* _MtxWIT) { m_Constant.MtxWIT = Transpose(_MtxWIT); }
 	void SetCameraPosition(XMFLOAT4* _CameraPos) { m_Constant.CameraPosition = *_CameraPos; }
+	void SetSpequlerPow(float _SpequlerPow) { m_Constant.SpequlerPow = _SpequlerPow; }
 
 private:
 	struct CONSTANT
@@ -39,6 +40,8 @@ private:
 		XMFLOAT4X4 ProjectionMatrix;
 		XMFLOAT4X4 MtxWIT;
 		XMFLOAT4   CameraPosition;
+		float      SpequlerPow;
+		float      Dummy[3];
 	};
 
 	CONSTANT	m_Constant;

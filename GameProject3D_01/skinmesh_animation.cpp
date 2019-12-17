@@ -36,7 +36,7 @@ static ofstream outputfile(F);
 //************************************************
 // ファイルロード
 //************************************************
-void CSkinModel::Load(char* pFileName, float size)
+void CSkinModel::Load(char* pFileName, float size, char* pTexture)
 {
 	m_pScene = aiImportFile(pFileName, aiProcessPreset_TargetRealtime_MaxQuality);
 
@@ -101,29 +101,16 @@ void CSkinModel::Load(char* pFileName, float size)
 		}
 	}
 
-
-	LoadMesh(m_pScene->mRootNode);
-
-
+	// 各ノード名書き出し
 	WritteName(m_pScene->mRootNode);
 	outputfile.close();
-
-
-	// モデルデータとテクスチャが同じファイルに入っている場合
-	//m_Texture = new unsigned int[m_pScene->mNumMaterials];
-	std::string modelPath = pFileName;
-
-	size_t fileNamePos = modelPath.find_last_of(".");								// モデルのパスの後ろから最初に出てきた"."の場所を取得
-	std::string fileType = modelPath.substr(fileNamePos + 1, sizeof(modelPath));	// ファイルの拡張子を取得
-
-	m_FileType = ChackFileType(fileType);	// ファイルタイプ取得
 
 	//// テクスチャ取得
 	aiString path;
 
-	for (int tex = 0; tex < m_pScene->mNumMaterials; tex++) {
+	for (int mat = 0; mat < m_pScene->mNumMaterials; mat++) {
 
-		if (m_pScene->mMaterials[tex]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+		if (m_pScene->mMaterials[mat]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
 
 			// fbxファイルの内部にテクスチャが入っているか否か
 			if (path.data[0] == '*') {
@@ -133,6 +120,8 @@ void CSkinModel::Load(char* pFileName, float size)
 				m_Texture[path.data]->loadTextureFromMemory((const unsigned char*)m_pScene->mTextures[id]->pcData, m_pScene->mTextures[id]->mWidth);
 			}
 			else {
+				m_Texture[path.data] = new CTexture();
+				m_Texture[path.data]->LoadSTB(pTexture);
 				// fbxファイル外にテクスチャあり
 				//size_t pos = modelPath.find_last_of("\\/");				// モデルのパスの後ろから最初に出てきた"\\/"の場所を取得
 				//std::string texPath = (char*)& path.data;					// Textureのパス取得
@@ -144,14 +133,110 @@ void CSkinModel::Load(char* pFileName, float size)
 		}
 	}
 
+	// アニメーションデータがあるか？
+	if (m_pScene->HasAnimations()) {
+		LoadMesh(m_pScene->mRootNode);
+	}
+	else {
+		LoadStaticMesh();
+	}
+
 	//DrawMesh(m_pScene->mRootNode, &aiMatrix4x4());
 
 	m_Shader = ShaderManager::GetShader<CShaderDefault>();
 }
 
+//************************************************
+// （アニメーションなし）メッシュごとにバッファ作成
+//************************************************
+void CSkinModel::LoadStaticMesh()
+{
+	for (int m = 0; m < m_pScene->mNumMeshes; m++) {
+
+		aiMesh* pMesh = m_pScene->mMeshes[m];
+
+		// マテリアル取得
+		const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
+		aiColor4D diffuse;
+		aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
+
+		VERTEX_3D* vertices = new VERTEX_3D[pMesh->mNumVertices];
+
+		// Index情報格納
+		UINT* Indices;
+		Indices = new UINT[pMesh->mNumFaces * 3];
+		m_Mesh[m].IndexNum = pMesh->mNumFaces * 3;
+
+		// メッシュの面ポリゴンの個数分繰り返し
+		for (int face = 0; face < pMesh->mNumFaces; face++) {
+			const aiFace* pFace = &pMesh->mFaces[face];	// 面ポリゴン一個分のデータ取得
+
+			assert(pFace->mNumIndices == 3);
+
+			Indices[face * 3 + 0] = pFace->mIndices[0];
+			Indices[face * 3 + 1] = pFace->mIndices[1];
+			Indices[face * 3 + 2] = pFace->mIndices[2];
+
+			std::vector<DEFORM_VERTEX>* pVertices = &m_pDeformVertex[m];
+
+			// 1つの面ポリゴンの頂点数を取得
+			for (int vertex = 0; vertex < pFace->mNumIndices; vertex++) {
+
+				// 各頂点毎にアクセス
+				int id = pFace->mIndices[vertex];
+
+				assert(pVertex);
+
+				// 頂点情報格納
+				vertices[id].Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
+				vertices[id].Normal = Vector3(pMesh->mNormals[id].x, pMesh->mNormals[id].y, pMesh->mNormals[id].z);
+				vertices[id].Position = Vector3(pMesh->mVertices[id].x, pMesh->mVertices[id].y, pMesh->mVertices[id].z);
+				vertices[id].TexCoord = pMesh->HasTextureCoords(0) ? XMFLOAT2(pMesh->mTextureCoords[0][id].x, 1.0f - pMesh->mTextureCoords[0][id].y) : XMFLOAT2(0.0f, 0.0f);
+			}
+		}
+
+		// VertexBuffer 作成
+		{
+			D3D11_BUFFER_DESC vbDesc;
+			vbDesc.ByteWidth = sizeof(VERTEX_3D) * pMesh->mNumVertices;
+			vbDesc.Usage = D3D11_USAGE_DEFAULT;
+			vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vbDesc.CPUAccessFlags = 0;;
+			vbDesc.MiscFlags = 0;
+			vbDesc.StructureByteStride = 0;
+
+			D3D11_SUBRESOURCE_DATA vrData;
+			vrData.pSysMem = vertices;
+			vrData.SysMemPitch = 0;
+			vrData.SysMemSlicePitch = 0;
+
+			CRenderer::GetDevice()->CreateBuffer(&vbDesc, &vrData, &m_Mesh[m].VertexBuffer);
+		}
+
+		// IndexBuffer 作成
+		{
+			D3D11_BUFFER_DESC bd{};
+			bd.ByteWidth = sizeof(UINT) * m_Mesh[m].IndexNum;
+			bd.Usage = D3D11_USAGE_DEFAULT;
+			bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bd.CPUAccessFlags = 0;
+			bd.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA sd{};
+			sd.pSysMem = Indices;
+			sd.SysMemPitch = 0;
+			sd.SysMemSlicePitch = 0;
+
+			CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_Mesh[m].IndexBuffer);
+		}
+		delete[] vertices;
+		delete[] Indices;
+	}
+}
+
 
 //************************************************
-// メッシュごとにバッファ作成
+// （アニメーションあり）メッシュごとにバッファ作成
 //************************************************
 void CSkinModel::LoadMesh(const aiNode* pNode)
 {
@@ -159,7 +244,7 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 
 		// メッシュ1つ分取得
 		const aiMesh* pMesh = m_pScene->mMeshes[pNode->mMeshes[mesh]];
-		unsigned int mesh_index = pNode->mMeshes[mesh];
+		UINT mesh_index = pNode->mMeshes[mesh];
 		m_Mesh[mesh_index].IndexNum = pMesh->mNumFaces * 3;
 
 		// マテリアル取得
@@ -170,8 +255,8 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 		VERTEX_3D* vertices = new VERTEX_3D[pMesh->mNumVertices];
 
 		// Index情報格納
-		unsigned short* Indices;
-		Indices = new unsigned short[pMesh->mNumFaces * 3];
+		UINT* Indices;
+		Indices = new UINT[pMesh->mNumFaces * 3];
 
 		// メッシュの面ポリゴンの個数分繰り返し
 		for (int face = 0; face < pMesh->mNumFaces; face++) {
@@ -223,7 +308,7 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 		// IndexBuffer 作成
 		{
 			D3D11_BUFFER_DESC bd{};
-			bd.ByteWidth = sizeof(unsigned short) * m_Mesh[mesh_index].IndexNum;
+			bd.ByteWidth = sizeof(UINT) * m_Mesh[mesh_index].IndexNum;
 			bd.Usage = D3D11_USAGE_DEFAULT;
 			bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			bd.CPUAccessFlags = 0;
@@ -236,6 +321,7 @@ void CSkinModel::LoadMesh(const aiNode* pNode)
 
 			CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_Mesh[mesh_index].IndexBuffer);
 		}
+
 		delete[] vertices;
 		delete[] Indices;
 	}
@@ -295,9 +381,39 @@ void CSkinModel::Draw(XMMATRIX* world)
 			// メッシュ1つ分取得
 			aiMesh* pMesh = m_pScene->mMeshes[mesh];
 
+			UINT stride;
+			UINT offset;
+
+			stride = sizeof(VERTEX_3D);
+			offset = 0;
+
+			CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_Mesh[mesh].VertexBuffer, &stride, &offset);
+
+			CRenderer::GetDeviceContext()->IASetIndexBuffer(m_Mesh[mesh].IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+			const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
+			aiString path;
+			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+			CRenderer::SetTexture(m_Texture[path.data], 0);
+
+			aiColor4D diffuse, ambient;
+			aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
+			aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, &ambient);	// ディフーズカラー取得
+
+
+			MATERIAL material;
+			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+
+			material.Ambient = COLOR(ambient.r * 2, ambient.g * 2, ambient.b * 2, ambient.a);
+			m_Shader->SetMaterial(material);
+			m_Shader->Set();
+
+
 			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			CRenderer::DrawIndexed(pMesh->mNumFaces * 3, 0, 0);
+			CRenderer::DrawIndexed(m_Mesh[mesh].IndexNum, 0, 0);
 		}
 
 	}
@@ -319,7 +435,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 		// メッシュ1つ分取得
 		const aiMesh* pMesh = m_pScene->mMeshes[pNode->mMeshes[mesh]];
-		unsigned int mesh_index = pNode->mMeshes[mesh];
+		UINT mesh_index = pNode->mMeshes[mesh];
 		m_Mesh[mesh_index].IndexNum = pMesh->mNumFaces * 3;
 
 		// メッシュごとの頂点群を取得
@@ -365,16 +481,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 		delete[] vertices;
 
 
-		//// テクスチャ読み込み //////
-		//assert(m_Texture[pNode->mName.C_Str()]);
-		//m_Texture[pNode->mName.C_Str()]->LoadSTB(path.C_Str());
-		CRenderer::SetTexture(m_Texture[pNode->mName.C_Str()]);
-
 		{
-			//// テクスチャ取得
-			//aiString path;
-			//mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-
 			// マテリアル取得
 			const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
 			assert(mat);
@@ -386,26 +493,21 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 			MATERIAL material;
 			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 
-			material.Ambient = COLOR(ambient.r, ambient.g, ambient.b, ambient.a);
+			material.Ambient = COLOR(ambient.r * 2, ambient.g * 2, ambient.b * 2, ambient.a);
 
 			m_Shader->SetMaterial(material);
 			m_Shader->Set();
 
 			aiString path;
 			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-			// fbxファイルの内部にテクスチャが入っているか否か
-			if (path.data[0] == '*') {
-				CRenderer::SetTexture(m_Texture[path.data], 0);
-			}
-
-
+			CRenderer::SetTexture(m_Texture[m_pScene->mRootNode->mName.C_Str()]);
 		}
 
 		{
 			UINT Stride = sizeof(VERTEX_3D);
 			UINT offdet = 0;
 			CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_Mesh[mesh_index].VertexBuffer, &Stride, &offdet);	// バーテクスバッファセット
-			CRenderer::GetDeviceContext()->IASetIndexBuffer(m_Mesh[mesh_index].IndexBuffer, DXGI_FORMAT_R16_UINT, 0);		// インデックスバッファセット
+			CRenderer::GetDeviceContext()->IASetIndexBuffer(m_Mesh[mesh_index].IndexBuffer, DXGI_FORMAT_R32_UINT, 0);		// インデックスバッファセット
 		}
 
 		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -468,7 +570,7 @@ void CSkinModel::CalculateBoneMatrix()
 
   ( 大文字 : 関連するボーン, 小文字 : そのウェイト )
 */
-	for (unsigned int m = 0; m < m_pScene->mNumMeshes; m++)
+	for (UINT m = 0; m < m_pScene->mNumMeshes; m++)
 	{
 		for (auto& vertex : m_pDeformVertex[m])
 		{
@@ -582,7 +684,6 @@ void CSkinModel::CalculateBoneMatrix()
 			vertex.DeformNormal *= outMatrix;
 		}
 	}
-
 }
 
 

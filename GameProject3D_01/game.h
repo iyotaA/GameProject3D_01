@@ -14,14 +14,17 @@ public:
 		AddGameObject<CSkyDome>(CManager::E_Background);
 
 		// フィールドの初期化
-		//AddGameObject<CField>(CManager::E_Background);
 		AddGameObject<CTerrain>(CManager::E_Background);
+		//AddGameObject<CField>(CManager::E_Background);
 
-		//// プレイヤーの初期化
+		// プレイヤーの初期化
 		CPlayer* player;
 		player = AddGameObject<CPlayer>(CManager::E_3D);
-		//player->SetCamera(camera);	// カメラセット
 
+		// エネミーの初期化
+		AddGameObject<CEnemy>(CManager::E_3D);
+
+		// カメラセット
 		CCamera* camera = CCameraManager::GetCamera();		// 注視点
 		camera->SetAt(player);
 
@@ -32,28 +35,6 @@ public:
 		m_GameObject[CManager::E_UI].push_back(number);
 
 		m_time = 0.0f;
-
-		EnemySpawnPlace[0] = XMFLOAT2(0.0f, 5.0f);
-		EnemySpawnPlace[1] = XMFLOAT2(3.0f, -2.5f);
-		EnemySpawnPlace[2] = XMFLOAT2(5.5f, 5.0f);
-		EnemySpawnPlace[3] = XMFLOAT2(4.0f, 2.0f);
-		EnemySpawnPlace[4] = XMFLOAT2(-4.0f, -6.0f);
-		EnemySpawnPlace[5] = XMFLOAT2(1.0f, 4.5f);
-		EnemySpawnPlace[6] = XMFLOAT2(3.5f, -6.5f);
-		EnemySpawnPlace[7] = XMFLOAT2(7.5f, 5.0f);
-		EnemySpawnPlace[8] = XMFLOAT2(-6.5f, 7.0f);
-		EnemySpawnPlace[9] = XMFLOAT2(-3.5f, 1.0f);
-		EnemySpawnPlace[10] = XMFLOAT2(-9.5f, 4.0f);
-		EnemySpawnPlace[11] = XMFLOAT2(1.5f, 6.5f);
-		EnemySpawnPlace[12] = XMFLOAT2(-6.5f, -7.5f);
-		EnemySpawnPlace[13] = XMFLOAT2(0.0f, -9.0f);
-		EnemySpawnPlace[14] = XMFLOAT2(5.5f, 10.0f);
-		EnemySpawnPlace[15] = XMFLOAT2(6.5f, 0.0f);
-		EnemySpawnPlace[16] = XMFLOAT2(0.0f, -4.5f);
-		EnemySpawnPlace[17] = XMFLOAT2(4.5f, -2.0f);
-		EnemySpawnPlace[18] = XMFLOAT2(8.5f, -3.5f);
-		EnemySpawnPlace[19] = XMFLOAT2(-2.5f, 5.0f);
-
 		FrameCount = 0;
 	}
 

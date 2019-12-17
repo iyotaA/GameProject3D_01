@@ -60,6 +60,12 @@ struct DX11_SUBSET
 
 struct LIGHT
 {
+	LIGHT() :
+		Direction(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)),
+		Diffuse(COLOR(1.0f, 1.0f, 1.0f, 1.0f)),
+		Ambient(COLOR(0.5, 0.5, 0.5, 1.0f))
+	{}
+
 	XMFLOAT4	Direction;
 	COLOR		Diffuse;
 	COLOR		Ambient;

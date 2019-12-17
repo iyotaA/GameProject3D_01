@@ -22,6 +22,7 @@ private:
 	static ID3D11Buffer*			m_VertexBufer;
 	static ID3D11Buffer*			m_IndexBufer;
 	static CShaderDefault*			m_Shader;
+	static CTexture*				m_Texture;
 
 	static unsigned int				m_CircleCount;	// ƒT[ƒNƒ‹•`‰æ”
 	static unsigned int				m_CubeCount;	// —§•û‘Ì•`‰æ”

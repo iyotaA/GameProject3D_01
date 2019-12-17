@@ -6,6 +6,8 @@ cbuffer ConstantBuffer:register(b0)
 	matrix Projection;
 	matrix MtxWIT;
 	float4 CameraPosition;
+	float  SpequlerPow;
+	float3 Dummy;
 }
 
 struct InputData
