@@ -19,7 +19,7 @@ void CPlayer::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f, "asset/image/white.png");
+	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
 
 	// トランスフォーム初期化
 	m_Position = Vector3(90.0f, 0.0f, -160.0f);
@@ -275,30 +275,19 @@ void CPlayer::Move()
 	moveDistance.Normalize();
 	m_MoveDistance += moveDistance * m_MoveSpeed;
 
+	m_Position += m_MoveDistance;
+	m_MoveDistance *= 0.85f;
 
 
-	// 移動範囲制限
-	//if (m_Position.x + m_CollisionSphere->GetRadius() > 15.0) m_Position.x = 15.0f - m_CollisionSphere->GetRadius();
-	//if (m_Position.x - m_CollisionSphere->GetRadius() < -15.0) m_Position.x = -15.0f + m_CollisionSphere->GetRadius();
-	//if (m_Position.z + m_CollisionSphere->GetRadius() > 15.0) m_Position.z = 15.0f - m_CollisionSphere->GetRadius();
-	//if (m_Position.z - m_CollisionSphere->GetRadius() < -15.0) m_Position.z = -15.0f + m_CollisionSphere->GetRadius();
-
-
-
-
+	// 敵とのコリジョン判定
 	std::vector<CEnemy*> game_obj = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
 	for (CEnemy*  obj : game_obj) {
 
 		// コリジョン判定
 		if (CCollision3DJudge::Collision3D_Spher_Spher(m_CollisionSphere, obj->GetCollisionSphere())) {
 
-			m_Position = prevPos;
+			m_Position -= m_MoveDistance * 1.1f;
 		}
-		else {
-			m_Position += m_MoveDistance;
-			m_MoveDistance *= 0.85f;
-		}
-
 	}
 
 	Vector3 MovedDir;
@@ -375,17 +364,18 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
+	// 特定のボーンの位置を取得
 	m_BonePosition = m_pModel->GetWorldPosition(&world, "LeftHandIndex4_end");
 	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
 	m_CollisionSphere->SetCenter(&m_Position);
 
+	// コリジョン更新
 	Vector3X3 obbColSize;
 	obbColSize.front = m_DirVec.front;
 	obbColSize.up = m_DirVec.up;
 	obbColSize.right = m_DirVec.right;
 	m_CollisionOBB->SetStatus(&Vector3(m_Position.x, m_Position.y + 1.0f, m_Position.z), &obbColSize, &Vector3(0.5f, 1.0f, 0.5f));
-
 
 	// 衝突判定テスト
 	CCollisionOBB obbCol;

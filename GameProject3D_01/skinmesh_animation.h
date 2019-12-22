@@ -40,7 +40,7 @@ struct BONE
 class CSkinModel
 {
 public:
-	void Load(char* pFileName, float size, char* pTexture);
+	void Load(char* pFileName, float size, char* pTexture, char* output_fileName);
 	void Unload();
 	void Draw(XMMATRIX* world);
 	void update(int addAnimationFrame);
@@ -108,7 +108,7 @@ private:
 
 	//ファイル操作・チェック ////////////////////////////////////
 	FileType ChackFileType(std::string pFileType);
-	void WritteName(aiNode* pNode);
+	void WritteName(aiNode* pNode, ofstream* fileName);
 
 };
 
