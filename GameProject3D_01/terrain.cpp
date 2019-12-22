@@ -86,7 +86,7 @@ void CTerrain::Draw()
 	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	m_Shader->SetMaterial(material);
-	m_Shader->SetSpequlerPow(0.1f);
+	m_Shader->SetSpequlerPow(0.2f);
 	m_Shader->Set();
 
 	DrawBuffers();

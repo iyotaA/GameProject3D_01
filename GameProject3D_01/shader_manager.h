@@ -29,6 +29,10 @@ public:
 
 			// typeid()‚ÍŒ^‚ð’²‚×‚é
 			if (typeid(*shader) == typeid(T)) {
+
+				T* shaderInstance = new T;
+				shaderInstance;
+
 				return (T*)shader;
 			}
 		}
@@ -43,8 +47,13 @@ public:
 
 
 private:
-	static std::vector<CShaderBase*>	m_Shaders;
+	struct
+	{
+		CShaderBase* shader
+	};
 
+	static std::vector<CShaderBase*>	m_Shaders;
+	static std::string m_Files;
 };
 
 #endif // !SHADER_MANAGER_H_

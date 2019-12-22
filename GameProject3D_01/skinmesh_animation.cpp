@@ -20,23 +20,16 @@
 #include "camera_manager.h"
 #include "camera.h"
 
-#define F "asset/Node.txt"
-
 
 /* Assimpの行列の合成順番は違うから気を付けよう！！
 	 A *= B;
 	 本来は : A = A * B;
 	 Assimpは : A = B * A;
 */
-
-
-static ofstream outputfile(F);
-
-
 //************************************************
 // ファイルロード
 //************************************************
-void CSkinModel::Load(char* pFileName, float size, char* pTexture)
+void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_fileName)
 {
 	m_pScene = aiImportFile(pFileName, aiProcessPreset_TargetRealtime_MaxQuality);
 
@@ -102,7 +95,8 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture)
 	}
 
 	// 各ノード名書き出し
-	WritteName(m_pScene->mRootNode);
+	ofstream outputfile(output_fileName);
+	WritteName(m_pScene->mRootNode, &outputfile);
 	outputfile.close();
 
 	//// テクスチャ取得
@@ -948,18 +942,18 @@ FileType CSkinModel::ChackFileType(std::string pFileType)
 	else return E_NONE;
 }
 
-void CSkinModel::WritteName(aiNode* pNode)
+void CSkinModel::WritteName(aiNode* pNode, ofstream* fileName)
 {
 	if (pNode->mParent != nullptr) {
-		outputfile << "(親)" << pNode->mParent->mName.data << " => " << pNode->mName.data << "\n";
+		*fileName << "(親)" << pNode->mParent->mName.data << " => " << pNode->mName.data << "\n";
 	}
 	else {
-		outputfile << pNode->mName.data << "\n";
+		*fileName << pNode->mName.data << "\n";
 	}
 
 	// 子ノードを描画
 	for (int child = 0; child < pNode->mNumChildren; child++) {
-		WritteName(pNode->mChildren[child]);
+		WritteName(pNode->mChildren[child], fileName);
 	}
 }
 

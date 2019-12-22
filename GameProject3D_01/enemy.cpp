@@ -19,7 +19,7 @@ void CEnemy::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/dragon001.fbx", 0.75f, "asset/image/dragon.png");
+	m_pModel->Load("asset/model/dragon001.fbx", 0.75f, "asset/image/dragon.png", "asset/NodeNameFiles/dragon_node.txt");
 
 
 	// トランスフォーム初期化
