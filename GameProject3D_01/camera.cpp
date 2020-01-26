@@ -23,7 +23,7 @@ void CCamera::Init(unsigned int _id)
 	m_DirVec.SetFrontUpRight(Vector3(0.0f, 0.0f, 1.0f));
 
 	/* ƒJƒƒ‰î•ñ‰Šú‰» */
-	m_LengthToAt     = 5.0f;
+	m_LengthToAt     = 6.5f;
 	m_At             = Vector3(0.0f, 10.0f, 0.0f);
 	m_SpinVerticall  = 0.0f;
 	m_SpinHorizontal = 0.0f;

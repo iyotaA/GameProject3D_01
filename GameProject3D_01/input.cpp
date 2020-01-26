@@ -68,8 +68,16 @@ bool CInput::GetGamepadPress(int state)
 bool CInput::GetGamepadTrigger(int state)
 {
 	return (
-		(m_GamepadState.Gamepad.wButtons & state) &
+		(m_GamepadState.Gamepad.wButtons & state) &&
 		!(m_OldGamepadState.Gamepad.wButtons & state)
+		);
+}
+
+bool CInput::GetGamepadRelease(int state)
+{
+	return (
+		!(m_GamepadState.Gamepad.wButtons & state) &&
+		(m_OldGamepadState.Gamepad.wButtons & state)
 		);
 }
 
@@ -113,9 +121,6 @@ XMFLOAT2 CInput::GetGamepadRightStick()
 
 bool CInput::GetIsInputStick(int stick)
 {
-	assert(stick >= LEFT_STICK);
-	assert(stick <= RIGHT_STICK);
-
 	if (stick == LEFT_STICK) {
 		return m_IsInputLeftStick;
 	}

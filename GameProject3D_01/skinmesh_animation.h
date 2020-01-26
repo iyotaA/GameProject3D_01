@@ -51,7 +51,8 @@ public:
 
 	// 引数 / _next : true = Next / _next : false = Back
 	void SetAnimation(bool _next);
-	void SetAnimation(const unsigned int _id, const float _startBlendNum);
+	void SetAnimation(const unsigned int _id, const float _endBlendNum);
+	bool CurrentAnimationFinish();
 
 	char GetCurrentAnimId() { return m_CurrentAnimId; }
 	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
@@ -62,6 +63,7 @@ public:
 	bool*  DrawAtLine() { return &m_DrawAtLine; }
 	int*   MotionFrame() { return &m_MotionFrame; }
 	char*  GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
+	bool&  AnimationBlending() { return m_IsAnimationBlending; }
 
 private:
 	std::unordered_map<std::string, CTexture*>	m_Texture;
@@ -72,7 +74,8 @@ private:
 	MESH* m_Mesh = nullptr;
 	FileType m_FileType;
 	CShaderDefault* m_Shader;
-	float    m_AnimationFrame = 0.0f;
+	float    m_CurrentAnimationFrame = 0.0f;
+	float    m_TargetAnimationFrame = 0.0f;
 	float    m_Size;
 
 	int  m_MotionFrame = 0;
@@ -84,16 +87,18 @@ private:
 	char m_TargetAnimId = 0;
 	float m_AnimationSpeed = 1.0f;
 	float m_PerBlend = 0.0f;
+	float m_PerBlendEnd = 0.0f;
 
 	// アニメーション・描画 ////////////////////////////////////
+	void DrawStaticMesh();
 	void DrawMesh(const aiNode* pNode);
 	void LoadMesh(const aiNode* pNode);
 	void LoadStaticMesh();
 	void CreateBone(aiNode* pNode);
 	void CalculateBoneMatrix();
 	void UpdateBoneMatrix(aiNode* pNode, aiMatrix4x4 matrix);
-	void AnimationBlend();
-	void Animation();
+	void AnimationBlend(int addAnimationFrame);
+	void Animation(int addAnimationFrame);
 	void GetBonePosition( aiNode* pNode, XMMATRIX* _world, const char* _targetName, XMMATRIX& _target );
 	aiNode* GetBoneNode(aiNode* pNode, const char* _name);
 

@@ -7,7 +7,7 @@
 
 // ÉOÉçÅ[ÉoÉãïœêî ////////////////////////////////////
 const char* CLASS_NAME = "DX11AppClass";
-const char* WINDOW_NAME = "DX11_FrameWork";
+const char* WINDOW_NAME = "Game_NONAME";
 DWORD dwExecLastTime;
 DWORD dwCurrentTime;
 HWND g_Window;

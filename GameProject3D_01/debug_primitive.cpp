@@ -82,7 +82,7 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_VertexBufer);
 
-		assert(m_VertexBufer =! NULL);
+		assert(m_VertexBufer);
 	}
 
 	// インデックスバッファ生成 //////
@@ -99,7 +99,7 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 		sd.pSysMem = m_Indices.data();
 		CRenderer::GetDevice()->CreateBuffer(&bd, &sd, &m_IndexBufer);
 
-		assert(m_IndexBufer = !NULL);
+		assert(m_IndexBufer);
 	}
 
 	XMMATRIX world;

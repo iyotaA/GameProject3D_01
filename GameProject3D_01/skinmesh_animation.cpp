@@ -38,6 +38,7 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 		assert(false);
 	}
 
+
 	// 各ボーン名取得
 	CreateBone(m_pScene->mRootNode);
 
@@ -95,9 +96,11 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 	}
 
 	// 各ノード名書き出し
-	ofstream outputfile(output_fileName);
-	WritteName(m_pScene->mRootNode, &outputfile);
-	outputfile.close();
+	if (output_fileName != NULL) {
+		ofstream outputfile(output_fileName);
+		WritteName(m_pScene->mRootNode, &outputfile);
+		outputfile.close();
+	}
 
 	//// テクスチャ取得
 	aiString path;
@@ -124,6 +127,10 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 				//texturePath += texPath.substr(texpos + 1, sizeof(texPath));	// モデルと同じ場所にあるテクスチャのパスに書き換え
 				//m_Texture[tex] = LoadTextureSTB(texturePath.c_str());		// 指定したパスのテクスチャを読み込む
 			}
+		}
+		else {
+			m_Texture["DefauldTexture"] = new CTexture();
+			m_Texture["DefauldTexture"]->LoadSTB(pTexture);
 		}
 	}
 
@@ -178,8 +185,6 @@ void CSkinModel::LoadStaticMesh()
 
 				// 各頂点毎にアクセス
 				int id = pFace->mIndices[vertex];
-
-				assert(pVertex);
 
 				// 頂点情報格納
 				vertices[id].Diffuse = XMFLOAT4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
@@ -360,56 +365,19 @@ void CSkinModel::Draw(XMMATRIX* world)
 
 	//CRenderer::SetWorldMatrix(&_world);
 
+	// モデルを線で描画する
 	if (m_DrawAtLine) {
 		CRenderer::SetRasterizerState(D3D11_FILL_WIREFRAME, D3D11_CULL_NONE);
 	}
+	// モデルを面で描画する
 	else {
 		CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 	}
 
 	// アニメーションデータもってない
 	if (!m_pScene->HasAnimations()) {
-
-		for (int mesh = 0; mesh < m_pScene->mNumMeshes; mesh++) {
-
-			// メッシュ1つ分取得
-			aiMesh* pMesh = m_pScene->mMeshes[mesh];
-
-			UINT stride;
-			UINT offset;
-
-			stride = sizeof(VERTEX_3D);
-			offset = 0;
-
-			CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_Mesh[mesh].VertexBuffer, &stride, &offset);
-
-			CRenderer::GetDeviceContext()->IASetIndexBuffer(m_Mesh[mesh].IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-			const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
-			aiString path;
-			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-			CRenderer::SetTexture(m_Texture[path.data], 0);
-
-			aiColor4D diffuse, ambient;
-			aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
-			aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, &ambient);	// ディフーズカラー取得
-
-
-			MATERIAL material;
-			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-
-			material.Ambient = COLOR(ambient.r * 2, ambient.g * 2, ambient.b * 2, ambient.a);
-			m_Shader->SetMaterial(material);
-			m_Shader->Set();
-
-
-			CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-			CRenderer::DrawIndexed(m_Mesh[mesh].IndexNum, 0, 0);
-		}
-
+		// 描画
+		DrawStaticMesh();
 	}
 	else {
 		// 描画
@@ -419,6 +387,55 @@ void CSkinModel::Draw(XMMATRIX* world)
 	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 }
 
+//************************************************
+// アニメーションを持たないモデルの描画
+//************************************************
+void CSkinModel::DrawStaticMesh()
+{
+	for (int mesh = 0; mesh < m_pScene->mNumMeshes; mesh++) {
+
+		// メッシュ1つ分取得
+		aiMesh* pMesh = m_pScene->mMeshes[mesh];
+
+		UINT stride;
+		UINT offset;
+
+		stride = sizeof(VERTEX_3D);
+		offset = 0;
+
+		CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_Mesh[mesh].VertexBuffer, &stride, &offset);
+
+		CRenderer::GetDeviceContext()->IASetIndexBuffer(m_Mesh[mesh].IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		const aiMaterial* mat = m_pScene->mMaterials[pMesh->mMaterialIndex];
+		aiString path;
+		if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+			CRenderer::SetTexture(m_Texture[path.data], 0);
+		}
+		else {
+			CRenderer::SetTexture(m_Texture["DefauldTexture"], 0);
+		}
+
+		aiColor4D diffuse, ambient;
+		aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);	// ディフーズカラー取得
+		aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, &ambient);	// ディフーズカラー取得
+
+
+		MATERIAL material;
+		material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+
+		material.Ambient = COLOR(ambient.r * 2, ambient.g * 2, ambient.b * 2, ambient.a);
+		m_Shader->SetMaterial(material);
+		m_Shader->Set();
+
+
+		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		CRenderer::DrawIndexed(m_Mesh[mesh].IndexNum, 0, 0);
+	}
+}
 
 //************************************************
 // メッシュごとの描画
@@ -457,8 +474,8 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 				// 頂点情報格納
 				vertices[id].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-				vertices[id].Normal   = Vector3(pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
-				vertices[id].Position = Vector3(pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
+				vertices[id].Normal   = Vector3(-pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
+				vertices[id].Position = Vector3(-pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
 				vertices[id].TexCoord = pMesh->HasTextureCoords(0) ? XMFLOAT2(pMesh->mTextureCoords[0][id].x, 1.0f - pMesh->mTextureCoords[0][id].y) : XMFLOAT2(0.0f, 0.0f);
 			}
 		}
@@ -541,11 +558,8 @@ void CSkinModel::update(int addAnimationFrame)
 	// アニメーションデータを持っているか
 	if (!m_pScene->HasAnimations()) return;
 
-	// アニメーションキー更新
-	m_AnimationFrame += addAnimationFrame * m_AnimationSpeed;
-
 	// アニメーションブレンドするか？しないか？
-	m_IsAnimationBlending ? AnimationBlend() : Animation();
+	m_IsAnimationBlending ? AnimationBlend(addAnimationFrame) : Animation(addAnimationFrame);
 
 	// ボーンの各行列を計算
 	CalculateBoneMatrix();
@@ -681,17 +695,21 @@ void CSkinModel::CalculateBoneMatrix()
 }
 
 
-void CSkinModel::AnimationBlend()
+void CSkinModel::AnimationBlend(int addAnimationFrame)
 {
 	// アニメーションデータ取得									↓どのアニメ―ション？
 	aiAnimation* pAnimationCurrent = m_pScene->mAnimations[m_CurrentAnimId];
 	aiAnimation* pAnimationTarget = m_pScene->mAnimations[m_TargetAnimId];
 
+	// アニメーションキー更新
+	m_CurrentAnimationFrame += addAnimationFrame * m_AnimationSpeed;
+	m_TargetAnimationFrame += addAnimationFrame * m_AnimationSpeed;
 
 	for (auto c = 0; c < pAnimationCurrent->mNumChannels; c++) {
 
 		// 現在フレームのアニメーション行列の回転・平行移動成分を取得
-		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_AnimationFrame);
+		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_CurrentAnimationFrame);
+		int CurrentFrameTarget = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_TargetAnimationFrame);
 
 		// ノードアニメーション取得
 		aiNodeAnim* pNodeAnimCurrent = pAnimationCurrent->mChannels[c];
@@ -703,8 +721,8 @@ void CSkinModel::AnimationBlend()
 
 		rotCurrent = pNodeAnimCurrent->mRotationKeys[CurrentFrame % pNodeAnimCurrent->mNumRotationKeys].mValue;
 		posCurrent = pNodeAnimCurrent->mPositionKeys[CurrentFrame % pNodeAnimCurrent->mNumPositionKeys].mValue;
-		rotTarget = pNodeAnimTarget->mRotationKeys[CurrentFrame % pNodeAnimTarget->mNumRotationKeys].mValue;
-		posTarget = pNodeAnimTarget->mPositionKeys[CurrentFrame % pNodeAnimTarget->mNumPositionKeys].mValue;
+		rotTarget = pNodeAnimTarget->mRotationKeys[CurrentFrameTarget % pNodeAnimTarget->mNumRotationKeys].mValue;
+		posTarget = pNodeAnimTarget->mPositionKeys[CurrentFrameTarget % pNodeAnimTarget->mNumPositionKeys].mValue;
 
 
 		// 回転をブレンド
@@ -723,28 +741,40 @@ void CSkinModel::AnimationBlend()
 
 
 	// ブレンド値を更新
-	m_PerBlend += 0.05;
-
-	if (m_PerBlend >= 1.0f) {
-
+	m_PerBlend += 0.1f;
+	if (m_PerBlend >= m_PerBlendEnd) {
 		m_IsAnimationBlending = false;
+		m_CurrentAnimationFrame = m_TargetAnimationFrame;
+
 		m_CurrentAnimId = m_TargetAnimId;
 		m_PerBlend = 0.0f;
 	}
 
+	//m_PerBlend = (m_PerBlend >= 1.0f)? 1.0f: m_PerBlend;
+
+	//if (m_TargetAnimationFrame >= (int)pAnimationTarget->mDuration) {
+	//	m_IsAnimationBlending = false;
+	//	m_CurrentAnimationFrame = m_TargetAnimationFrame = 0;
+
+	//	m_CurrentAnimId = m_TargetAnimId;
+	//	m_PerBlend = 0.0f;
+	//}
+
 }
 
 
-void CSkinModel::Animation()
+void CSkinModel::Animation(int addAnimationFrame)
 {
+	// アニメーションキー更新
+	m_CurrentAnimationFrame += addAnimationFrame * m_AnimationSpeed;
+
 	// アニメーションデータ取得									↓どのアニメ―ション？
 	aiAnimation* pAnimationCurrent = m_pScene->mAnimations[m_CurrentAnimId];
-
 
 	for (auto c = 0; c < pAnimationCurrent->mNumChannels; c++) {
 
 		// 現在フレームのアニメーション行列の回転・平行移動成分を取得
-		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_AnimationFrame);
+		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_CurrentAnimationFrame);
 
 		// ノードアニメーション取得
 		aiNodeAnim* pNodeAnimCurrent = pAnimationCurrent->mChannels[c];
@@ -857,9 +887,15 @@ void CSkinModel::GetBonePosition(aiNode* pNode, XMMATRIX* _world, const char* _t
 	}
 }
 
+bool CSkinModel::CurrentAnimationFinish()
+{
+	aiAnimation* pAnimationCurrent = m_pScene->mAnimations[m_CurrentAnimId];
 
-void CSkinModel::SetAnimation(bool _next) {
+	return (m_CurrentAnimationFrame >= m_pScene->mAnimations[m_CurrentAnimId]->mDuration) ? true : false;
+}
 
+void CSkinModel::SetAnimation(bool _next)
+{
 	m_PerBlend = 0.0f;
 	m_TargetAnimId = m_CurrentAnimId;
 	m_TargetAnimId += _next ? 1 : -1;
@@ -872,16 +908,14 @@ void CSkinModel::SetAnimation(bool _next) {
 	}
 }
 
-void CSkinModel::SetAnimation(const unsigned int _id, const float _startBlendNum) {
-
-	if (m_IsAnimationBlending)return;
+void CSkinModel::SetAnimation(const unsigned int _id, const float _endBlendNum)
+{
 	if (m_TargetAnimId == _id)return;
 
 	m_IsAnimationBlending = true;
-
-	m_PerBlend =(_startBlendNum > 1.0f) ? 1.0f : _startBlendNum;
-	m_PerBlend =(_startBlendNum < 0.0f) ? 0.0f : _startBlendNum;
-
+	m_TargetAnimationFrame = 0.0f;
+	m_PerBlend = 0.0f;
+	m_PerBlendEnd = _endBlendNum;
 	m_TargetAnimId = (_id >= m_pScene->mNumAnimations) ? 0 : _id;
 }
 

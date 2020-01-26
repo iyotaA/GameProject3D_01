@@ -9,20 +9,23 @@
 #include "shader_all.h"
 #include "skinmesh_animation.h"
 #include "main.h"
+#include "state_player_idle.h"
+#include "state_player_dodge.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
-
-static double t = 0.0;
 
 void CPlayer::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/SAKURA_Master.fbx", 0.005f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
+	m_pModel->Load("asset/model/human000.fbx", 0.0023f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
+
+	// 状態
+	m_pState = new CStatePlayerIdle(this);
 
 	// トランスフォーム初期化
-	m_Position = Vector3(90.0f, 0.0f, -160.0f);
+	m_Position = Vector3(70.0f, 0.0f, -100.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -50,6 +53,7 @@ void CPlayer::Uninit()
 	delete m_CollisionOBB;
 	delete m_CollisionSphere;
 
+	delete m_pState;
 
 	m_pModel->Unload();
 	delete m_pModel;
@@ -57,7 +61,6 @@ void CPlayer::Uninit()
 
 void CPlayer::Update()
 {
-
 	// 移動
 	Move();
 
@@ -66,7 +69,6 @@ void CPlayer::Update()
 
 	// モデル更新
 	m_pModel->update(1);
-
 }
 
 void CPlayer::Draw()
@@ -196,6 +198,7 @@ void CPlayer:: DrawGUI()
 			ImGui::Text("PosY = %.1f", m_Position.y);
 			ImGui::Text("PosZ = %.1f", m_Position.z);
 			ImGui::Text(m_IsCollision ? "Collision" :"Through");
+			ImGui::Text(m_IsPressMovingEntry ? "MoveEntry" : "NotEntry");
 			ImGui::EndChildFrame();
 		}
 
@@ -252,8 +255,8 @@ void CPlayer::Move()
 	// 移動入力されたか？
 	m_IsPressMovingEntry = CInput::GetIsInputStick(LEFT_STICK) || CInput::GetKeyPress('W') || CInput::GetKeyPress('A') || CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
 
-	moveDistance += cameraRight * inputNum.x;
-	moveDistance += cameraFront * inputNum.y;
+	moveDistance += Vector3(cameraRight.x, 0.0f, cameraRight.z) * inputNum.x;
+	moveDistance += Vector3(cameraFront.x, 0.0f, cameraFront.z) * inputNum.y;
 
 	if (CInput::GetKeyPress('W')) {
 		moveDistance.x += cameraFront.x;
@@ -272,11 +275,15 @@ void CPlayer::Move()
 		moveDistance.z += cameraRight.z;
 	}
 
+	// 移動量
 	moveDistance.Normalize();
 	m_MoveDistance += moveDistance * m_MoveSpeed;
 
+	// 座標移動
 	m_Position += m_MoveDistance;
-	m_MoveDistance *= 0.85f;
+
+	// コリジョン位置の更新
+	UpdateCollision();
 
 
 	// 敵とのコリジョン判定
@@ -286,15 +293,18 @@ void CPlayer::Move()
 		// コリジョン判定
 		if (CCollision3DJudge::Collision3D_Spher_Spher(m_CollisionSphere, obj->GetCollisionSphere())) {
 
-			m_Position -= m_MoveDistance * 1.1f;
+			m_Position = prevPos;
 		}
 	}
+
+	// 移動量減衰...
+	m_MoveDistance *= 0.85f;
+
 
 	Vector3 MovedDir;
 	MovedDir.x = m_Position.x - prevPos.x;
 	MovedDir.y = 0.0f;
 	MovedDir.z = m_Position.z - prevPos.z;
-
 
 
 	if ((fabs(MovedDir.x) > 0.001f) || (fabs(MovedDir.z) > 0.001f)) {
@@ -312,21 +322,22 @@ void CPlayer::Move()
 		m_DirVec.right.Normalize();
 	}
 
-
-	// コリジョン位置の更新
-	UpdateCollision();
-
 	// 重力加算
 	AddGlavity();
 
+	// 状態の更新
+	m_pState->Update(this);
+	return;
+
 	if (m_IsPressMovingEntry) {
 		m_pModel->SetAnimation(2, 0.0f);
-		m_pModel->SetAnimationSpeed(1.0f + m_MoveDistance.Length() * 13.0f);
+		//m_pModel->SetAnimationSpeed(1.0f + m_MoveDistance.Length() * 13.0f);
 	}
 	else {
 		m_pModel->SetAnimation(0, 0.0f);
 		m_pModel->SetAnimationSpeed(1.0f);
 	}
+
 }
 
 
@@ -334,24 +345,26 @@ void CPlayer::Action()
 {
 	if (CInput::GetKeyTrigger(VK_SPACE)) {
 
-		CSound::Play(SOUND_LABEL_SE_ATTACK);
+		//CSound::Play(SOUND_LABEL_SE_ATTACK);
 
-		std::vector<CEnemy*> enemys;
-		enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
+		//ChangeState(new CStatePlayerDodge(this));
 
-		// 敵と攻撃範囲の当たり判定
-		for (CEnemy* enemy : enemys) {
-			if (enemy != nullptr) {
+		//std::vector<CEnemy*> enemys;
+		//enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
 
-				// 当たり判定
-				if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
+		//// 敵と攻撃範囲の当たり判定
+		//for (CEnemy* enemy : enemys) {
+		//	if (enemy != nullptr) {
 
-					CSound::Play(SOUND_LABEL_SE_HIT);
-					// ダメ―ジ判定
-					m_DamageManager->DoDamage(enemy->GetDamageManager());
-				}
-			}
-		}
+		//		// 当たり判定
+		//		if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
+
+		//			CSound::Play(SOUND_LABEL_SE_HIT);
+		//			// ダメ―ジ判定
+		//			m_DamageManager->DoDamage(enemy->GetDamageManager());
+		//		}
+		//	}
+		//}
 	}
 }
 
@@ -365,7 +378,7 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
 	// 特定のボーンの位置を取得
-	m_BonePosition = m_pModel->GetWorldPosition(&world, "LeftHandIndex4_end");
+	m_BonePosition = m_pModel->GetWorldPosition(&world, "mixamorig:LeftHandIndex4_end");
 	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
 	m_CollisionSphere->SetCenter(&m_Position);
@@ -390,6 +403,8 @@ void CPlayer::UpdateCollision()
 
 void CPlayer::AddGlavity()
 {
+	static double t = 0.0;
+
 	// 重力
 	float move_y = Glavity * Mass * t * t * 0.5f;
 	m_Position.y += move_y;
@@ -425,5 +440,29 @@ bool CPlayer::IsLanding()
 	}
 }
 
+bool CPlayer::CurrentAnimationFinish(void)
+{
+	return m_pModel->CurrentAnimationFinish();
+}
 
+bool& CPlayer::AnimationBlending(void)
+{
+	return m_pModel->AnimationBlending();
+}
+
+void CPlayer::SetAnimation(const unsigned int _id, const float _startBlendNum)
+{
+	m_pModel->SetAnimation(_id, _startBlendNum);
+}
+
+void CPlayer::SetAnimationSpeed(const float _speed)
+{
+	m_pModel->SetAnimationSpeed(_speed);
+}
+
+void CPlayer::ChangeState(CStatePlayer* pState)
+{
+	delete m_pState;
+	m_pState = pState;
+}
 
