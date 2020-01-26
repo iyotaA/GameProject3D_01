@@ -19,11 +19,12 @@ void CEnemy::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/dragon001.fbx", 0.75f, "asset/image/dragon.png", "asset/NodeNameFiles/dragon_node.txt");
+	m_pModel->Load("asset/model/dragon001.fbx", 0.55f, "asset/image/dragon.png", NULL);
 
 
 	// トランスフォーム初期化
 	m_Position = Vector3(70.0f, 0.0f, -90.0f);
+	//m_Rotation = Vector3(0.0f, 180.0f * 3.14f / 180.0f, 0.0f);
 	m_Rotation = Vector3(0.0f, 180.0f * 3.14f / 180.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 

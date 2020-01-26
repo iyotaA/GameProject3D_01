@@ -47,10 +47,10 @@ public:
 
 
 private:
-	struct
-	{
-		CShaderBase* shader
-	};
+	//struct
+	//{
+	//	CShaderBase* shader
+	//};
 
 	static std::vector<CShaderBase*>	m_Shaders;
 	static std::string m_Files;

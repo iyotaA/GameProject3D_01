@@ -49,6 +49,12 @@
     <Filter Include="shader\hlsl">
       <UniqueIdentifier>{9bcec31f-5f8f-4bf6-949a-ab832a070df9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="State">
+      <UniqueIdentifier>{ecc75ad9-acff-4292-9d66-3cc418fd4ed1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\PlayerState">
+      <UniqueIdentifier>{7c3f22d5-6482-48d4-82a3-b77bc23c10fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp">
@@ -164,6 +170,18 @@
     </ClCompile>
     <ClCompile Include="shader_water.cpp">
       <Filter>shader\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_move.cpp">
+      <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_move_run.cpp">
+      <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_idle.cpp">
+      <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_dodge.cpp">
+      <Filter>State\PlayerState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -328,6 +346,21 @@
     </ClInclude>
     <ClInclude Include="shader_water.h">
       <Filter>shader\h</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_move.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_move_run.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_idle.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_dodge.h">
+      <Filter>State\PlayerState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

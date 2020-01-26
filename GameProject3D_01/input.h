@@ -16,6 +16,7 @@ public:
 
 	static bool GetGamepadPress(int state);
 	static bool GetGamepadTrigger(int state);
+	static bool GetGamepadRelease(int state);
 	static bool GetIsInputStick(int stick);
 	static XMFLOAT2 GetGamepadLeftStick();
 	static XMFLOAT2 GetGamepadRightStick();

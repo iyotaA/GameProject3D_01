@@ -206,7 +206,7 @@ bool CTerrain::InitializeBuffers()
 
 				m_Vertex[m_terrainHeight * z + x] = {
 
-					Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
+					Vector3(m_heightMap[m_terrainHeight * z + x].x, 0.0f, m_heightMap[m_terrainHeight * z + x].z),
 					Vector3(0.0f, 0.0f, 1.0f),
 					Vector3(1.0f, 0.0f, 0.0f),
 					Vector3(0.0f, 1.0f, 0.0f),

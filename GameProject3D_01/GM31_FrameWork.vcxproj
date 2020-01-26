@@ -54,6 +54,10 @@
     <ClCompile Include="skyDome.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="state_player_dodge.cpp" />
+    <ClCompile Include="state_player_idle.cpp" />
+    <ClCompile Include="state_player_move.cpp" />
+    <ClCompile Include="state_player_move_run.cpp" />
     <ClCompile Include="terrain.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="wall.cpp" />
@@ -105,6 +109,11 @@
     <ClInclude Include="skinmesh_animation.h" />
     <ClInclude Include="skyDome.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="state_player.h" />
+    <ClInclude Include="state_player_dodge.h" />
+    <ClInclude Include="state_player_idle.h" />
+    <ClInclude Include="state_player_move.h" />
+    <ClInclude Include="state_player_move_run.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stl.h" />
     <ClInclude Include="terrain.h" />
