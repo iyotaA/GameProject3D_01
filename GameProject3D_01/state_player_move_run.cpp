@@ -72,18 +72,22 @@ void CStatePlayerRun::Move(CPlayer* pPlayer)
 	if (CInput::GetKeyPress('W')) {
 		moveDistance.x += cameraFront.x;
 		moveDistance.z += cameraFront.z;
+		inputNum.y += 1.0f;
 	}
 	else if (CInput::GetKeyPress('S')) {
 		moveDistance.x -= cameraFront.x;
 		moveDistance.z -= cameraFront.z;
+		inputNum.y -= 1.0f;
 	}
 	if (CInput::GetKeyPress('A')) {
 		moveDistance.x -= cameraRight.x;
 		moveDistance.z -= cameraRight.z;
+		inputNum.x -= 1.0f;
 	}
 	else if (CInput::GetKeyPress('D')) {
 		moveDistance.x += cameraRight.x;
 		moveDistance.z += cameraRight.z;
+		inputNum.x += 1.0f;
 	}
 
 	// ˆÚ“®—Ê
@@ -93,5 +97,10 @@ void CStatePlayerRun::Move(CPlayer* pPlayer)
 	// ˆÚ“®—ÊŒ¸Š...
 	m_Volocity *= 0.87f;
 
+	// ˆÚ“®
 	pPlayer->AddVelocity(m_Volocity);
+
+	// ‰ñ“]Šp“x
+	float radian = atan2f(inputNum.x, inputNum.y) + atan2f(cameraFront.x, cameraFront.z);
+	pPlayer->SetRotation(&Vector3(0.0f, radian, 0.0f));
 }

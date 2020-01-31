@@ -11,15 +11,15 @@ public:
 	void Draw();
 	void DrawGUI();
 
-	CCollisionSphere* GetCollisionSphere(void) { return m_CollisionSphere; }
-	CDamage* GetDamageManager(void) { return m_DamageManager; }
+	std::vector< CCollisionSphere*> GetCollisionSphere(void) const { return m_CollisionSphere; }
+	CDamage* GetDamageManager(void) const{ return m_DamageManager; }
 
 private:
 	const float m_DefaultSpeed = 0.017f;
 
 	CSkinModel* m_pModel;
 	Vector3X3         m_DirVec;
-	CCollisionSphere* m_CollisionSphere;
+	std::vector< CCollisionSphere*> m_CollisionSphere;
 	CCollisionOBB* m_CollisionOBB;
 	CDamage* m_DamageManager;
 	Vector3			  m_MoveDistance;

@@ -23,7 +23,7 @@ void CEnemy::Init()
 
 	// 影
 	m_Shadow = new CPolygon3D();
-	m_Shadow->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(4.0f, 1.0f, 6.0f), Vector3(0.0f, 0.0f, 0.0f), "asset/image/shadow.png");
+	m_Shadow->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(6.0f, 1.0f, 12.0f), Vector3(0.0f, 0.0f, 0.0f), "asset/image/shadow.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(70.0f, 0.0f, -90.0f);
@@ -35,8 +35,13 @@ void CEnemy::Init()
 	m_DirVec.SetFrontUpRight(Vector3(0.0f, 0.0f, 1.0f));
 
 	// コリジョンの初期化
-	m_CollisionSphere = new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f);
-	m_CollisionOBB = new CCollisionOBB(m_Position, m_DirVec, Vector3(0.5f, 0.5f, 0.5f));
+	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+	m_CollisionOBB = new CCollisionOBB(m_Position, m_DirVec, Vector3(1.0f, 2.0f, 1.0f));
 
 	// ダメージ関連ステータスの初期化
 	m_DamageManager = new CDamage(100, 15);
@@ -53,7 +58,7 @@ void CEnemy::Uninit()
 {
 	delete m_DamageManager;
 	delete m_CollisionOBB;
-	delete m_CollisionSphere;
+	m_CollisionSphere.clear();
 
 	m_Shadow->Uninit();
 	delete m_Shadow;
@@ -110,8 +115,15 @@ void CEnemy::DrawCollisionGrid()
 {
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
+	for (CCollisionSphere* coll : m_CollisionSphere) {
+		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll, &color);
+	}
 
+	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
+
+	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(m_CollisionOBB, &color);
 }
 
 void CEnemy::DrawGUI()
@@ -124,10 +136,15 @@ void CEnemy::Move()
 	// 重力加算
 	AddGlavity();
 
+	//m_Position.z -= 0.08f;
+
+
 	// 影の更新
 	m_Shadow->SetPosition(&Vector3(m_Position.x, 0.01f, m_Position.z));
 	m_Shadow->SetRotation(&Vector3(m_Rotation.x, 0.0f, m_Rotation.z));
 	m_Shadow->Update();
+
+	UpdateCollision();
 }
 
 
@@ -138,7 +155,31 @@ void CEnemy::Action()
 
 void CEnemy::UpdateCollision()
 {
-	m_CollisionSphere->SetCenter(&Vector3(m_Position.x, m_Position.y + 7.0f, m_Position.z));
+	// マトリクス設定
+	XMMATRIX world;
+	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
+	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+
+	// 特定のボーンの位置を取得
+	m_BonePosition = m_pModel->GetWorldPosition(&world, "B_R_Back_Leg");
+	m_DamageManager->GetCollisionSphere()->SetCenter(&m_pModel->GetWorldPosition(&world, "B_Head"));
+	m_DamageManager->GetCollisionSphere()->SetRadius(2.0f);
+	m_CollisionSphere[0]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_Hip"));
+	m_CollisionSphere[0]->SetRadius(3.0f);
+	m_CollisionSphere[1]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_Spine.001"));
+	m_CollisionSphere[1]->SetRadius(3.0f);
+	m_CollisionSphere[2]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_R_Back_Leg"));
+	m_CollisionSphere[2]->SetRadius(2.0f);
+	m_CollisionSphere[3]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_L_Back_Leg"));
+	m_CollisionSphere[3]->SetRadius(2.0f);
+	m_CollisionSphere[4]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_R_Front_Leg"));
+	m_CollisionSphere[4]->SetRadius(2.0f);
+	m_CollisionSphere[5]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_L_Front_Leg"));
+	m_CollisionSphere[5]->SetRadius(2.0f);
+	m_CollisionOBB->SetPosition(&m_BonePosition);
+
+	//m_CollisionSphere->SetCenter(&Vector3(m_Position.x, m_Position.y + 7.0f, m_Position.z));
 }
 
 void CEnemy::AddGlavity()

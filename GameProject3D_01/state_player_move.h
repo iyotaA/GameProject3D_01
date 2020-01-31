@@ -20,6 +20,10 @@ protected:
 
 private:
 	CStatePlayerMove* m_pStateMove;
+	float m_Lerp_t;
+	float m_LerpStart;
+	float m_LerpEnd;
+	float m_Counter;
 };
 
 

@@ -22,6 +22,10 @@ public:
 	static XMFLOAT2 GetGamepadRightStick();
 
 private:
+	static bool InputLeftThumb();
+	static bool InputRightThumb();
+
+private:
 	// キーボード
 	static BYTE m_OldKeyState[256];
 	static BYTE m_KeyState[256];
@@ -29,8 +33,6 @@ private:
 	// ゲームパッド
 	static XINPUT_STATE m_GamepadState;
 	static XINPUT_STATE m_OldGamepadState;
-	static bool m_IsInputLeftStick;
-	static bool m_IsInputRightStick;
 };
 
 #endif

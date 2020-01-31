@@ -202,9 +202,7 @@ void CPlayer:: DrawGUI()
 
 			ImGui::BeginChildFrame(Window_Status_Id, ImVec2(width, 100));
 			ImGui::InputFloat3("Position", (float*)&m_Position);
-			ImGui::Text("PosX = %.1f", m_Position.x);
-			ImGui::Text("PosY = %.1f", m_Position.y);
-			ImGui::Text("PosZ = %.1f", m_Position.z);
+			ImGui::InputFloat3("Rotation", (float*)&m_Rotation);
 			ImGui::Text(m_IsCollision ? "Collision" :"Through");
 			ImGui::EndChildFrame();
 		}
@@ -248,90 +246,45 @@ void CPlayer:: DrawGUI()
 
 void CPlayer::Move()
 {
-	// 前フレームのポジション
-	Vector3 prevPos = m_Position;
-
 	CCamera* camera = CCameraManager::GetCamera();
-
 	if (!camera->GetIsBindAtObject())return;
 
 	// 状態の更新
 	m_pState->Update(this);
 
-	//Vector3 cameraFront = camera->GetDir3Vector()->front;
-	//Vector3 cameraRight = camera->GetDir3Vector()->right;
-	//XMFLOAT2 inputNum = CInput::GetGamepadLeftStick();
-	//Vector3 moveDistance = Vector3(0.0f, 0.0f, 0.0f);
-
-	//// 移動入力されたか？
-	//m_IsPressMovingEntry = CInput::GetIsInputStick(LEFT_STICK) || CInput::GetKeyPress('W') || CInput::GetKeyPress('A') || CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
-
-	//moveDistance += Vector3(cameraRight.x, 0.0f, cameraRight.z) * inputNum.x;
-	//moveDistance += Vector3(cameraFront.x, 0.0f, cameraFront.z) * inputNum.y;
-
-	//if (CInput::GetKeyPress('W')) {
-	//	moveDistance.x += cameraFront.x;
-	//	moveDistance.z += cameraFront.z;
-	//}
-	//else if (CInput::GetKeyPress('S')) {
-	//	moveDistance.x -= cameraFront.x;
-	//	moveDistance.z -= cameraFront.z;
-	//}
-	//if (CInput::GetKeyPress('A')) {
-	//	moveDistance.x -= cameraRight.x;
-	//	moveDistance.z -= cameraRight.z;
-	//}
-	//else if (CInput::GetKeyPress('D')) {
-	//	moveDistance.x += cameraRight.x;
-	//	moveDistance.z += cameraRight.z;
-	//}
-
-	//// 移動量
-	//moveDistance.Normalize();
-	//m_MoveDistance += moveDistance * m_MoveSpeed;
-
-	// 座標移動
-	//m_Position += m_MoveDistance;
-
 	// コリジョン位置の更新
 	UpdateCollision();
-
 
 	// 敵とのコリジョン判定
 	std::vector<CEnemy*> game_obj = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
 	for (CEnemy*  obj : game_obj) {
 
 		// コリジョン判定
-		if (CCollision3DJudge::Collision3D_Spher_Spher(m_CollisionSphere, obj->GetCollisionSphere())) {
+		std::vector< CCollisionSphere*> collision = obj->GetCollisionSphere();
+		for (CCollisionSphere* coll : collision) {
+			if (CCollision3DJudge::Collision3D_Spher_Spher(m_CollisionSphere, coll)) {
 
-			m_Position = prevPos;
+				float distance = m_CollisionSphere->GetRadius() + coll->GetRadius();
+				Vector3 vec = m_CollisionSphere->GetCenter() - coll->GetCenter();
+				float length = vec.Length();
+				vec.Normalize();
+				vec = vec * (distance - length);
+				m_Position += vec;
+				break;
+			}
 		}
 	}
 
-	// 移動量減衰...
-	//m_MoveDistance *= 0.87f;
+	// 方向ベクトル回転
+	Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
+	XMMATRIX rotationMtx;
+	rotationMtx = XMMatrixRotationY(m_Rotation.y);
 
-
-	Vector3 MovedDir;
-	MovedDir.x = m_Position.x - prevPos.x;
-	MovedDir.y = 0.0f;
-	MovedDir.z = m_Position.z - prevPos.z;
-
-
-	if ((fabs(MovedDir.x) > 0.001f) || (fabs(MovedDir.z) > 0.001f)) {
-
-		m_Rotation.y = atan2f(MovedDir.x, MovedDir.z);
-
-		Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
-		XMMATRIX rotationMtx;
-		rotationMtx = XMMatrixRotationY(m_Rotation.y);
-
-		front = XMVector3TransformNormal(front, rotationMtx);
-		front.Normalize();
-		m_DirVec.front = front;
-		m_DirVec.right = -m_DirVec.front.VCross(m_DirVec.up);
-		m_DirVec.right.Normalize();
-	}
+	front = XMVector3TransformNormal(front, rotationMtx);
+	front.Normalize();
+	m_DirVec.front = front;
+	m_DirVec.right = -m_DirVec.front.VCross(m_DirVec.up);
+	m_DirVec.right.Normalize();
 
 	// 重力加算
 	AddGlavity();
@@ -379,11 +332,10 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
 	// 特定のボーンの位置を取得
-	Vector3 position_from_bone = m_pModel->GetWorldPosition(&world, "mixamorig:LeftHandIndex4_end") - m_Position;
-	m_BonePosition = m_Position + Vector3(-position_from_bone.x, position_from_bone.y, position_from_bone.z);
+	m_BonePosition = m_pModel->GetWorldPosition(&world, "mixamorig:LeftHandIndex4_end");
 	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
-	m_CollisionSphere->SetCenter(&m_Position);
+	m_CollisionSphere->SetCenter(&m_pModel->GetWorldPosition(&world, "mixamorig:Hips"));
 
 	// コリジョン更新
 	Vector3X3 obbColSize;
