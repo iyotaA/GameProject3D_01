@@ -40,12 +40,6 @@
     <Filter Include="shader">
       <UniqueIdentifier>{f3a3b764-079d-4dd1-8e05-e01177998007}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shader\cpp">
-      <UniqueIdentifier>{dcbcbfa7-7677-4c5e-ac04-2fab770056a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shader\h">
-      <UniqueIdentifier>{9a4c2244-f459-4aa0-bfb7-12eb9fa6e952}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shader\hlsl">
       <UniqueIdentifier>{9bcec31f-5f8f-4bf6-949a-ab832a070df9}</UniqueIdentifier>
     </Filter>
@@ -141,21 +135,6 @@
     <ClCompile Include="terrain.cpp">
       <Filter>ソース ファイル\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="shader_base.cpp">
-      <Filter>shader\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="shader_default.cpp">
-      <Filter>shader\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="shader_manager.cpp">
-      <Filter>shader\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="shader_per_pixel_light.cpp">
-      <Filter>shader\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="shader_multi_texture.cpp">
-      <Filter>shader\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="camera_manager.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
@@ -164,12 +143,6 @@
     </ClCompile>
     <ClCompile Include="skinmesh_animation.cpp">
       <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="shader_normal_mapping.cpp">
-      <Filter>shader\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="shader_water.cpp">
-      <Filter>shader\cpp</Filter>
     </ClCompile>
     <ClCompile Include="state_player_move.cpp">
       <Filter>State\PlayerState</Filter>
@@ -182,6 +155,30 @@
     </ClCompile>
     <ClCompile Include="state_player_dodge.cpp">
       <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_base.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_default.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_manager.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_multi_texture.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_normal_mapping.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_per_pixel_light.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_water.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_2d.cpp">
+      <Filter>shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -317,35 +314,11 @@
     <ClInclude Include="camera_manager.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="shader_base.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_default.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_manager.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_all.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_per_pixel_light.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_multi_texture.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
     <ClInclude Include="skinmesh_animation.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="stl.h">
       <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_normal_mapping.h">
-      <Filter>shader\h</Filter>
-    </ClInclude>
-    <ClInclude Include="shader_water.h">
-      <Filter>shader\h</Filter>
     </ClInclude>
     <ClInclude Include="state_player.h">
       <Filter>State\PlayerState</Filter>
@@ -361,6 +334,33 @@
     </ClInclude>
     <ClInclude Include="state_player_dodge.h">
       <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_all.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_base.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_default.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_manager.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_multi_texture.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_normal_mapping.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_per_pixel_light.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_water.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_2d.h">
+      <Filter>shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -392,6 +392,12 @@
       <Filter>shader\hlsl</Filter>
     </FxCompile>
     <FxCompile Include="shader3DWaterVS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader2DPS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader2DVS.hlsl">
       <Filter>shader\hlsl</Filter>
     </FxCompile>
   </ItemGroup>

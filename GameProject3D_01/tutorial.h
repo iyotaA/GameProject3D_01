@@ -15,13 +15,13 @@ public:
 		// フィールドの初期化
 		AddGameObject<CField>(CManager::E_Background);
 
-		CPolygon* ui = new CPolygon;
-		ui->Init(XMFLOAT2(170, 100), XMFLOAT2(996, 480), "asset/tutorial.tga");
-		m_GameObject[CManager::E_UI].push_back(ui);
+		//CPolygon2D* ui = new CPolygon2D;
+		//ui->Init(XMFLOAT2(170, 100), XMFLOAT2(996, 480), "asset/tutorial.tga");
+		//m_GameObject[CManager::E_UI].push_back(ui);
 
-		CPolygon* ui2 = new CPolygon;
-		ui2->Init(XMFLOAT2(500, 600), XMFLOAT2(315, 75), "asset/press.tga");
-		m_GameObject[CManager::E_UI].push_back(ui2);
+		//CPolygon2D* ui2 = new CPolygon2D;
+		//ui2->Init(XMFLOAT2(500, 600), XMFLOAT2(315, 75), "asset/press.tga");
+		//m_GameObject[CManager::E_UI].push_back(ui2);
 	}
 
 	void Uninit()

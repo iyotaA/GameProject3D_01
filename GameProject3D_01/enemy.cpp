@@ -19,8 +19,11 @@ void CEnemy::Init()
 {
 	// ƒ‚ƒfƒ‹‚Ì‰Šú‰»
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/dragon001.fbx", 0.55f, "asset/image/dragon.png", NULL);
+	m_pModel->Load("asset/model/dragon.fbx", 2.0f, "asset/image/dragon.png", "asset/NodeNameFiles/doragon.txt");
 
+	// ‰e
+	m_Shadow = new CPolygon3D();
+	m_Shadow->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(4.0f, 1.0f, 6.0f), Vector3(0.0f, 0.0f, 0.0f), "asset/image/shadow.png");
 
 	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€‰Šú‰»
 	m_Position = Vector3(70.0f, 0.0f, -90.0f);
@@ -52,6 +55,8 @@ void CEnemy::Uninit()
 	delete m_CollisionOBB;
 	delete m_CollisionSphere;
 
+	m_Shadow->Uninit();
+	delete m_Shadow;
 
 	m_pModel->Unload();
 	delete m_pModel;
@@ -68,7 +73,6 @@ void CEnemy::Update()
 
 	// ƒ‚ƒfƒ‹XV
 	m_pModel->update(1);
-
 }
 
 void CEnemy::Draw()
@@ -90,6 +94,9 @@ void CEnemy::Draw()
 
 	// ƒ‚ƒfƒ‹•`‰æ
 	m_pModel->Draw(&world);
+
+	// ‰e•`‰æ
+	m_Shadow->Draw();
 
 	// ƒRƒŠƒWƒ‡ƒ“•`‰æ
 	DrawCollisionGrid();
@@ -116,6 +123,11 @@ void CEnemy::Move()
 {
 	// d—Í‰ÁŽZ
 	AddGlavity();
+
+	// ‰e‚ÌXV
+	m_Shadow->SetPosition(&Vector3(m_Position.x, 0.01f, m_Position.z));
+	m_Shadow->SetRotation(&Vector3(m_Rotation.x, 0.0f, m_Rotation.z));
+	m_Shadow->Update();
 }
 
 

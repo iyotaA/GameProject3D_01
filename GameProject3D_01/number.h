@@ -4,25 +4,25 @@
 class CNumber : public CGameObject
 {
 public:
-	void Init(char* pFileName);
+	void Init();
 	void Update();
 	void Uninit();
 	void Draw();
 
-	void SetPosition(XMFLOAT2 pos)
-	{
-		m_Position.x = pos.x;
-		m_Position.y = pos.y;
+	void SetPosition(XMFLOAT2 pos) {
+		m_Position = Vector3(pos.x, pos.y, 0.0f);
 	}
 
-	void SetNum(float num)
-	{
-		m_Num = num;
-	}
+	void SetNum(float num) { m_Num = num; }
 
 private:
-	CTexture* m_Texture;
 	float m_Num;
+	CPolygon2D* m_Polygon;
+
+	// íËêî
+	const int   COUNTER_STOP = 9999;
+	const int   MAX_DIGIT = 4;
+	const float SPACE_MAGNIFICATION = 0.7f;
 
 };
 

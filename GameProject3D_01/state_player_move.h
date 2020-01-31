@@ -12,6 +12,11 @@ public:
 
 protected:
 	CStatePlayerMove(){} // デフォルトコンストラクタ封印
+	bool MoveEntry() {
+		return CInput::GetIsInputStick(LEFT_STICK) ||
+			CInput::GetKeyPress('W') || CInput::GetKeyPress('A') ||
+			CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
+	}
 
 private:
 	CStatePlayerMove* m_pStateMove;

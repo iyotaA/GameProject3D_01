@@ -7,6 +7,7 @@ std::vector<CShaderBase*>	ShaderManager::m_Shaders;
 // シェーダーマネージャー初期化
 void ShaderManager::Init()
 {
+	AddShader<CShader2D>("asset/shader/shader2DVS.cso", "asset/shader/shader2DPS.cso");
 	AddShader<CShaderDefault>("asset/shader/shader3DDefaultVS.cso", "asset/shader/shader3DDefaultPS.cso");
 	AddShader<CShaderPerPixelLight>("asset/shader/shader3DPerPixelLightingVS.cso", "asset/shader/shader3DPerPixelLightingPS.cso");
 	AddShader<CShaderMultiTexture>("asset/shader/shader3DMultiTextureVS.cso", "asset/shader/shader3DMultiTexturePS.cso");

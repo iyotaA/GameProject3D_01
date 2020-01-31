@@ -9,7 +9,21 @@ public:
 	virtual void Update(CPlayer* pPlayer) override;
 
 private:
+	CStatePlayerDodge() {}
+	void Move(CPlayer* pPlayer);
+
+	bool MoveEntry() {
+		return CInput::GetIsInputStick(LEFT_STICK) ||
+			CInput::GetKeyPress('W') || CInput::GetKeyPress('A') ||
+			CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
+	}
+
+
+
+private:
 	int m_FrameCounter;
+	Vector3 m_Velocity;
+	Vector3 m_DirFront;
 
 };
 

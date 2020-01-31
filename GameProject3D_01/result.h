@@ -46,18 +46,18 @@ public:
 			}
 		}
 
-		// タイトルロゴの初期化
-		CPolygon* ui = new CPolygon;
-		ui->Init(XMFLOAT2(350, 70), XMFLOAT2(670, 200), "asset/score.tga");
-		m_GameObject[CManager::E_UI].push_back(ui);
+		//// タイトルロゴの初期化
+		//CPolygon2D* ui = new CPolygon2D;
+		//ui->Init(XMFLOAT2(350, 70), XMFLOAT2(670, 200), "asset/score.tga");
+		//m_GameObject[CManager::E_UI].push_back(ui);
 
-		CPolygon* ui2 = new CPolygon;
-		ui2->Init(XMFLOAT2(530, 600), XMFLOAT2(315, 75), "asset/press.tga");
-		m_GameObject[CManager::E_UI].push_back(ui2);
+		//CPolygon2D* ui2 = new CPolygon2D;
+		//ui2->Init(XMFLOAT2(530, 600), XMFLOAT2(315, 75), "asset/press.tga");
+		//m_GameObject[CManager::E_UI].push_back(ui2);
 
 		// 数字の初期化
 		CNumber* number = new CNumber;
-		number->Init("asset/number.tga");
+		number->Init();
 		number->SetPosition(XMFLOAT2(550.0f, 300.0f));
 		number->SetNum(static_cast<float>(CManager::GetScore()));
 		m_GameObject[CManager::E_UI].push_back(number);

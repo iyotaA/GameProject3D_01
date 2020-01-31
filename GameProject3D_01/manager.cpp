@@ -83,11 +83,15 @@ void CManager::Update()
 
 void CManager::Draw()
 {
-	// •`‰æ‚ÌŠJŽn
-	CRenderer::Begin();
-
 	// imgui•`‰æ€”õ
 	CImgui::NewFrame();
+
+	//// Zƒoƒbƒtƒ@‘‚«ž‚Ý
+	//CRenderer::BeginDepth();
+	//m_Scene->Draw();
+
+	// •`‰æ‚ÌŠJŽn
+	CRenderer::Begin();
 
 	// GUI‚Ì•`‰æ
 	DrawGUI();
