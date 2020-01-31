@@ -12,8 +12,13 @@ public:
 
 private:
 	CStatePlayerRun(){} // デフォルトコンストラクタ封印
+	void Move(CPlayer* pPlayer);
+
+private:
 	float m_MoveSpeed;
 	float m_AnimationSpeed;
+	int   m_FrameCounter;
+	Vector3 m_Volocity;
 
 };
 

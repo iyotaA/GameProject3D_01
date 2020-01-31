@@ -70,7 +70,7 @@ float4 main(in InputData input) : SV_TARGET
 	input.blendNum = saturate(input.blendNum);
 
 	// ノーマルマップ( (0.0f ～ 1.0f) → (-1.0f ～ 1.0f)  )
-	float4 normalMap = gTextures[2].Sample(gSampler, input.uv) * 2.0f - 1.0f;
+	float4 normalMap = gTextures[2].Sample(gSampler, input.uv * 0.99f) * 2.0f - 1.0f;
 
 	// 本の法線ベクトルの変換
 	// tangentのx.y.zのどれかにマイナスを入れないとうまくいかないかも...

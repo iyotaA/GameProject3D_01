@@ -54,6 +54,7 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 		// 各メッシュの頂点初期化
 		for (int v = 0; v < pMesh->mNumVertices; v++) {
 
+			pMesh->mTangents;
 			DEFORM_VERTEX vertex;
 			vertex.Position = pMesh->mVertices[v];
 			vertex.DeformPosition = pMesh->mVertices[v];
@@ -131,6 +132,7 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 		else {
 			m_Texture["DefauldTexture"] = new CTexture();
 			m_Texture["DefauldTexture"]->LoadSTB(pTexture);
+			break;
 		}
 	}
 
@@ -510,8 +512,12 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 			m_Shader->Set();
 
 			aiString path;
-			mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-			CRenderer::SetTexture(m_Texture[m_pScene->mRootNode->mName.C_Str()]);
+			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+				CRenderer::SetTexture(m_Texture[path.data], 0);
+			}
+			else {
+				CRenderer::SetTexture(m_Texture["DefauldTexture"], 0);
+			}
 		}
 
 		{
@@ -741,7 +747,7 @@ void CSkinModel::AnimationBlend(int addAnimationFrame)
 
 
 	// ブレンド値を更新
-	m_PerBlend += 0.1f;
+	m_PerBlend += 0.05f;
 	if (m_PerBlend >= m_PerBlendEnd) {
 		m_IsAnimationBlending = false;
 		m_CurrentAnimationFrame = m_TargetAnimationFrame;
@@ -790,7 +796,7 @@ void CSkinModel::Animation(int addAnimationFrame)
 		pBone->AnimationMatrix = aiMatrix4x4(
 			aiVector3D(1.0f, 1.0f, 1.0f), // 拡大縮小
 			rotCurrent,					  // 回転
-			posCurrent                      // 移動
+			posCurrent	                  // 移動
 		);
 	}
 }
@@ -889,9 +895,12 @@ void CSkinModel::GetBonePosition(aiNode* pNode, XMMATRIX* _world, const char* _t
 
 bool CSkinModel::CurrentAnimationFinish()
 {
-	aiAnimation* pAnimationCurrent = m_pScene->mAnimations[m_CurrentAnimId];
-
 	return (m_CurrentAnimationFrame >= m_pScene->mAnimations[m_CurrentAnimId]->mDuration) ? true : false;
+}
+
+int CSkinModel::GetCurrentAnimFrameNum()
+{
+	return m_pScene->mAnimations[m_CurrentAnimId]->mDuration;
 }
 
 void CSkinModel::SetAnimation(bool _next)
@@ -908,14 +917,14 @@ void CSkinModel::SetAnimation(bool _next)
 	}
 }
 
-void CSkinModel::SetAnimation(const unsigned int _id, const float _endBlendNum)
+void CSkinModel::SetAnimation(const unsigned int _id, const float _end_blend_num)
 {
 	if (m_TargetAnimId == _id)return;
 
 	m_IsAnimationBlending = true;
 	m_TargetAnimationFrame = 0.0f;
 	m_PerBlend = 0.0f;
-	m_PerBlendEnd = _endBlendNum;
+	m_PerBlendEnd = _end_blend_num;
 	m_TargetAnimId = (_id >= m_pScene->mNumAnimations) ? 0 : _id;
 }
 

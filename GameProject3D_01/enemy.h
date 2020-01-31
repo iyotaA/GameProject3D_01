@@ -24,6 +24,7 @@ private:
 	CDamage* m_DamageManager;
 	Vector3			  m_MoveDistance;
 	Vector3			  m_BonePosition;
+	CPolygon3D*       m_Shadow;
 	float             m_MoveSpeed;
 	bool			  m_IsCollision;
 	bool			  m_IsPressMovingEntry;

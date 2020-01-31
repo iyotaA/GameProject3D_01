@@ -16,7 +16,7 @@ void CTerrain::Init()
 {
 	bool result;
 
-	result = LoadHeightMap("asset/image/height_map000.bmp");
+	result = LoadHeightMap("asset/image/height_map001.bmp");
 	assert(result);
 
 	// テクスチャ読み込み //////
@@ -30,7 +30,7 @@ void CTerrain::Init()
 
 	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
 	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
-	m_Texture[2]->LoadSTB("asset/image/NormalMap.png");
+	m_Texture[2]->LoadSTB("asset/image/normal_map_terrian000.png");
 
 	result = InitializeBuffers();
 	assert(result);
@@ -207,11 +207,12 @@ bool CTerrain::InitializeBuffers()
 				m_Vertex[m_terrainHeight * z + x] = {
 
 					Vector3(m_heightMap[m_terrainHeight * z + x].x, 0.0f, m_heightMap[m_terrainHeight * z + x].z),
+					//Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
 					Vector3(0.0f, 0.0f, 1.0f),
 					Vector3(1.0f, 0.0f, 0.0f),
 					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-					XMFLOAT2(x, z),
+					XMFLOAT2(x * 0.33f, z * 0.33f),
 					max((rand() % blend) * (1.0f / blend), m_heightMap[m_terrainHeight * z + x].y / (10.0f * GRID_SIZE))
 				};
 			}

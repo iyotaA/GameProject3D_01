@@ -78,4 +78,4 @@ RootNode
 (親)mixamorig:RightFoot => mixamorig:RightToeBase
 (親)mixamorig:RightToeBase => mixamorig:RightToe_End
 (親)mixamorig:RightToe_End => mixamorig:RightToe_End_end
-(親)RootNode => pants
+(親)RootNode => skins

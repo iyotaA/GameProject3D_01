@@ -2,6 +2,7 @@
 #define PLAYER_H_
 
 #include "state_player.h"
+#include "number.h"
 
 class CCamera;
 class CSkinModel;
@@ -24,11 +25,14 @@ public:
 	void SetMoveSpeed(const float _speed) { m_MoveSpeed = _speed * m_DefaultSpeed; }
 	void SetAnimation(const unsigned int _id, const float _endBlendNum);
 	void SetAnimationSpeed(const float _speed);
+	void AddVelocity(Vector3 velocity) { m_Position += velocity; }
+	Vector3 GetFront() { return m_DirVec.front; }
 
 public:
-	bool& PressMovingEntry(void) { return m_IsPressMovingEntry; }
-	bool& AnimationBlending(void);
-	bool CurrentAnimationFinish(void);
+	bool& AnimationBlending();
+	bool CurrentAnimationFinish();
+	int GetCurrentAnimFrameNum();
+	const float DefaultSpeed() { return m_DefaultSpeed; }
 
 private:
 	const float m_DefaultSpeed = 0.017f;
@@ -41,9 +45,9 @@ private:
 	CDamage*          m_DamageManager;
 	Vector3			  m_MoveDistance;
 	Vector3			  m_BonePosition;
+	CPolygon3D*		  m_Shadow;
 	float             m_MoveSpeed;
 	bool			  m_IsCollision;
-	bool			  m_IsPressMovingEntry;
 
 	bool IsLanding();
 	void Move();

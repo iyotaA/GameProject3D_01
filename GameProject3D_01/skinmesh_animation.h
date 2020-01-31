@@ -51,13 +51,15 @@ public:
 
 	// ˆø” / _next : true = Next / _next : false = Back
 	void SetAnimation(bool _next);
-	void SetAnimation(const unsigned int _id, const float _endBlendNum);
+	void SetAnimation(const unsigned int _id, const float _end_blend_num);
 	bool CurrentAnimationFinish();
+	int  GetCurrentAnimFrameNum();
 
 	char GetCurrentAnimId() { return m_CurrentAnimId; }
 	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
 	void SetAnimationSpeed(float _speed) { m_AnimationSpeed = _speed; }
 
+	int GetAnimationNum() { return m_pScene->mNumAnimations; }
 	float* AnimationSpeed() { return &m_AnimationSpeed; }
 	bool*  IsStopMotion() { return &m_IsStopMotion; }
 	bool*  DrawAtLine() { return &m_DrawAtLine; }

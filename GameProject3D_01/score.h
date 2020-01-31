@@ -6,9 +6,9 @@ class CScore
 public:
 	static void Init()
 	{
-		m_Num = new CNumber;
-		m_Num->Init("asset/number.tga");
-		m_Num->SetPosition(XMFLOAT2(550.0f, 100.0f));
+		//m_Num = new CNumber;
+		//m_Num->Init("asset/number.tga");
+		//m_Num->SetPosition(XMFLOAT2(550.0f, 100.0f));
 
 		m_Score = 0;
 	}

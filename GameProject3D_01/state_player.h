@@ -13,7 +13,7 @@ public:
 class CStatePlayerNone: public CStatePlayer
 {
 public:
-	virtual ~CStatePlayerNone() {}
+	~CStatePlayerNone() {}
 	virtual void Update(CPlayer* pPlayer) override {}
 };
 

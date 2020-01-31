@@ -16,7 +16,7 @@ using namespace DirectX;
 
 struct Vector3 : public XMFLOAT3 {
 
-	Vector3() = default;
+	Vector3() { this->x = 0.0f; this->y = 0.0f; this->z = 0.0f; }
 	Vector3(float _x, float _y, float _z)
 	{
 		this->x = _x; this->y = _y; this->z = _z;

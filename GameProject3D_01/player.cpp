@@ -8,7 +8,6 @@
 #include "tutorial.h"
 #include "shader_all.h"
 #include "skinmesh_animation.h"
-#include "main.h"
 #include "state_player_idle.h"
 #include "state_player_dodge.h"
 
@@ -19,10 +18,14 @@ void CPlayer::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/human000.fbx", 0.0023f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
+	m_pModel->Load("asset/model/Human.fbx", 0.0023f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
 
 	// 状態
 	m_pState = new CStatePlayerIdle(this);
+
+	// 影
+	m_Shadow = new CPolygon3D();
+	m_Shadow->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(1.7f, 1.0f, 1.7f), Vector3(0.0f, 0.0f, 0.0f), "asset/image/shadow.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(70.0f, 0.0f, -100.0f);
@@ -44,7 +47,6 @@ void CPlayer::Init()
 	m_BonePosition = Vector3(0.0f, 0.0f, 0.0f);
 	m_MoveSpeed = m_DefaultSpeed;
 	m_IsCollision = false;
-	m_IsPressMovingEntry = false;
 }
 
 void CPlayer::Uninit()
@@ -52,6 +54,9 @@ void CPlayer::Uninit()
 	delete m_DamageManager;
 	delete m_CollisionOBB;
 	delete m_CollisionSphere;
+
+	m_Shadow->Uninit();
+	delete m_Shadow;
 
 	delete m_pState;
 
@@ -90,6 +95,9 @@ void CPlayer::Draw()
 
 	// モデル描画
 	m_pModel->Draw(&world);
+
+	// 影描画
+	m_Shadow->Draw();
 
 	// コリジョン描画
 	DrawCollisionGrid();
@@ -198,7 +206,6 @@ void CPlayer:: DrawGUI()
 			ImGui::Text("PosY = %.1f", m_Position.y);
 			ImGui::Text("PosZ = %.1f", m_Position.z);
 			ImGui::Text(m_IsCollision ? "Collision" :"Through");
-			ImGui::Text(m_IsPressMovingEntry ? "MoveEntry" : "NotEntry");
 			ImGui::EndChildFrame();
 		}
 
@@ -214,6 +221,7 @@ void CPlayer:: DrawGUI()
 
 			ImGui::BeginChildFrame(Window_Animation_Id, ImVec2(width, 100));
 			{
+				ImGui::Text("%d", m_pModel->GetAnimationNum()); ImGui::SameLine();
 				if (ImGui::Button("<")) { m_pModel->SetAnimation(false); }ImGui::SameLine();
 				ImGui::Text(m_pModel->GetCurrentAnimName()); ImGui::SameLine();
 				if (ImGui::Button(">")) { m_pModel->SetAnimation(true); }
@@ -247,40 +255,43 @@ void CPlayer::Move()
 
 	if (!camera->GetIsBindAtObject())return;
 
-	Vector3 cameraFront = camera->GetDir3Vector()->front;
-	Vector3 cameraRight = camera->GetDir3Vector()->right;
-	XMFLOAT2 inputNum = CInput::GetGamepadLeftStick();
-	Vector3 moveDistance = Vector3(0.0f, 0.0f, 0.0f);
+	// 状態の更新
+	m_pState->Update(this);
 
-	// 移動入力されたか？
-	m_IsPressMovingEntry = CInput::GetIsInputStick(LEFT_STICK) || CInput::GetKeyPress('W') || CInput::GetKeyPress('A') || CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
+	//Vector3 cameraFront = camera->GetDir3Vector()->front;
+	//Vector3 cameraRight = camera->GetDir3Vector()->right;
+	//XMFLOAT2 inputNum = CInput::GetGamepadLeftStick();
+	//Vector3 moveDistance = Vector3(0.0f, 0.0f, 0.0f);
 
-	moveDistance += Vector3(cameraRight.x, 0.0f, cameraRight.z) * inputNum.x;
-	moveDistance += Vector3(cameraFront.x, 0.0f, cameraFront.z) * inputNum.y;
+	//// 移動入力されたか？
+	//m_IsPressMovingEntry = CInput::GetIsInputStick(LEFT_STICK) || CInput::GetKeyPress('W') || CInput::GetKeyPress('A') || CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
 
-	if (CInput::GetKeyPress('W')) {
-		moveDistance.x += cameraFront.x;
-		moveDistance.z += cameraFront.z;
-	}
-	else if (CInput::GetKeyPress('S')) {
-		moveDistance.x -= cameraFront.x;
-		moveDistance.z -= cameraFront.z;
-	}
-	if (CInput::GetKeyPress('A')) {
-		moveDistance.x -= cameraRight.x;
-		moveDistance.z -= cameraRight.z;
-	}
-	else if (CInput::GetKeyPress('D')) {
-		moveDistance.x += cameraRight.x;
-		moveDistance.z += cameraRight.z;
-	}
+	//moveDistance += Vector3(cameraRight.x, 0.0f, cameraRight.z) * inputNum.x;
+	//moveDistance += Vector3(cameraFront.x, 0.0f, cameraFront.z) * inputNum.y;
 
-	// 移動量
-	moveDistance.Normalize();
-	m_MoveDistance += moveDistance * m_MoveSpeed;
+	//if (CInput::GetKeyPress('W')) {
+	//	moveDistance.x += cameraFront.x;
+	//	moveDistance.z += cameraFront.z;
+	//}
+	//else if (CInput::GetKeyPress('S')) {
+	//	moveDistance.x -= cameraFront.x;
+	//	moveDistance.z -= cameraFront.z;
+	//}
+	//if (CInput::GetKeyPress('A')) {
+	//	moveDistance.x -= cameraRight.x;
+	//	moveDistance.z -= cameraRight.z;
+	//}
+	//else if (CInput::GetKeyPress('D')) {
+	//	moveDistance.x += cameraRight.x;
+	//	moveDistance.z += cameraRight.z;
+	//}
+
+	//// 移動量
+	//moveDistance.Normalize();
+	//m_MoveDistance += moveDistance * m_MoveSpeed;
 
 	// 座標移動
-	m_Position += m_MoveDistance;
+	//m_Position += m_MoveDistance;
 
 	// コリジョン位置の更新
 	UpdateCollision();
@@ -298,7 +309,7 @@ void CPlayer::Move()
 	}
 
 	// 移動量減衰...
-	m_MoveDistance *= 0.85f;
+	//m_MoveDistance *= 0.87f;
 
 
 	Vector3 MovedDir;
@@ -325,19 +336,9 @@ void CPlayer::Move()
 	// 重力加算
 	AddGlavity();
 
-	// 状態の更新
-	m_pState->Update(this);
-	return;
-
-	if (m_IsPressMovingEntry) {
-		m_pModel->SetAnimation(2, 0.0f);
-		//m_pModel->SetAnimationSpeed(1.0f + m_MoveDistance.Length() * 13.0f);
-	}
-	else {
-		m_pModel->SetAnimation(0, 0.0f);
-		m_pModel->SetAnimationSpeed(1.0f);
-	}
-
+	// 影の更新
+	m_Shadow->SetPosition(&Vector3(m_Position.x, 0.01f, m_Position.z));
+	m_Shadow->Update();
 }
 
 
@@ -378,7 +379,8 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
 	// 特定のボーンの位置を取得
-	m_BonePosition = m_pModel->GetWorldPosition(&world, "mixamorig:LeftHandIndex4_end");
+	Vector3 position_from_bone = m_pModel->GetWorldPosition(&world, "mixamorig:LeftHandIndex4_end") - m_Position;
+	m_BonePosition = m_Position + Vector3(-position_from_bone.x, position_from_bone.y, position_from_bone.z);
 	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
 	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
 	m_CollisionSphere->SetCenter(&m_Position);
@@ -393,12 +395,7 @@ void CPlayer::UpdateCollision()
 	// 衝突判定テスト
 	CCollisionOBB obbCol;
 	obbCol.SetStatus(&Vector3(0.0f, 5.0f, 0.0f), &Vector3X3(Vector3(-1.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)), &Vector3(1.0f, 10.0f, 1.0f));
-	if (CCollision3DJudge::Collision3D_OBB_OBB(*m_CollisionOBB, obbCol)) {
-		m_IsCollision = true;
-	}
-	else {
-		m_IsCollision = false;
-	}
+	m_IsCollision = CCollision3DJudge::Collision3D_OBB_OBB(*m_CollisionOBB, obbCol);
 }
 
 void CPlayer::AddGlavity()
@@ -443,6 +440,11 @@ bool CPlayer::IsLanding()
 bool CPlayer::CurrentAnimationFinish(void)
 {
 	return m_pModel->CurrentAnimationFinish();
+}
+
+int CPlayer::GetCurrentAnimFrameNum()
+{
+	return m_pModel->GetCurrentAnimFrameNum();
 }
 
 bool& CPlayer::AnimationBlending(void)

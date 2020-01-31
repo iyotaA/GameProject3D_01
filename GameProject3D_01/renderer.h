@@ -91,20 +91,27 @@ public:
 	static void DrawIndexed( unsigned int IndexCount, unsigned int StartIndexLocation, int BaseVertexLocation );
 	static void SetRasterizerState(D3D11_FILL_MODE _fill_mode, D3D11_CULL_MODE _cull_mode);
 
+	// Zバッファ
+	static void BeginDepth();
+	static void SetDepthTexture(unsigned int _slot);
+
+
 	static ID3D11Device* GetDevice( void ){ return m_D3DDevice; }
 	static ID3D11DeviceContext* GetDeviceContext( void ){ return m_ImmediateContext; }
 
 private:
 
-	static D3D_FEATURE_LEVEL		m_FeatureLevel;
+	static D3D_FEATURE_LEVEL			m_FeatureLevel;
 
-	static ID3D11Device*            m_D3DDevice;
-	static ID3D11DeviceContext*     m_ImmediateContext;
-	static IDXGISwapChain*          m_SwapChain;
-	static ID3D11RenderTargetView*  m_RenderTargetView;
-	static ID3D11DepthStencilView*  m_DepthStencilView;
-	static ID3D11DepthStencilState* m_DepthStateEnable;
-	static ID3D11DepthStencilState* m_DepthStateDisable;
+	static ID3D11Device*				m_D3DDevice;
+	static ID3D11DeviceContext*			m_ImmediateContext;
+	static IDXGISwapChain*				m_SwapChain;
+	static ID3D11RenderTargetView*		m_RenderTargetView;
+	static ID3D11DepthStencilView*		m_DepthStencilView;
+	static ID3D11DepthStencilState*		m_DepthStateEnable;
+	static ID3D11DepthStencilState*		m_DepthStateDisable;
+	static ID3D11DepthStencilView*		m_LightDepthStencilView;
+	static ID3D11ShaderResourceView*	m_LightDepthShaderResourceView;
 
 	/*
 		static XMMATRIX				m_WorldMatrix;

@@ -1,14 +1,16 @@
+#include "game_objects_all.h"
 #include "state_player.h"
 #include "state_player_move_run.h"
 #include "state_player_idle.h"
 #include "state_player_dodge.h"
-#include "game_objects_all.h"
 #include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerRun::CStatePlayerRun(CPlayer* pPlayer)
 	: m_MoveSpeed(1.0f)
 	, m_AnimationSpeed(1.0f)
+	, m_FrameCounter(0)
+	, m_Volocity(Vector3(0.0f, 0.0f, 0.0f))
 {
 	pPlayer->SetAnimation(2, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
@@ -25,8 +27,12 @@ void CStatePlayerRun::Update(CPlayer* pPlayer)
 	// キー入力
 	//******************************
 	if (CInput::GetKeyTrigger(VK_SPACE) || CInput::GetGamepadTrigger(VK_PAD_A)) {
-		pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
-		return;
+
+		// 20F経ってから回避可能に
+		if (m_FrameCounter >= 20) {
+			pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
+			return;
+		}
 	}
 	if (CInput::GetGamepadPress(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 	{
@@ -42,4 +48,50 @@ void CStatePlayerRun::Update(CPlayer* pPlayer)
 
 	pPlayer->SetAnimationSpeed(m_AnimationSpeed);
 	pPlayer->SetMoveSpeed(m_MoveSpeed);
+
+	m_FrameCounter++;
+
+	// 移動処理
+	Move(pPlayer);
+}
+
+void CStatePlayerRun::Move(CPlayer* pPlayer)
+{
+	CCamera* camera = CCameraManager::GetCamera();
+
+	Vector3 cameraFront = camera->GetDir3Vector()->front;
+	Vector3 cameraRight = camera->GetDir3Vector()->right;
+
+	// ジョイパッド
+	XMFLOAT2 inputNum = CInput::GetGamepadLeftStick();
+	Vector3 moveDistance = Vector3(0.0f, 0.0f, 0.0f);
+	moveDistance += Vector3(cameraRight.x, 0.0f, cameraRight.z) * inputNum.x;
+	moveDistance += Vector3(cameraFront.x, 0.0f, cameraFront.z) * inputNum.y;
+
+	// キーボード
+	if (CInput::GetKeyPress('W')) {
+		moveDistance.x += cameraFront.x;
+		moveDistance.z += cameraFront.z;
+	}
+	else if (CInput::GetKeyPress('S')) {
+		moveDistance.x -= cameraFront.x;
+		moveDistance.z -= cameraFront.z;
+	}
+	if (CInput::GetKeyPress('A')) {
+		moveDistance.x -= cameraRight.x;
+		moveDistance.z -= cameraRight.z;
+	}
+	else if (CInput::GetKeyPress('D')) {
+		moveDistance.x += cameraRight.x;
+		moveDistance.z += cameraRight.z;
+	}
+
+	// 移動量
+	moveDistance.Normalize();
+	m_Volocity += moveDistance * m_MoveSpeed * pPlayer->DefaultSpeed();
+
+	// 移動量減衰...
+	m_Volocity *= 0.87f;
+
+	pPlayer->AddVelocity(m_Volocity);
 }

@@ -1,8 +1,7 @@
-#include "main.h"
+#include "game_objects_all.h"
 #include "state_player_move.h"
 #include "state_player_move_run.h"
 #include "state_player_idle.h"
-#include "game_objects_all.h"
 #include "modelAnimation.h"
 #include "player.h"
 
@@ -20,7 +19,7 @@ CStatePlayerMove::~CStatePlayerMove()
 void CStatePlayerMove::Update(CPlayer* pPlayer)
 {
 	// 入力がされてなければ待機モーションに
-	if (!pPlayer->PressMovingEntry()) {
+	if (!MoveEntry()) {
 		pPlayer->ChangeState(new CStatePlayerIdle(pPlayer));
 		return;
 	}
@@ -28,3 +27,4 @@ void CStatePlayerMove::Update(CPlayer* pPlayer)
 	// 更新
 	m_pStateMove->Update(pPlayer);
 }
+

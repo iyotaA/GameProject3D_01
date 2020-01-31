@@ -9,7 +9,6 @@ class CGame : public CScene
 public:
 	void Init()
 	{
-
 		// スカイドームの初期化
 		AddGameObject<CSkyDome>(CManager::E_Background);
 
@@ -17,12 +16,12 @@ public:
 		AddGameObject<CTerrain>(CManager::E_Background);
 		//AddGameObject<CField>(CManager::E_Background);
 
+		// エネミーの初期化
+		AddGameObject<CEnemy>(CManager::E_3D);
+
 		// プレイヤーの初期化
 		CPlayer* player;
 		player = AddGameObject<CPlayer>(CManager::E_3D);
-
-		// エネミーの初期化
-		AddGameObject<CEnemy>(CManager::E_3D);
 
 		// カメラセット
 		CCamera* camera = CCameraManager::GetCamera();		// 注視点
@@ -30,8 +29,8 @@ public:
 
 		// 数字の初期化
 		number = new CNumber;
-		number->Init("asset/number.tga");
-		number->SetPosition(XMFLOAT2(550.0f, 0.0f));
+		number->Init();
+		number->SetPosition(XMFLOAT2(60.0f, 60.0f));
 		m_GameObject[CManager::E_UI].push_back(number);
 
 		m_time = 0.0f;
@@ -51,8 +50,8 @@ public:
 		CScene::Update();
 
 		// タイム計測
-		m_time += 0.016f;
-		//number->SetNum(m_time);
+		m_time += 1.6f;
+		number->SetNum(m_time);
 
 		//if (FrameCount % 100 == 0) {
 
@@ -80,11 +79,7 @@ public:
 		CScene::Draw();
 	}
 
-	bool IsClear(void)
-	{
-		if (m_time <= 0.0f) { return true; }
-		else return false;
-	}
+	bool IsClear(void) { return (m_time <= 0.0f) ? true : false; }
 
 private:
 	float m_time;
