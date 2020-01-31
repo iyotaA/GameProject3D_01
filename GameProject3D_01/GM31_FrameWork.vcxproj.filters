@@ -180,6 +180,9 @@
     <ClCompile Include="shader_2d.cpp">
       <Filter>shader</Filter>
     </ClCompile>
+    <ClCompile Include="MathFunc.cpp">
+      <Filter>ソース ファイル\MyTypeClass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="field.h">
@@ -361,6 +364,9 @@
     </ClInclude>
     <ClInclude Include="shader_2d.h">
       <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="MathFunc.h">
+      <Filter>ソース ファイル\MyTypeClass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

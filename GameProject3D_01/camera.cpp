@@ -25,6 +25,7 @@ void CCamera::Init(unsigned int _id)
 	/* カメラ情報初期化 */
 	m_LengthToAt     = 6.5f;
 	m_At             = Vector3(0.0f, 10.0f, 0.0f);
+	m_Offset		 = Vector3();
 	m_SpinVerticall  = 0.0f;
 	m_SpinHorizontal = 0.0f;
 	m_RotateSpeed    = 0.004f;
@@ -46,7 +47,7 @@ void CCamera::Update()
 	if (m_pAtPoint != NULL)
 	{
 		if (m_BindAtObject) {
-			m_At = Vector3(m_pAtPoint->GetPosition()->x, m_pAtPoint->GetPosition()->y + 2.0f, m_pAtPoint->GetPosition()->z);
+			m_At = *m_pAtPoint->GetPosition() + m_Offset;
 		}
 	}
 
@@ -79,7 +80,7 @@ void CCamera::Update()
 
 	// カメラの位置更新
 	Vector3 vFront = m_DirVec.front * m_LengthToAt;
-	m_Position = Vector3(m_At.x - vFront.x, m_At.y + 1.0f - vFront.y, m_At.z - vFront.z);
+	m_Position = m_At - vFront;
 
 	// 回転の慣性（徐々にスピードダウン）
 	m_SpinVerticall *= 0.92f;
@@ -232,36 +233,20 @@ void CCamera::Move(CCameraManager::CameraMove _move_dir)
 	}
 }
 
-void CCamera::SetAt(CGameObject* pAt)
+void CCamera::SetAt(CGameObject* pAt, Vector3 offset)
 {
 	if (pAt) {
 		m_pAtPoint = pAt;
-		XMFLOAT3 front;
-		XMStoreFloat3(&front, m_DirVec.front);
-		front.x *= m_LengthToAt;
-		front.y *= m_LengthToAt;
-		front.z *= m_LengthToAt;
+		m_Offset = offset;
 
 		// カメラの初期位置
-		m_Position.x = m_pAtPoint->GetPosition()->x - front.x;
-		m_Position.y = m_pAtPoint->GetPosition()->y - front.y;
-		m_Position.z = m_pAtPoint->GetPosition()->z - front.z;
+		m_Position = *m_pAtPoint->GetPosition() + m_Offset - m_DirVec.front;
 	}
 	else {
 		m_pAtPoint = NULL;
-		XMFLOAT3 front;
-		XMStoreFloat3(&front, m_DirVec.front);
-		front.x *= m_LengthToAt;
-		front.y *= m_LengthToAt;
-		front.z *= m_LengthToAt;
-
-		XMFLOAT3 at;
-		XMStoreFloat3(&at, m_At);
 
 		// カメラの初期位置
-		m_Position.x = 0.0f;
-		m_Position.y = 10.0f;
-		m_Position.z = -10.0f;
+		m_Position = Vector3(0.0f, 10.0f, -10.0f);
 	}
 }
 

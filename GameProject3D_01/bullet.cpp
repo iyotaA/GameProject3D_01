@@ -41,21 +41,21 @@ void CBullet::Update()
 	// ƒRƒŠƒWƒ‡ƒ“ˆÊ’u‚ÌXV
 	m_CollisionSphere->SetCenter(&m_Position);
 
-	// “G‚Æ’e‚Ì“–‚½‚è”»’è
-	for (CEnemy* enemy : enemys) {
-		if (enemy != nullptr) {
+	//// “G‚Æ’e‚Ì“–‚½‚è”»’è
+	//for (CEnemy* enemy : enemys) {
+	//	if (enemy != nullptr) {
 
-			// “–‚½‚è”»’è
-			if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_CollisionSphere)) {
+	//		// “–‚½‚è”»’è
+	//		if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_CollisionSphere)) {
 
-				CSound::Play(SOUND_LABEL_SE_HIT);
+	//			CSound::Play(SOUND_LABEL_SE_HIT);
 
-				CManager::GetScene()->DestroyGameObject(enemy);
-				CManager::GetScene()->DestroyGameObject(this);
-				return;
-			}
-		}
-	}
+	//			CManager::GetScene()->DestroyGameObject(enemy);
+	//			CManager::GetScene()->DestroyGameObject(this);
+	//			return;
+	//		}
+	//	}
+	//}
 
 	// •Ç‚ÌŠO‚ÅÁ‚·
 	if (fabs(m_Position.x) > 15.0f || fabs(m_Position.z) > 15.0f ){

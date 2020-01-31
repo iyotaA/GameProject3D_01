@@ -19,7 +19,7 @@ class CPolygon2D
 public:
 	CPolygon2D()
 		: m_Position()
-		, m_Size(XMFLOAT2(100.0f, 100.0f))
+		, m_Size(XMFLOAT2(50.0f, 50.0f))
 		, m_UV(UV())
 		, m_Color(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f))
 		, m_RotateDeg(0.0f)

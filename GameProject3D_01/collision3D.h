@@ -42,6 +42,11 @@ public:
 		m_fLength = *_len;
 	}
 
+	void SetPosition(Vector3* _pos){ m_Pos = *_pos;	}
+	void SetVec3Dir(Vector3X3* _vec3){ m_NormaDirect = *_vec3;	}
+	void Set3Length(Vector3* _len){ m_fLength = *_len;	}
+
+
 	// 指定軸番号の方向ベクトルを取得
 	// 0 : right / 1 : up / 2 : front
 	Vector3 GetDirect(int elem) {

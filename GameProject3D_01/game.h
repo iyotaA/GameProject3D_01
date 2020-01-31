@@ -25,12 +25,12 @@ public:
 
 		// カメラセット
 		CCamera* camera = CCameraManager::GetCamera();		// 注視点
-		camera->SetAt(player);
+		camera->SetAt(player, Vector3(0.0f, 3.0f, 0.0f));
 
 		// 数字の初期化
 		number = new CNumber;
 		number->Init();
-		number->SetPosition(XMFLOAT2(60.0f, 60.0f));
+		number->SetPosition(XMFLOAT2(30.0f, 30.0f));
 		m_GameObject[CManager::E_UI].push_back(number);
 
 		m_time = 0.0f;

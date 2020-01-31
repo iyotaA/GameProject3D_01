@@ -4,11 +4,15 @@
 #include "state_player_idle.h"
 #include "modelAnimation.h"
 #include "player.h"
+#include "MathFunc.h"
 
 CStatePlayerMove::CStatePlayerMove(CPlayer* pPlayer)
-	:m_pStateMove(new CStatePlayerRun(pPlayer))
+	: m_pStateMove(new CStatePlayerRun(pPlayer))
+	, m_Lerp_t(0.0f)
+	, m_LerpStart(CCameraManager::GetCamera()->GetLengthToAt())
+	, m_LerpEnd(8.0f)
+	, m_Counter(0.0f)
 {
-
 }
 
 CStatePlayerMove::~CStatePlayerMove()
@@ -26,5 +30,12 @@ void CStatePlayerMove::Update(CPlayer* pPlayer)
 
 	// 更新
 	m_pStateMove->Update(pPlayer);
+
+	// 徐々にカメラズームアウト
+	CCamera* camera = CCameraManager::GetCamera();
+	camera->SetLengthToAt(lerp(m_LerpStart, m_LerpEnd, m_Lerp_t));
+	m_Lerp_t = sinf(m_Counter * 3.14f / 180.0f);
+	m_Counter += 1.0f;
+	if (m_Counter >= 90.0f) { m_Counter = 90.0f; }
 }
 

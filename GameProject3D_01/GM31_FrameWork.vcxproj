@@ -36,6 +36,7 @@
     <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
+    <ClCompile Include="MathFunc.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modelAnimation.cpp" />
     <ClCompile Include="number.cpp" />
@@ -89,6 +90,7 @@
     <ClInclude Include="input.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="MathFunc.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modelAnimation.h" />
     <ClInclude Include="number.h" />

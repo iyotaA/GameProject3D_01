@@ -18,6 +18,12 @@ private:
 			CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
 	}
 
+private:
+	float m_Lerp_t;
+	float m_LerpStart;
+	float m_LerpEnd;
+	float m_Counter;
+
 };
 
 #endif // !STATE_PLAYER_IDLE_H_

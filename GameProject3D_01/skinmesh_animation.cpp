@@ -54,7 +54,6 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 		// 各メッシュの頂点初期化
 		for (int v = 0; v < pMesh->mNumVertices; v++) {
 
-			pMesh->mTangents;
 			DEFORM_VERTEX vertex;
 			vertex.Position = pMesh->mVertices[v];
 			vertex.DeformPosition = pMesh->mVertices[v];
@@ -120,13 +119,6 @@ void CSkinModel::Load(char* pFileName, float size, char* pTexture, char* output_
 			else {
 				m_Texture[path.data] = new CTexture();
 				m_Texture[path.data]->LoadSTB(pTexture);
-				// fbxファイル外にテクスチャあり
-				//size_t pos = modelPath.find_last_of("\\/");				// モデルのパスの後ろから最初に出てきた"\\/"の場所を取得
-				//std::string texPath = (char*)& path.data;					// Textureのパス取得
-				//size_t texpos = texPath.find_last_of("\\/");				// Textureのパスの後ろから最初に出てきた"\\/"の場所を取得
-				//std::string texturePath = modelPath.substr(0, pos + 1);		// モデルと同じ場所のパスを取得
-				//texturePath += texPath.substr(texpos + 1, sizeof(texPath));	// モデルと同じ場所にあるテクスチャのパスに書き換え
-				//m_Texture[tex] = LoadTextureSTB(texturePath.c_str());		// 指定したパスのテクスチャを読み込む
 			}
 		}
 		else {
@@ -476,8 +468,8 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 				// 頂点情報格納
 				vertices[id].Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-				vertices[id].Normal   = Vector3(-pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
-				vertices[id].Position = Vector3(-pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
+				vertices[id].Normal   = Vector3(pVertex->DeformNormal.x, pVertex->DeformNormal.y, pVertex->DeformNormal.z);
+				vertices[id].Position = Vector3(pVertex->DeformPosition.x, pVertex->DeformPosition.y, pVertex->DeformPosition.z);
 				vertices[id].TexCoord = pMesh->HasTextureCoords(0) ? XMFLOAT2(pMesh->mTextureCoords[0][id].x, 1.0f - pMesh->mTextureCoords[0][id].y) : XMFLOAT2(0.0f, 0.0f);
 			}
 		}
@@ -529,7 +521,6 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 
 		CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		CRenderer::DrawIndexed( m_Mesh[mesh_index].IndexNum, 0, 0 );
-		//CRenderer::GetDeviceContext()->DrawIndexedInstanced(m_Mesh[mesh_index].IndexNum, 100, 0, 0, 0);
 	}
 
 
