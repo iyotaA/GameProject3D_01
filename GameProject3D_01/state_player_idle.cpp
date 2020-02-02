@@ -2,6 +2,8 @@
 #include "state_player_idle.h"
 #include "state_player_move_run.h"
 #include "state_player_attack.h"
+#include "state_player_damage_large.h"
+#include "state_player_damage_small.h"
 #include "game_objects_all.h"
 #include "modelAnimation.h"
 #include "player.h"
@@ -25,11 +27,20 @@ CStatePlayerIdle::~CStatePlayerIdle()
 
 void CStatePlayerIdle::Update(CPlayer* pPlayer)
 {
+	// 移動ステートに遷移
 	if (MoveEntry()) {
 		pPlayer->ChangeState(new CStatePlayerMove(pPlayer));
 		return;
 	}
 
+	// ダメージステートに遷移
+	if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X)) {
+
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		return;
+	}
+
+	// 移動処理
 	Move(pPlayer);
 
 	// 徐々にカメラズームイン
@@ -39,6 +50,7 @@ void CStatePlayerIdle::Update(CPlayer* pPlayer)
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
 	camera->SetLengthToAt(lerp(m_LerpStart, m_LerpEnd, lerp_t));
 
+	// カウンター更新
 	m_FrameCounter++;
 }
 

@@ -22,11 +22,6 @@ CStatePlayerAttackTop::~CStatePlayerAttackTop()
 
 }
 
-void CStatePlayerAttackTop::Move(CPlayer* pPlayer)
-{
-
-}
-
 void CStatePlayerAttackTop::UpdateAttackState(CStatePlayerAttack* pAttackState, CPlayer* pPlayer)
 {
 	// ˆÚ“®ˆ—
@@ -36,4 +31,9 @@ void CStatePlayerAttackTop::UpdateAttackState(CStatePlayerAttack* pAttackState, 
 	if (m_FrameCounter++ <= pPlayer->GetCurrentAnimFrameNum() - 80) return;
 
 	pAttackState->ChangeState(new CStatePlayerAttackLow(pPlayer));
+}
+
+void CStatePlayerAttackTop::Move(CPlayer* pPlayer)
+{
+
 }
