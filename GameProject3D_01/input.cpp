@@ -51,26 +51,59 @@ bool CInput::GetKeyTrigger(BYTE KeyCode)
 ///////////////////////////////////////////////////
 bool CInput::GetGamepadPress(int state)
 {
-	return (
-		(m_GamepadState.Gamepad.wButtons & state) &
-		(m_OldGamepadState.Gamepad.wButtons & state)
-		);
+	bool flag;
+	flag = ((m_GamepadState.Gamepad.wButtons & state) &
+		(m_OldGamepadState.Gamepad.wButtons & state));
+	if (flag) return true;
+
+	if (state == LEFT_TRRIGER) {
+		return (m_GamepadState.Gamepad.bLeftTrigger &
+			m_OldGamepadState.Gamepad.bLeftTrigger);
+	}
+	if (state == RIGHT_TRRIGER) {
+		return (m_GamepadState.Gamepad.bRightTrigger &
+			m_OldGamepadState.Gamepad.bRightTrigger);
+	}
+
+	return false;
 }
 
 bool CInput::GetGamepadTrigger(int state)
 {
-	return (
-		(m_GamepadState.Gamepad.wButtons & state) &&
-		!(m_OldGamepadState.Gamepad.wButtons & state)
-		);
+	bool flag;
+	flag = ((m_GamepadState.Gamepad.wButtons & state) &&
+		!(m_OldGamepadState.Gamepad.wButtons & state));
+	if (flag) return true;
+
+	if (state == LEFT_TRRIGER) {
+		return (m_GamepadState.Gamepad.bLeftTrigger &&
+			!m_OldGamepadState.Gamepad.bLeftTrigger);
+	}
+	if (state == RIGHT_TRRIGER) {
+		return (m_GamepadState.Gamepad.bRightTrigger &&
+			!m_OldGamepadState.Gamepad.bRightTrigger);
+	}
+
+	return false;
 }
 
 bool CInput::GetGamepadRelease(int state)
 {
-	return (
-		!(m_GamepadState.Gamepad.wButtons & state) &&
-		(m_OldGamepadState.Gamepad.wButtons & state)
-		);
+	bool flag;
+	flag = (!(m_GamepadState.Gamepad.wButtons & state) &&
+		(m_OldGamepadState.Gamepad.wButtons & state));
+	if (flag) return true;
+
+	if (state == LEFT_TRRIGER) {
+		return (!m_GamepadState.Gamepad.bLeftTrigger &&
+			m_OldGamepadState.Gamepad.bLeftTrigger);
+	}
+	if (state == RIGHT_TRRIGER) {
+		return (!m_GamepadState.Gamepad.bRightTrigger &&
+			m_OldGamepadState.Gamepad.bRightTrigger);
+	}
+
+	return false;
 }
 
 XMFLOAT2 CInput::GetGamepadLeftStick()

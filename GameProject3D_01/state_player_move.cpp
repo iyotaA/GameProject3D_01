@@ -1,17 +1,15 @@
 #include "game_objects_all.h"
+#include "state_player_idle.h"
 #include "state_player_move.h"
 #include "state_player_move_run.h"
-#include "state_player_idle.h"
+#include "state_player_attack.h"
+#include "state_player_attack_jump.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
 
 CStatePlayerMove::CStatePlayerMove(CPlayer* pPlayer)
-	: m_pStateMove(new CStatePlayerRun(pPlayer))
-	, m_Lerp_t(0.0f)
-	, m_LerpStart(CCameraManager::GetCamera()->GetLengthToAt())
-	, m_LerpEnd(8.0f)
-	, m_Counter(0.0f)
+	: m_pStateMove(new CStatePlayerMoveRun(pPlayer, 1.0f))
 {
 }
 
@@ -28,14 +26,27 @@ void CStatePlayerMove::Update(CPlayer* pPlayer)
 		return;
 	}
 
-	// 更新
-	m_pStateMove->Update(pPlayer);
+	// アクション
+	if (Action(pPlayer)) {
+		return;
+	}
 
-	// 徐々にカメラズームアウト
-	CCamera* camera = CCameraManager::GetCamera();
-	camera->SetLengthToAt(lerp(m_LerpStart, m_LerpEnd, m_Lerp_t));
-	m_Lerp_t = sinf(m_Counter * 3.14f / 180.0f);
-	m_Counter += 1.0f;
-	if (m_Counter >= 90.0f) { m_Counter = 90.0f; }
+	// 更新
+	m_pStateMove->UpdateMoveState(this, pPlayer);
 }
 
+bool CStatePlayerMove::Action(CPlayer* pPlayer)
+{
+	if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_Y)) {
+		pPlayer->ChangeState(new CStatePlayerAttack(pPlayer));
+		return true;
+	}
+
+	return false;
+}
+
+void CStatePlayerMove::ChangeState(CStatePlayerMove* pMoveState)
+{
+	delete m_pStateMove;
+	m_pStateMove = pMoveState;
+}

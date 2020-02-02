@@ -25,7 +25,7 @@ public:
 
 		// カメラセット
 		CCamera* camera = CCameraManager::GetCamera();		// 注視点
-		camera->SetAt(player, Vector3(0.0f, 3.0f, 0.0f));
+		camera->SetAt(player, Vector3(0.0f, 2.5f, 0.0f));
 
 		// 数字の初期化
 		number = new CNumber;

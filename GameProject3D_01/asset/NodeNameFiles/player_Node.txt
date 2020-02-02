@@ -66,6 +66,8 @@ RootNode
 (親)mixamorig:RightHandPinky2 => mixamorig:RightHandPinky3
 (親)mixamorig:RightHandPinky3 => mixamorig:RightHandPinky4
 (親)mixamorig:RightHandPinky4 => mixamorig:RightHandPinky4_end
+(親)mixamorig:RightHand => B_Weapon
+(親)B_Weapon => B_Weapon_end
 (親)mixamorig:Hips => mixamorig:LeftUpLeg
 (親)mixamorig:LeftUpLeg => mixamorig:LeftLeg
 (親)mixamorig:LeftLeg => mixamorig:LeftFoot

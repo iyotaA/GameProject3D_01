@@ -1,4 +1,7 @@
-#pragma once
+#ifndef STATE_PLAYER_DODGE_H_
+#define STATE_PLAYER_DODGE_H_
+
+
 #include "state_player.h"
 
 class CStatePlayerDodge : public CStatePlayer
@@ -18,8 +21,6 @@ private:
 			CInput::GetKeyPress('S') || CInput::GetKeyPress('D');
 	}
 
-
-
 private:
 	int m_FrameCounter;
 	Vector3 m_Velocity;
@@ -27,3 +28,4 @@ private:
 
 };
 
+#endif // !STATE_PLAYER_DODGE_H_

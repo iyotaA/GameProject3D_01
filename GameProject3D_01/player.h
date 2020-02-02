@@ -38,6 +38,7 @@ private:
 	const float m_DefaultSpeed = 0.017f;
 
 	CSkinModel*       m_pModel;
+	CSkinModel*       m_pWeapon;
 	CStatePlayer*	  m_pState;
 	Vector3X3         m_DirVec;
 	CCollisionSphere* m_CollisionSphere;

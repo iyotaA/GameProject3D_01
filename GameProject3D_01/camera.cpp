@@ -75,6 +75,8 @@ void CCamera::Update()
 
 		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
 		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+
+		//if (!IsRange())return;
 	}
 
 
@@ -105,15 +107,12 @@ void CCamera::Project()
 	XMMATRIX viewMtx;
 	viewMtx = XMMatrixLookAtLH(m_Position, m_At, m_DirVec.up);
 	XMStoreFloat4x4(&m_ViewMatrix, viewMtx);
-	//CRenderer::SetViewMatrix(&XMLoadFloat4x4(&m_ViewMatrix));
 
 	// ビュー逆行列
 	XMStoreFloat4x4(&m_InvViewMatrix, XMMatrixInverse(NULL, viewMtx));
 
 	// プロジェクションマトリクス設定
 	XMStoreFloat4x4(&m_ProjectionMatrix ,XMMatrixPerspectiveFovLH(1.0f, dxViewport.Width / dxViewport.Height, 0.1f, 1000.0f));
-
-	//CRenderer::SetProjectionMatrix(&XMLoadFloat4x4(&m_ProjectionMatrix));
 }
 
 bool CCamera::GetVisivility(XMFLOAT3* position)const
@@ -165,6 +164,9 @@ void CCamera::DrawGUI()
 
 bool CCamera::IsRange()
 {
+	Vector3 vecY = Vector3(0.0f, 1.0f, 0.0f); // Y軸ベクトル
+	float dot = vecY.VDot(m_DirVec.front);
+	return(dot >= 0.0f) ? false : true;
 	return true;
 	XMMATRIX rotationMtx;
 	XMVECTOR vector = m_DirVec.up; // カメラ上方向ベクトルを取得

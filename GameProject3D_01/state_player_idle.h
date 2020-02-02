@@ -12,6 +12,7 @@ public:
 
 private:
 	CStatePlayerIdle() {}	// デフォルトコンストラクタ封印
+	void Move(CPlayer* pPlayer);
 	bool MoveEntry() {
 		return CInput::GetIsInputStick(LEFT_STICK) ||
 			CInput::GetKeyPress('W') || CInput::GetKeyPress('A') ||
@@ -19,10 +20,11 @@ private:
 	}
 
 private:
-	float m_Lerp_t;
 	float m_LerpStart;
 	float m_LerpEnd;
-	float m_Counter;
+	float m_FrameCounter;
+	float m_MoveSpeed;
+	Vector3 m_Volocity;
 
 };
 

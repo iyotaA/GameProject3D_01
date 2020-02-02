@@ -1,27 +1,33 @@
 #include "game_objects_all.h"
 #include "state_player.h"
 #include "state_player_move_run.h"
+#include "state_player_move_dash.h"
 #include "state_player_idle.h"
 #include "state_player_dodge.h"
 #include "modelAnimation.h"
 #include "player.h"
+#include "MathFunc.h"
 
-CStatePlayerRun::CStatePlayerRun(CPlayer* pPlayer)
+
+CStatePlayerMoveRun::CStatePlayerMoveRun(CPlayer* pPlayer, float StartSpeed)
 	: m_MoveSpeed(1.0f)
-	, m_AnimationSpeed(1.0f)
+	, m_StartSpeed(StartSpeed)
+	, m_TargetSpeed(1.0f)
+	, m_StartLength(CCameraManager::GetCamera()->GetLengthToAt())
+	, m_TargetLength(5.0f)
 	, m_FrameCounter(0)
-	, m_Volocity(Vector3(0.0f, 0.0f, 0.0f))
+	, m_Volocity(Vector3())
 {
-	pPlayer->SetAnimation(2, 1.0f);
+	pPlayer->SetAnimation(PLAYER_STATE_RUN, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
 }
 
-CStatePlayerRun::~CStatePlayerRun()
+CStatePlayerMoveRun::~CStatePlayerMoveRun()
 {
 
 }
 
-void CStatePlayerRun::Update(CPlayer* pPlayer)
+void CStatePlayerMoveRun::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer* pPlayer)
 {
 	//******************************
 	// キー入力
@@ -34,28 +40,27 @@ void CStatePlayerRun::Update(CPlayer* pPlayer)
 			return;
 		}
 	}
-	if (CInput::GetGamepadPress(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+	if (CInput::GetGamepadPress(RIGHT_TRRIGER))
 	{
-		m_MoveSpeed += 0.1f;
-		m_AnimationSpeed += 0.1f;
+		pMoveState->ChangeState(new CStatePlayerMoveDash(pPlayer, m_MoveSpeed));
+		return;
 	}
-
-	m_MoveSpeed *= 0.95f;
-	if (m_MoveSpeed <= 1.0f) { m_MoveSpeed = 1.0f; }
-
-	m_AnimationSpeed *= 0.93f;
-	if (m_AnimationSpeed <= 1.0f) { m_AnimationSpeed = 1.0f; }
-
-	pPlayer->SetAnimationSpeed(m_AnimationSpeed);
-	pPlayer->SetMoveSpeed(m_MoveSpeed);
-
-	m_FrameCounter++;
 
 	// 移動処理
 	Move(pPlayer);
+
+	// 徐々にカメラズームアウト
+	CCamera* camera = CCameraManager::GetCamera();
+	float lerp_deg = m_FrameCounter;
+	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
+	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
+	camera->SetLengthToAt(lerp(m_StartLength, m_TargetLength, lerp_t));
+
+	// カウンター更新
+	m_FrameCounter++;
 }
 
-void CStatePlayerRun::Move(CPlayer* pPlayer)
+void CStatePlayerMoveRun::Move(CPlayer* pPlayer)
 {
 	CCamera* camera = CCameraManager::GetCamera();
 
@@ -103,4 +108,10 @@ void CStatePlayerRun::Move(CPlayer* pPlayer)
 	// 回転角度
 	float radian = atan2f(inputNum.x, inputNum.y) + atan2f(cameraFront.x, cameraFront.z);
 	pPlayer->SetRotation(&Vector3(0.0f, radian, 0.0f));
+
+	// 速度更新
+	float lerp_deg = m_FrameCounter;
+	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
+	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
+	m_MoveSpeed = lerp(m_StartSpeed, m_TargetSpeed, lerp_t);
 }

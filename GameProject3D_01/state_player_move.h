@@ -9,6 +9,9 @@ public:
 	CStatePlayerMove(CPlayer* pPlayer);
 	virtual ~CStatePlayerMove();
 	virtual void Update(CPlayer* pPlayer) override;
+	virtual void UpdateMoveState(CStatePlayerMove* pAttackState, CPlayer* pPlayer) {};
+
+	void ChangeState(CStatePlayerMove* pMoveState);
 
 protected:
 	CStatePlayerMove(){} // デフォルトコンストラクタ封印
@@ -19,11 +22,10 @@ protected:
 	}
 
 private:
+	bool Action(CPlayer* pPlayer);
+
+private:
 	CStatePlayerMove* m_pStateMove;
-	float m_Lerp_t;
-	float m_LerpStart;
-	float m_LerpEnd;
-	float m_Counter;
 };
 
 

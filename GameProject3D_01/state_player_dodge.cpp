@@ -10,7 +10,7 @@ CStatePlayerDodge::CStatePlayerDodge(CPlayer* pPlayer)
 	, m_Velocity(Vector3())
 	, m_DirFront(pPlayer->GetFront())
 {
-	pPlayer->SetAnimation(3, 1.0f);
+	pPlayer->SetAnimation(PLAYER_STATE_ROOL, 1.0f);
 	pPlayer->SetAnimationSpeed(1.2f);
 	pPlayer->SetMoveSpeed(1.0f);
 }
