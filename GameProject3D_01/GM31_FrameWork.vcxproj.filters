@@ -55,6 +55,12 @@
     <Filter Include="State\PlayerState\StateMove">
       <UniqueIdentifier>{c7dd0180-dcf1-455e-a4fe-f7f54d944e5c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="State\PlayerState\StateBlock">
+      <UniqueIdentifier>{373e535b-1014-430d-82bd-00ade83f4127}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\PlayerState\StateDamage">
+      <UniqueIdentifier>{954bb98c-37ad-4c01-938d-1fd3e2a8f3a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp">
@@ -212,6 +218,15 @@
     </ClCompile>
     <ClCompile Include="state_player_move_dash.cpp">
       <Filter>State\PlayerState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_damage.cpp">
+      <Filter>State\PlayerState\StateDamage</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_damage_large.cpp">
+      <Filter>State\PlayerState\StateDamage</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_damage_small.cpp">
+      <Filter>State\PlayerState\StateDamage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -421,6 +436,15 @@
     </ClInclude>
     <ClInclude Include="state_player_move_dash.h">
       <Filter>State\PlayerState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_damage.h">
+      <Filter>State\PlayerState\StateDamage</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_damage_large.h">
+      <Filter>State\PlayerState\StateDamage</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_damage_small.h">
+      <Filter>State\PlayerState\StateDamage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -22,11 +22,6 @@ CStatePlayerAttackHorizontal::~CStatePlayerAttackHorizontal()
 
 }
 
-void CStatePlayerAttackHorizontal::Move(CPlayer* pPlayer)
-{
-
-}
-
 void CStatePlayerAttackHorizontal::UpdateAttackState(CStatePlayerAttack* pAttackState, CPlayer* pPlayer)
 {
 	// à⁄ìÆèàóù
@@ -36,4 +31,9 @@ void CStatePlayerAttackHorizontal::UpdateAttackState(CStatePlayerAttack* pAttack
 	if (m_FrameCounter++ <= pPlayer->GetCurrentAnimFrameNum() - 80) return;
 
 	pAttackState->ChangeState(new CStatePlayerAttackVirtical(pPlayer));
+}
+
+void CStatePlayerAttackHorizontal::Move(CPlayer* pPlayer)
+{
+
 }

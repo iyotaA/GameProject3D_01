@@ -22,6 +22,17 @@ CStatePlayerAttackJump::~CStatePlayerAttackJump()
 
 }
 
+void CStatePlayerAttackJump::UpdateAttackState(CStatePlayerAttack* pAttackState, CPlayer* pPlayer)
+{
+	// ˆÚ“®ˆ—
+	Move(pPlayer);
+
+	if (pPlayer->AnimationBlending()) return;
+	if (m_FrameCounter++ <= pPlayer->GetCurrentAnimFrameNum() - 115) return;
+
+	pAttackState->ChangeState(new CStatePlayerAttackNone(pPlayer));
+}
+
 void CStatePlayerAttackJump::Move(CPlayer* pPlayer)
 {
 	if (m_FrameCounter >= 68)return;
@@ -35,15 +46,4 @@ void CStatePlayerAttackJump::Move(CPlayer* pPlayer)
 
 	m_Velocity *= 0.99f;
 	pPlayer->AddVelocity(m_Velocity);
-}
-
-void CStatePlayerAttackJump::UpdateAttackState(CStatePlayerAttack* pAttackState, CPlayer* pPlayer)
-{
-	// ˆÚ“®ˆ—
-	Move(pPlayer);
-
-	if (pPlayer->AnimationBlending()) return;
-	if (m_FrameCounter++ <= pPlayer->GetCurrentAnimFrameNum() - 115) return;
-
-	pAttackState->ChangeState(new CStatePlayerAttackNone(pPlayer));
 }

@@ -62,6 +62,9 @@
     <ClCompile Include="state_player_attack_low.cpp" />
     <ClCompile Include="state_player_attack_top.cpp" />
     <ClCompile Include="state_player_attack_virtical.cpp" />
+    <ClCompile Include="state_player_damage.cpp" />
+    <ClCompile Include="state_player_damage_large.cpp" />
+    <ClCompile Include="state_player_damage_small.cpp" />
     <ClCompile Include="state_player_dodge.cpp" />
     <ClCompile Include="state_player_idle.cpp" />
     <ClCompile Include="state_player_attack_jump.cpp" />
@@ -128,6 +131,9 @@
     <ClInclude Include="state_player_attack_low.h" />
     <ClInclude Include="state_player_attack_top.h" />
     <ClInclude Include="state_player_attack_virtical.h" />
+    <ClInclude Include="state_player_damage.h" />
+    <ClInclude Include="state_player_damage_large.h" />
+    <ClInclude Include="state_player_damage_small.h" />
     <ClInclude Include="state_player_dodge.h" />
     <ClInclude Include="state_player_idle.h" />
     <ClInclude Include="state_player_attack_jump.h" />
