@@ -109,5 +109,12 @@ float4 main(in InputData input) : SV_TARGET
 
 	float4 outDiffuse = color0 + color1;
 	outDiffuse *= input.color;
+
+	// ÉtÉHÉO
+    float4 fogColor = float4(0.2f, 0.2f, 0.2f, 1.0f);
+    float vLength = length(input.positionW.xyz - CameraPosition.xyz);
+    float fogFactor = saturate((50.0f - 1.0f) / vLength);
+    outDiffuse = fogFactor * outDiffuse + (1.0 - fogFactor) * fogColor;
+
 	return outDiffuse;
 }

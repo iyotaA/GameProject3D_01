@@ -842,9 +842,6 @@ aiNode* CSkinModel::GetBoneNode(aiNode* pNode, const char* _name)
 //************************************************
 Vector3 CSkinModel::GetWorldPosition(XMMATRIX* _world, const char* _bone_name)
 {
-	XMMATRIX mtxWorld;
-	mtxWorld = *_world;
-
 	//モデル空間のボーン位置（行列）
 	XMMATRIX targetMatrix = XMMatrixIdentity();
 	GetBonePosition(m_pScene->mRootNode, &XMMatrixIdentity(), _bone_name, targetMatrix);
@@ -859,6 +856,20 @@ Vector3 CSkinModel::GetWorldPosition(XMMATRIX* _world, const char* _bone_name)
 	return bonePosition;
 }
 
+//************************************************
+// 名前からボーンのマトリクスを取得
+//************************************************
+XMMATRIX* CSkinModel::GetBoneMatrix(XMMATRIX* _world, const char* _bone_name)
+{
+	//モデル空間のボーン位置（行列）
+	XMMATRIX targetMatrix = XMMatrixIdentity();
+	GetBonePosition(m_pScene->mRootNode, &XMMatrixIdentity(), _bone_name, targetMatrix);
+
+	// ワールド空間のボーン位置（行列）
+	targetMatrix = targetMatrix * XMMatrixScaling(m_Size, m_Size, m_Size) * *_world;
+
+	return &targetMatrix;
+}
 
 //************************************************
 // 指定したボーンのワールド行列を取得

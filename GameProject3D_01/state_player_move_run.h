@@ -1,27 +1,31 @@
-#ifndef STATE_PLAYER_RUN_H_
-#define STATE_PLAYER_RUN_H_
+#ifndef STATE_PLAYER_MOVE_RUN_H_
+#define STATE_PLAYER_MOVE_RUN_H_
 
 #include "state_player_move.h"
 
-class CStatePlayerRun : public CStatePlayerMove
+class CStatePlayerMoveRun : public CStatePlayerMove
 {
 public:
-	CStatePlayerRun(CPlayer* pPlayer);
-	virtual ~CStatePlayerRun();
-	virtual void Update(CPlayer* pPlayer) override;
+	CStatePlayerMoveRun(CPlayer* pPlayer, float StartSpeed);
+	virtual ~CStatePlayerMoveRun();
+	virtual void Update(CPlayer* pPlayer) override{}
+	virtual void UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer* pPlayer) override;
 
 private:
-	CStatePlayerRun(){} // デフォルトコンストラクタ封印
+	CStatePlayerMoveRun(){} // デフォルトコンストラクタ封印
 	void Move(CPlayer* pPlayer);
 
 private:
 	float m_MoveSpeed;
-	float m_AnimationSpeed;
+	float m_StartSpeed;
+	float m_TargetSpeed;
+	float m_StartLength;
+	float m_TargetLength;
 	int   m_FrameCounter;
 	Vector3 m_Volocity;
 
 };
 
 
-#endif // !STATE_PLAYER_RUN_H_
+#endif // !STATE_PLAYER_MOVE_RUN_H_
 

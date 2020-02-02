@@ -24,11 +24,12 @@ using namespace DirectX;
 using namespace std;
 
 
-#define SCREEN_WIDTH		(1366)			// ウインドウの幅
-#define SCREEN_HEIGHT		(768) 			// ウインドウの高さ
-//#define SCREEN_WIDTH		(1920)			// ウインドウの幅
-//#define SCREEN_HEIGHT		(1080) 			// ウインドウの高さ
+//#define SCREEN_WIDTH		(1366)			// ウインドウの幅
+//#define SCREEN_HEIGHT		(768) 			// ウインドウの高さ
+#define SCREEN_WIDTH		(1920)			// ウインドウの幅
+#define SCREEN_HEIGHT		(1080) 			// ウインドウの高さ
 #define PI					(3.1415926535f)	// 円周率
+#define DEGREE_TO_RADIAN	(PI / 180.0f)
 #define FAILD_NUM			(-99)
 #define DELTA_TIME			(1.0 / 60.0)
 

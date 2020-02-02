@@ -45,6 +45,7 @@ public:
 	void Draw(XMMATRIX* world);
 	void update(int addAnimationFrame);
 	Vector3 GetWorldPosition( XMMATRIX* _world,const char* _bone_name);
+	XMMATRIX* GetBoneMatrix(XMMATRIX* _world, const char* _bone_name);
 
 	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
 	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }

@@ -1,8 +1,10 @@
 #ifndef INPUT_H_
 #define INPUT_H_
 
-#define LEFT_STICK  (0)
-#define RIGHT_STICK (1)
+#define LEFT_STICK    (0)
+#define RIGHT_STICK   (1)
+#define LEFT_TRRIGER  (3)
+#define RIGHT_TRRIGER (4)
 
 class CInput
 {

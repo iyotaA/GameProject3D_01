@@ -9,7 +9,6 @@
 #include "shader_all.h"
 #include "skinmesh_animation.h"
 #include "state_player_idle.h"
-#include "state_player_dodge.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
@@ -19,6 +18,10 @@ void CPlayer::Init()
 	// ƒ‚ƒfƒ‹‚Ì‰Šú‰»
 	m_pModel = new CSkinModel();
 	m_pModel->Load("asset/model/Human.fbx", 0.0023f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
+
+	// •Šíƒ‚ƒfƒ‹‚Ì‰Šú‰»
+	m_pWeapon = new CSkinModel();
+	m_pWeapon->Load("asset/model/sord000.fbx", 40.0f, "asset/image/dragon.png", NULL);
 
 	// ó‘Ô
 	m_pState = new CStatePlayerIdle(this);
@@ -60,6 +63,9 @@ void CPlayer::Uninit()
 
 	delete m_pState;
 
+	m_pWeapon->Unload();
+	delete m_pWeapon;
+
 	m_pModel->Unload();
 	delete m_pModel;
 }
@@ -95,6 +101,9 @@ void CPlayer::Draw()
 
 	// ƒ‚ƒfƒ‹•`‰æ
 	m_pModel->Draw(&world);
+
+	// •Ší•`‰æ
+	m_pWeapon->Draw(m_pModel->GetBoneMatrix(&world, "B_Weapon"));
 
 	// ‰e•`‰æ
 	m_Shadow->Draw();
@@ -219,7 +228,7 @@ void CPlayer:: DrawGUI()
 
 			ImGui::BeginChildFrame(Window_Animation_Id, ImVec2(width, 100));
 			{
-				ImGui::Text("%d", m_pModel->GetAnimationNum()); ImGui::SameLine();
+				ImGui::Text("AnimationNum : %d", m_pModel->GetAnimationNum()); ImGui::SameLine();
 				if (ImGui::Button("<")) { m_pModel->SetAnimation(false); }ImGui::SameLine();
 				ImGui::Text(m_pModel->GetCurrentAnimName()); ImGui::SameLine();
 				if (ImGui::Button(">")) { m_pModel->SetAnimation(true); }

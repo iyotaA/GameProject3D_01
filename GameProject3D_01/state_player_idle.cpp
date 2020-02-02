@@ -1,18 +1,20 @@
 #include "game_objects_all.h"
 #include "state_player_idle.h"
 #include "state_player_move_run.h"
+#include "state_player_attack.h"
 #include "game_objects_all.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
 
 CStatePlayerIdle::CStatePlayerIdle(CPlayer* pPlayer)
-	: m_Lerp_t(0.0f)
-	, m_LerpStart(CCameraManager::GetCamera()->GetLengthToAt())
-	, m_LerpEnd(6.0f)
-	, m_Counter(0.0f)
+	: m_LerpStart(CCameraManager::GetCamera()->GetLengthToAt())
+	, m_LerpEnd(4.0f)
+	, m_FrameCounter(0.0f)
+	, m_MoveSpeed(1.0f)
+	, m_Volocity(Vector3())
 {
-	pPlayer->SetAnimation(0, 1.0f);
+	pPlayer->SetAnimation(PLAYER_STATE_IDLE, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
 }
 
@@ -25,12 +27,33 @@ void CStatePlayerIdle::Update(CPlayer* pPlayer)
 {
 	if (MoveEntry()) {
 		pPlayer->ChangeState(new CStatePlayerMove(pPlayer));
+		return;
 	}
+
+	Move(pPlayer);
 
 	// 徐々にカメラズームイン
 	CCamera* camera = CCameraManager::GetCamera();
-	camera->SetLengthToAt(lerp(m_LerpStart, m_LerpEnd, m_Lerp_t));
-	m_Lerp_t = sinf(m_Counter * 3.14f / 180.0f);
-	m_Counter += 0.5f;
-	if (m_Counter >= 90.0f) { m_Counter = 90.0f; }
+	float lerp_deg = m_FrameCounter;
+	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
+	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
+	camera->SetLengthToAt(lerp(m_LerpStart, m_LerpEnd, lerp_t));
+
+	m_FrameCounter++;
+}
+
+void CStatePlayerIdle::Move(CPlayer* pPlayer)
+{
+	// 移動量
+	m_Volocity += Vector3() * m_MoveSpeed * pPlayer->DefaultSpeed();
+
+	// 移動量減衰...
+	m_Volocity *= 0.87f;
+
+	// 移動
+	pPlayer->AddVelocity(m_Volocity);
+
+	// 減速
+	m_MoveSpeed *= 0.95f;
+	if (m_MoveSpeed <= 1.0f) { m_MoveSpeed = 1.0f; }
 }

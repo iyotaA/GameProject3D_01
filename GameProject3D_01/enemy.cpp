@@ -20,6 +20,7 @@ void CEnemy::Init()
 	// ƒ‚ƒfƒ‹‚Ì‰Šú‰»
 	m_pModel = new CSkinModel();
 	m_pModel->Load("asset/model/dragon.fbx", 2.0f, "asset/image/dragon.png", "asset/NodeNameFiles/doragon.txt");
+	m_pModel->SetAnimationSpeed(2.0f);
 
 	// ‰e
 	m_Shadow = new CPolygon3D();
@@ -136,8 +137,20 @@ void CEnemy::Move()
 	// d—Í‰ÁŽZ
 	AddGlavity();
 
-	//m_Position.z -= 0.08f;
+	m_Rotation.y -= DEGREE_TO_RADIAN;
+	// •ûŒüƒxƒNƒgƒ‹‰ñ“]
+	Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
+	XMMATRIX rotationMtx;
+	rotationMtx = XMMatrixRotationY(m_Rotation.y);
 
+	front = XMVector3TransformNormal(front, rotationMtx);
+	front.Normalize();
+	m_DirVec.front = front;
+	m_DirVec.right = -m_DirVec.front.VCross(m_DirVec.up);
+	m_DirVec.right.Normalize();
+
+
+	m_Position += m_DirVec.front * 0.4f;
 
 	// ‰e‚ÌXV
 	m_Shadow->SetPosition(&Vector3(m_Position.x, 0.01f, m_Position.z));

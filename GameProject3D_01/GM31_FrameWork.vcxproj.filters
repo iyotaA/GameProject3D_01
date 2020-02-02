@@ -49,6 +49,12 @@
     <Filter Include="State\PlayerState">
       <UniqueIdentifier>{7c3f22d5-6482-48d4-82a3-b77bc23c10fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="State\PlayerState\StateAttack">
+      <UniqueIdentifier>{116e9596-3442-4105-b785-048299512b49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\PlayerState\StateMove">
+      <UniqueIdentifier>{c7dd0180-dcf1-455e-a4fe-f7f54d944e5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp">
@@ -144,12 +150,6 @@
     <ClCompile Include="skinmesh_animation.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="state_player_move.cpp">
-      <Filter>State\PlayerState</Filter>
-    </ClCompile>
-    <ClCompile Include="state_player_move_run.cpp">
-      <Filter>State\PlayerState</Filter>
-    </ClCompile>
     <ClCompile Include="state_player_idle.cpp">
       <Filter>State\PlayerState</Filter>
     </ClCompile>
@@ -182,6 +182,36 @@
     </ClCompile>
     <ClCompile Include="MathFunc.cpp">
       <Filter>ソース ファイル\MyTypeClass</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack_combo.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack_horizontal.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack_jump.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack_low.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack_top.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_attack_virtical.cpp">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_move.cpp">
+      <Filter>State\PlayerState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_move_run.cpp">
+      <Filter>State\PlayerState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_move_dash.cpp">
+      <Filter>State\PlayerState\StateMove</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,12 +356,6 @@
     <ClInclude Include="state_player.h">
       <Filter>State\PlayerState</Filter>
     </ClInclude>
-    <ClInclude Include="state_player_move.h">
-      <Filter>State\PlayerState</Filter>
-    </ClInclude>
-    <ClInclude Include="state_player_move_run.h">
-      <Filter>State\PlayerState</Filter>
-    </ClInclude>
     <ClInclude Include="state_player_idle.h">
       <Filter>State\PlayerState</Filter>
     </ClInclude>
@@ -367,6 +391,36 @@
     </ClInclude>
     <ClInclude Include="MathFunc.h">
       <Filter>ソース ファイル\MyTypeClass</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack_combo.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack_horizontal.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack_jump.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack_low.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack_top.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_attack_virtical.h">
+      <Filter>State\PlayerState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_move.h">
+      <Filter>State\PlayerState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_move_run.h">
+      <Filter>State\PlayerState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_move_dash.h">
+      <Filter>State\PlayerState\StateMove</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
