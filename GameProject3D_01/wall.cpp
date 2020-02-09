@@ -109,7 +109,7 @@ void CWall::Init()
 
 	// テクスチャ読み込み //////
 	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/field004.tga");
+	m_Texture->LoadSTB("asset/image/dart000.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 0.0f, 0.0f);

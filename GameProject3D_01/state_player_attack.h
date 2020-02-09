@@ -7,7 +7,7 @@
 class CStatePlayerAttack : public CStatePlayer
 {
 public:
-	CStatePlayerAttack(CPlayer* pPlayer);
+	CStatePlayerAttack(CPlayer* pPlayer, PLAYER_STATE state_index);
 	virtual ~CStatePlayerAttack();
 	virtual void Update(CPlayer* pPlayer) override;
 	virtual void UpdateAttackState(CStatePlayerAttack* pAttackState, CPlayer* pPlayer) {};

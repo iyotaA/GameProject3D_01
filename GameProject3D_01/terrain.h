@@ -15,6 +15,7 @@ public:
 
 	int GetIndexCount();
 	float GetHeight(XMFLOAT3* _position);
+	//Vector3 GetNormal
 
 private:
 	const unsigned int m_TextureNum = 3;

@@ -15,6 +15,7 @@ public:
 	void SetWorldMatrix(XMFLOAT4X4* _WorldMatrix)          { m_Constant.WorldMatrix      = Transpose(_WorldMatrix); }
 	void SetViewMatrix(XMFLOAT4X4* _ViewMatrix)            { m_Constant.ViewMatrix       = Transpose(_ViewMatrix); }
 	void SetProjectionMatrix(XMFLOAT4X4* _ProjectionMatrix){ m_Constant.ProjectionMatrix = Transpose(_ProjectionMatrix); }
+	void SetCameraPositoin(XMFLOAT3* _CameraPosition){ m_Constant.CameraPosition = XMFLOAT4(_CameraPosition->x, _CameraPosition->y, _CameraPosition->z, 1.0f); }
 
 private:
 
@@ -24,6 +25,7 @@ private:
 		XMFLOAT4X4 WorldMatrix;
 		XMFLOAT4X4 ViewMatrix;
 		XMFLOAT4X4 ProjectionMatrix;
+		XMFLOAT4   CameraPosition;
 	};
 
 	CONSTANT	m_Constant;

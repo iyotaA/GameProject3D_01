@@ -1,6 +1,7 @@
 
 // インクルード ////////////////////////////////////
 #include "game_objects_all.h"
+#include "user_interface_manager.h"
 #include "scene.h"
 #include "title.h"
 #include "game.h"
@@ -9,6 +10,8 @@
 #include "shader_all.h"
 #include "skinmesh_animation.h"
 #include "state_player_idle.h"
+#include "state_player_block.h"
+#include "MathFunc.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
@@ -17,21 +20,30 @@ void CPlayer::Init()
 {
 	// モデルの初期化
 	m_pModel = new CSkinModel();
-	m_pModel->Load("asset/model/Human.fbx", 0.0023f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
+	m_pModel->Load("asset/model/human.fbx", 0.0023f, "asset/image/white.png", "asset/NodeNameFiles/player_Node.txt" );
 
 	// 武器モデルの初期化
 	m_pWeapon = new CSkinModel();
-	m_pWeapon->Load("asset/model/sord000.fbx", 40.0f, "asset/image/dragon.png", NULL);
+	m_pWeapon->Load("asset/model/sword.fbx", 40.0f, "asset/image/dragon.png", NULL);
 
 	// 状態
 	m_pState = new CStatePlayerIdle(this);
+
+	// ダメージ値
+	m_Number = new CNumber("asset/image/user_interface/number.png");
+	m_Number->SetNum(100);
+	m_Number->SetSize(XMFLOAT2(25.0f, 25.0f));
+	m_Number->SetColor(XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f));
+
+	// UIに追加する
+	CUserInterfaceManager::AddUI(m_Number);
 
 	// 影
 	m_Shadow = new CPolygon3D();
 	m_Shadow->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(1.7f, 1.0f, 1.7f), Vector3(0.0f, 0.0f, 0.0f), "asset/image/shadow.png");
 
 	// トランスフォーム初期化
-	m_Position = Vector3(70.0f, 0.0f, -100.0f);
+	m_Position = Vector3(-20.0f, 0.0f, 0.0f);
 	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -39,27 +51,46 @@ void CPlayer::Init()
 	m_DirVec.SetFrontUpRight(Vector3(0.0f, 0.0f, 1.0f));
 
 	// コリジョンの初期化
-	m_CollisionSphere = new CCollisionSphere(m_Position, 1.1f);
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.3f),  "mixamorig:Head"));		// 頭
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.5f),  "mixamorig:Hips"));		// 胴
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f), "mixamorig:RightFoot"));	// 右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f), "mixamorig:LeftFoot"));	// 左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f), "mixamorig:RightHand"));	// 右手
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f), "mixamorig:LeftHand"));	// 左手
+
+
+	// 剣のコリジョンの初期化
+	m_CollisionWeapon.push_back(new CCollisionSphere(m_Position, 0.15f)); // 剣根
+	m_CollisionWeapon.push_back(new CCollisionSphere(m_Position, 0.15f));
+	m_CollisionWeapon.push_back(new CCollisionSphere(m_Position, 0.15f));
+	m_CollisionWeapon.push_back(new CCollisionSphere(m_Position, 0.15f));
+	m_CollisionWeapon.push_back(new CCollisionSphere(m_Position, 0.15f)); // 剣先
+
 	m_CollisionOBB = new CCollisionOBB(m_Position, m_DirVec, Vector3(0.5f, 0.5f, 0.5f));
 
-	// ダメージ関連ステータスの初期化
-	m_DamageManager = new CDamage(100, 15);
-	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
-
 	m_MoveDistance = Vector3(0.0f, 0.0f, 0.0f);
-	m_BonePosition = Vector3(0.0f, 0.0f, 0.0f);
-	m_MoveSpeed = m_DefaultSpeed;
-	m_IsCollision = false;
+	m_MoveSpeed = m_DEFAULT_SPEED;
+
+	m_WeaponState = SWORD_STATE_SHEATHE;
+	m_WeaponBoneName.push_back("B_Weapon_Waist");
+	m_WeaponBoneName.push_back("B_Weapon");
+
+	m_Collision = false;
+	m_StateFlags.Damage = false;
+	m_StateFlags.Dodge = false;
+	m_StateFlags.Attack = false;
+	m_StateFlags.Block = false;
 }
 
 void CPlayer::Uninit()
 {
-	delete m_DamageManager;
 	delete m_CollisionOBB;
-	delete m_CollisionSphere;
+	m_CollisionBody.clear();
 
 	m_Shadow->Uninit();
 	delete m_Shadow;
+
+	delete m_Number;
 
 	delete m_pState;
 
@@ -75,24 +106,12 @@ void CPlayer::Update()
 	// 移動
 	Move();
 
-	// 行動
-	Action();
-
 	// モデル更新
 	m_pModel->update(1);
 }
 
 void CPlayer::Draw()
 {
-	// カリング
-	//CCamera* camera;
-	//camera = CManager::GetScene()->GetGameObject<CCamera>(CManager::E_Camera);
-
-	//if (camera->GetVisivility(&m_Position) == false) {
-	//	return;
-	//}
-
-
 	// マトリクス設定
 	XMMATRIX world;
 	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
@@ -103,7 +122,7 @@ void CPlayer::Draw()
 	m_pModel->Draw(&world);
 
 	// 武器描画
-	m_pWeapon->Draw(m_pModel->GetBoneMatrix(&world, "B_Weapon"));
+	m_pWeapon->Draw(m_pModel->GetBoneMatrix(&world, m_WeaponBoneName[m_WeaponState].c_str()));
 
 	// 影描画
 	m_Shadow->Draw();
@@ -118,23 +137,19 @@ void CPlayer::Draw()
 
 void CPlayer::DrawCollisionGrid()
 {
-	// デバッググリッドセット
-	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
+	XMFLOAT4 color;
 
-	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
+	// 体のコリジョン表示
+	color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+	for (CCollisionWithBone* coll : m_CollisionBody) {
+		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll->GetSphere(), &color);
+	}
 
-
-	CCollisionSphere vector_sphere;
-	vector_sphere.SetRadius(0.3f);
-	vector_sphere.SetCenter(
-		&Vector3(
-			m_Position.x + m_DirVec.front.x,
-			m_Position.y + m_DirVec.front.y + 1.5f,
-			m_Position.z + m_DirVec.front.z
-		)
-	);
+	// 剣のコリジョン表示
+	color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	for (CCollisionSphere* coll : m_CollisionWeapon) {
+		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll, &color);
+	}
 
 	// OBB
 	color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
@@ -195,9 +210,6 @@ void CPlayer:: DrawGUI()
 		ImGuiID Window_Player_Id = ImGui::GetID("Player");
 
 		ImVec2 s = ImGui::GetWindowSize();
-		ImGui::InputFloat3("BonePosition", (float*)&m_BonePosition);
-
-		m_DamageManager->DebugDraw();
 
 		ImGui::Columns(3, "Player");
 
@@ -212,7 +224,7 @@ void CPlayer:: DrawGUI()
 			ImGui::BeginChildFrame(Window_Status_Id, ImVec2(width, 100));
 			ImGui::InputFloat3("Position", (float*)&m_Position);
 			ImGui::InputFloat3("Rotation", (float*)&m_Rotation);
-			ImGui::Text(m_IsCollision ? "Collision" :"Through");
+			ImGui::Text(m_Collision ? "Collision" :"Through");
 			ImGui::EndChildFrame();
 		}
 
@@ -255,6 +267,8 @@ void CPlayer:: DrawGUI()
 
 void CPlayer::Move()
 {
+	Vector3 prevPos = m_Position;
+
 	CCamera* camera = CCameraManager::GetCamera();
 	if (!camera->GetIsBindAtObject())return;
 
@@ -265,24 +279,7 @@ void CPlayer::Move()
 	UpdateCollision();
 
 	// 敵とのコリジョン判定
-	std::vector<CEnemy*> game_obj = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
-	for (CEnemy*  obj : game_obj) {
-
-		// コリジョン判定
-		std::vector< CCollisionSphere*> collision = obj->GetCollisionSphere();
-		for (CCollisionSphere* coll : collision) {
-			if (CCollision3DJudge::Collision3D_Spher_Spher(m_CollisionSphere, coll)) {
-
-				float distance = m_CollisionSphere->GetRadius() + coll->GetRadius();
-				Vector3 vec = m_CollisionSphere->GetCenter() - coll->GetCenter();
-				float length = vec.Length();
-				vec.Normalize();
-				vec = vec * (distance - length);
-				m_Position += vec;
-				break;
-			}
-		}
-	}
+	CheckCollision_Enemy();
 
 	// 方向ベクトル回転
 	Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
@@ -298,39 +295,67 @@ void CPlayer::Move()
 	// 重力加算
 	AddGlavity();
 
-	// 影の更新
-	m_Shadow->SetPosition(&Vector3(m_Position.x, 0.01f, m_Position.z));
+	// 影の更新(胴の位置に移動)
+	Vector3 pos = m_CollisionBody[1]->GetSphere()->GetCenter();
+	m_Shadow->SetPosition(&Vector3(pos.x, 0.001f, pos.z));
 	m_Shadow->Update();
+
+	//if (m_Position.y > 0.0f) {
+	//	m_Position = prevPos;
+	//}
 }
 
-
-void CPlayer::Action()
+void CPlayer::CheckCollision_Enemy()
 {
-	if (CInput::GetKeyTrigger(VK_SPACE)) {
+	// 敵とのコリジョン判定
+	if (!m_StateFlags.Dodge && !m_StateFlags.Damage) {
+		std::vector<CEnemy*> game_obj = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
+		for (CEnemy* obj : game_obj) {
 
-		//CSound::Play(SOUND_LABEL_SE_ATTACK);
+			// コリジョン判定
+			std::vector< CCollisionWithBone*> collision = obj->GetCollisionSphere();
+			for (CCollisionWithBone* enemyColl : collision) {
+				if (m_StateFlags.Damage)break;
 
-		//ChangeState(new CStatePlayerDodge(this));
+				// 体のコリジョン判定
+				for (CCollisionWithBone* playerColl : m_CollisionBody) {
+					if (CCollision3DJudge::Collision3D_Spher_Spher(playerColl->GetSphere(), enemyColl->GetSphere())) {
 
-		//std::vector<CEnemy*> enemys;
-		//enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
+						float distance = playerColl->GetSphere()->GetRadius() + enemyColl->GetSphere()->GetRadius();
+						Vector3 vec	   = playerColl->GetSphere()->GetCenter() - enemyColl->GetSphere()->GetCenter();
+						float length   = vec.Length();
+						vec.Normalize();
+						vec = vec * (distance - length);
+						m_Position += vec;
 
-		//// 敵と攻撃範囲の当たり判定
-		//for (CEnemy* enemy : enemys) {
-		//	if (enemy != nullptr) {
+						//m_StateFlags.Damage = true;
+						break;
+					}
+				}
 
-		//		// 当たり判定
-		//		if (CCollision3DJudge::Collision3D_Spher_Spher(enemy->GetCollisionSphere(), m_DamageManager->GetCollisionSphere())) {
+				// 攻撃ステートの時だけ以下実行
+				if (!m_StateFlags.Attack)continue;
 
-		//			CSound::Play(SOUND_LABEL_SE_HIT);
-		//			// ダメ―ジ判定
-		//			m_DamageManager->DoDamage(enemy->GetDamageManager());
-		//		}
-		//	}
-		//}
+				// 武器のコリジョン判定
+				for (CCollisionSphere* coll_weapon : m_CollisionWeapon) {
+
+					if (CCollision3DJudge::Collision3D_Spher_Spher(coll_weapon, enemyColl->GetSphere())) {
+						// カメラゲット
+						CCamera* camera = CCameraManager::GetCamera();
+						camera->SetShake();
+
+						// 効果音再生
+						CSound::Play(SOUND_LABEL_SE_ATTACK_LARGE);
+						m_StateFlags.Attack = false;
+						m_Number->SetPosition(GetScreenPos(coll_weapon->GetCenter()));
+
+						break;
+					}
+				}
+			}
+		}
 	}
 }
-
 
 void CPlayer::UpdateCollision()
 {
@@ -340,11 +365,22 @@ void CPlayer::UpdateCollision()
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
+
 	// 特定のボーンの位置を取得
-	m_BonePosition = m_pModel->GetWorldPosition(&world, "mixamorig:LeftHandIndex4_end");
-	m_DamageManager->GetCollisionSphere()->SetCenter(&(m_BonePosition));
-	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
-	m_CollisionSphere->SetCenter(&m_pModel->GetWorldPosition(&world, "mixamorig:Hips"));
+	for (CCollisionWithBone* coll : m_CollisionBody) {
+
+		coll->GetSphere()->SetCenter(&m_pModel->GetWorldPosition(&world, coll->GetBoneName()));
+	}
+
+
+	// 武器コリジョン位置更新（剣の根元から剣先まで球型コリジョンを５個）
+	Vector3 weapon_Root = m_pModel->GetWorldPosition(&world, "B_Weapon");
+	Vector3 weapon_Vector = m_pModel->GetWorldPosition(&world, "B_Weapon_Top") - weapon_Root;
+	float length = 0.0f;
+	for (CCollisionSphere* coll : m_CollisionWeapon) {
+		length += 1.0f / m_CollisionWeapon.size();
+		coll->SetCenter(&(weapon_Root + weapon_Vector * length));
+	}
 
 	// コリジョン更新
 	Vector3X3 obbColSize;
@@ -356,7 +392,7 @@ void CPlayer::UpdateCollision()
 	// 衝突判定テスト
 	CCollisionOBB obbCol;
 	obbCol.SetStatus(&Vector3(0.0f, 5.0f, 0.0f), &Vector3X3(Vector3(-1.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)), &Vector3(1.0f, 10.0f, 1.0f));
-	m_IsCollision = CCollision3DJudge::Collision3D_OBB_OBB(*m_CollisionOBB, obbCol);
+	m_Collision = CCollision3DJudge::Collision3D_Sphere_OBB(m_CollisionBody[0]->GetSphere(), obbCol);
 }
 
 void CPlayer::AddGlavity()
@@ -378,7 +414,6 @@ void CPlayer::AddGlavity()
 
 	// 最下層（これ以下に下がらないように）
 	if (m_Position.y < -20.0f) { m_Position.y = -20.0f; }
-
 }
 
 
@@ -388,6 +423,7 @@ bool CPlayer::IsLanding()
 	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::E_Background);
 	float height = pTerrain->GetHeight(&m_Position);
 	if (FAILD_NUM != (int)height) {
+
 		if (m_Position.y <= height) {
 			m_Position.y = height;
 			return true;

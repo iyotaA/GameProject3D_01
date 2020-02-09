@@ -1,7 +1,11 @@
 #ifndef COLLISION3D_H_
 #define COLLISION3D_H_
 
-// 球型コリジョン
+////////////////////////////////////////////////////////
+//
+//	球型コリジョン
+//
+////////////////////////////////////////////////////////
 class CCollisionSphere
 {
 public:
@@ -19,7 +23,35 @@ private:
 
 };
 
-// CCollisionOBB(Vector3 _pos, Dir3Vector _vec3, Vector3 _len)
+////////////////////////////////////////////////////////
+//
+//	球型コリジョンとボーンの名前のセットクラス
+//
+////////////////////////////////////////////////////////
+class CCollisionWithBone
+{
+public:
+	CCollisionWithBone(CCollisionSphere* pCollision_sphere, std::string name)
+		: m_CollisionSphere(pCollision_sphere)
+		, m_BoneName(name)
+	{}
+
+	CCollisionSphere* GetSphere() { return m_CollisionSphere; }
+	const char* GetBoneName() { return m_BoneName.c_str(); }
+
+private:
+	CCollisionWithBone() {}
+
+	CCollisionSphere* m_CollisionSphere;
+	std::string		  m_BoneName;
+};
+
+
+////////////////////////////////////////////////////////
+//
+//	OBBコリジョンクラス
+//
+////////////////////////////////////////////////////////
 class CCollisionOBB
 {
 public:
@@ -61,8 +93,21 @@ public:
 			assert(false);
 			return Vector3(0.0f, 0.0f, 0.0f);
 	}
-	// 指定軸方向の長さを取得
+	// 各軸方向の長さを取得
 	Vector3 GetLen_W() { return m_fLength; }
+
+	// 指定軸方向の長さを取得　0 : right / 1 : up / 2 : front
+	float GetLen_W(int elem) {
+
+		if (elem == 0)
+			return m_fLength.x;
+		else if (elem == 1)
+			return m_fLength.y;
+		else if (elem == 2)
+			return m_fLength.z;
+		else
+			return 1.0f;
+	}
 	// 位置を取得
 	Vector3 GetPos_W() { return m_Pos; }
 
@@ -73,6 +118,8 @@ private:
 
 
 };
+
+
 
 
 
@@ -90,8 +137,14 @@ public:
 	// 球と点の衝突判定
 	static bool Collision3D_Spher_Point(CCollisionSphere* pSA, XMFLOAT3* pPB);
 
+	// 球とOBBの衝突判定
+	static bool Collision3D_Sphere_OBB(CCollisionSphere* pSphere, CCollisionOBB& obb);
+
 	// OBBとOBBの衝突判定
 	static bool Collision3D_OBB_OBB(CCollisionOBB& obb1, CCollisionOBB& obb2);
+
+	// 点とOBBの距離を求める
+	static float LenOBBToPoint(CCollisionOBB& obb, Vector3* p);
 
 private:
 	// 分離軸に投影された軸成分から投影線分長を算出

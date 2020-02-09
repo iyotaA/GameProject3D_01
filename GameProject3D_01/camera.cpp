@@ -1,7 +1,8 @@
 
 // インクルード ////////////////////////////////////
 #include "main.h"
-#include "gameObject.h"
+#include "game_objects_all.h"
+#include "scene.h"
 #include "camera_manager.h"
 #include "camera.h"
 
@@ -24,6 +25,7 @@ void CCamera::Init(unsigned int _id)
 
 	/* カメラ情報初期化 */
 	m_LengthToAt     = 6.5f;
+	m_FrameCounter = 0;
 	m_At             = Vector3(0.0f, 10.0f, 0.0f);
 	m_Offset		 = Vector3();
 	m_SpinVerticall  = 0.0f;
@@ -31,6 +33,7 @@ void CCamera::Init(unsigned int _id)
 	m_RotateSpeed    = 0.004f;
 	m_MoveSpeedScale = 1.0f;
 	m_BindAtObject = true;
+	m_Shake = false;
 }
 
 
@@ -51,42 +54,14 @@ void CCamera::Update()
 		}
 	}
 
+	IsRange();
 
-	{// 横回転
-		XMMATRIX rotationMtx;
-		rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
+	Shake();
 
-		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
-
-		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-
-		m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
-		m_DirVec.right = XMVector3Normalize(m_DirVec.right);
-	}
-
-	{// 縦回転
-		XMMATRIX rotationMtx;
-		rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
-
-		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
-		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
-
-		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
-		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
-
-		//if (!IsRange())return;
-	}
-
-
-	// カメラの位置更新
+	// 地面との衝突が無ければカメラの位置更新
 	Vector3 vFront = m_DirVec.front * m_LengthToAt;
 	m_Position = m_At - vFront;
-
-	// 回転の慣性（徐々にスピードダウン）
-	m_SpinVerticall *= 0.92f;
-	m_SpinHorizontal *= 0.92f;
+	CollisionTerrian();
 }
 
 
@@ -162,25 +137,66 @@ void CCamera::DrawGUI()
 	}
 }
 
-bool CCamera::IsRange()
+void CCamera::IsRange()
 {
+	Vector3 prevFront = m_DirVec.front;
+
+	{// 横回転
+		XMMATRIX rotationMtx;
+		rotationMtx = XMMatrixRotationY(m_SpinHorizontal);
+
+		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+
+		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+
+		m_DirVec.right = XMVector3TransformNormal(m_DirVec.right, rotationMtx);
+		m_DirVec.right = XMVector3Normalize(m_DirVec.right);
+	}
+
+	{// 縦回転
+		XMMATRIX rotationMtx;
+		rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
+
+		m_DirVec.up = XMVector3TransformNormal(m_DirVec.up, rotationMtx);
+		m_DirVec.up = XMVector3Normalize(m_DirVec.up);
+
+		m_DirVec.front = XMVector3TransformNormal(m_DirVec.front, rotationMtx);
+		m_DirVec.front = XMVector3Normalize(m_DirVec.front);
+	}
+
 	Vector3 vecY = Vector3(0.0f, 1.0f, 0.0f); // Y軸ベクトル
 	float dot = vecY.VDot(m_DirVec.front);
-	return(dot >= 0.0f) ? false : true;
-	return true;
-	XMMATRIX rotationMtx;
-	XMVECTOR vector = m_DirVec.up; // カメラ上方向ベクトルを取得
+	if (!(dot >= -0.6f && dot <= 0.6f)) {
+		m_DirVec.front = prevFront;
+		m_SpinVerticall  = 0.0f;
+		m_SpinHorizontal = 0.0f;
+		return;
+	}
 
-	rotationMtx = XMMatrixRotationAxis(m_DirVec.right, m_SpinVerticall);
-	vector = XMVector3TransformNormal(vector, rotationMtx);
-	vector = XMVector3Normalize(vector);
-
-	XMFLOAT3 up;
-	XMStoreFloat3(&up, vector);
-
-	if (up.y >= 0.7f)	return true;
-	else return false;
+	// カメラの回転可能範囲か？
+	m_SpinVerticall *= 0.92f;
+	m_SpinHorizontal *= 0.92f;
 }
+
+bool CCamera::CollisionTerrian()
+{
+	// 地面とのコリジョン
+	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::E_Background);
+	float height = pTerrain->GetHeight(&(m_Position + Vector3(0.0f, -2.0f, 0.0f)));
+	if (FAILD_NUM != (int)height) {
+
+		if (m_Position.y <= height) {
+			m_Position.y = height;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+}
+
 
 void CCamera::Pan(CCameraManager::CameraRotate _rotate_dir)
 {
@@ -262,5 +278,22 @@ void CCamera::SetPos(Vector3* pPos)
 void CCamera::AddPos(Vector3* pAddPos)
 {
 	m_Position += *pAddPos;
+}
+
+void CCamera::Shake()
+{
+	if (!m_Shake)return;
+	if (m_FrameCounter * DELTA_TIME >= 0.5f) {
+		m_Shake = false;
+		m_Offset = Vector3(0.0f, 2.5f, 0.0f);
+		m_FrameCounter = 0;
+		return;
+	}
+
+	if (m_FrameCounter++ % 2 == 0) {
+
+		XMFLOAT2 shake = XMFLOAT2(rand() % 10 / 40.0f - 0.125f, rand() % 10 / 40.0f - 0.125f);
+		m_Offset = Vector3(0.0f, 2.5f, 0.0f) + m_DirVec.right * shake.x + m_DirVec.up * shake.y;
+	}
 }
 

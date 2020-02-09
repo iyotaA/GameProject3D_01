@@ -10,7 +10,6 @@
 #include "gameObject.h"
 #include "camera_manager.h"
 #include "camera.h"
-#include "polygon.h"
 #include "polygon3d.h"
 
 

@@ -3,7 +3,6 @@
 #include "state_player_idle.h"
 #include "modelAnimation.h"
 #include "player.h"
-#include "state_player_damage.h"
 
 CStatePlayerDamageSmall::CStatePlayerDamageSmall(CPlayer* pPlayer)
 	: m_FrameCounter(0)
@@ -19,8 +18,11 @@ CStatePlayerDamageSmall::~CStatePlayerDamageSmall()
 
 void CStatePlayerDamageSmall::UpdateDamageState(CStatePlayerDamage* pStateDamage, CPlayer* pPlayer)
 {
+	// カウンター更新
+	m_FrameCounter++;
+
 	if (pPlayer->AnimationBlending()) return;
-	if (m_FrameCounter++ <= pPlayer->GetCurrentAnimFrameNum() - 40) return;
+	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum()) return;
 
 	// ダメージステート終了
 	pStateDamage->ChangeState(new CStatePlayerDamageNone(pPlayer));

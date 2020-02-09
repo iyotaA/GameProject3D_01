@@ -67,7 +67,8 @@ RootNode
 (親)mixamorig:RightHandPinky3 => mixamorig:RightHandPinky4
 (親)mixamorig:RightHandPinky4 => mixamorig:RightHandPinky4_end
 (親)mixamorig:RightHand => B_Weapon
-(親)B_Weapon => B_Weapon_end
+(親)B_Weapon => B_Weapon_Top
+(親)B_Weapon_Top => B_Weapon_Top_end
 (親)mixamorig:Hips => mixamorig:LeftUpLeg
 (親)mixamorig:LeftUpLeg => mixamorig:LeftLeg
 (親)mixamorig:LeftLeg => mixamorig:LeftFoot
@@ -80,4 +81,6 @@ RootNode
 (親)mixamorig:RightFoot => mixamorig:RightToeBase
 (親)mixamorig:RightToeBase => mixamorig:RightToe_End
 (親)mixamorig:RightToe_End => mixamorig:RightToe_End_end
+(親)mixamorig:Hips => B_Weapon_Waist
+(親)B_Weapon_Waist => B_Weapon_Waist_end
 (親)RootNode => skins

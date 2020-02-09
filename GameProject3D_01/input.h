@@ -15,6 +15,7 @@ public:
 
 	static bool GetKeyPress(BYTE KeyCode);
 	static bool GetKeyTrigger(BYTE KeyCode);
+	static bool GetKeyRelease(BYTE KeyCode);
 
 	static bool GetGamepadPress(int state);
 	static bool GetGamepadTrigger(int state);

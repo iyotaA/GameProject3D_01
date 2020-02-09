@@ -1,12 +1,14 @@
 
 // インクルード ////////////////////////////////////
 #include "game_objects_all.h"
+#include "user_interface_manager.h"
 #include "scene.h"
 #include "title.h"
 #include "game.h"
 #include "result.h"
 #include "tutorial.h"
 #include "shader_all.h"
+
 
 // グローバル変数 ////////////////////////////////////
 CScene*	CManager::m_Scene;
@@ -20,6 +22,9 @@ void CManager::Init()
 
 	// インプットの初期化
 	CInput::Init();
+
+	// サウンドの初期化
+	CSound::InitSound(GetWindow());
 
 	//カメラの生成
 	CCameraManager::CreateCamera();
@@ -62,6 +67,12 @@ void CManager::Uninit()
 	// カメラ破壊
 	CCameraManager::DeleteCamera();
 
+	// UI破壊
+	CUserInterfaceManager::DeleteAllUI();
+
+	// サウンドの終了処理
+	CSound::UninitSound();
+
 	// インプットの終了処理
 	CInput::Uninit();
 
@@ -101,6 +112,8 @@ void CManager::Draw()
 
 	// シーンの描画
 	m_Scene->Draw();
+
+	CUserInterfaceManager::Draw();
 
 	// imgui描画
 	CImgui::Draw();

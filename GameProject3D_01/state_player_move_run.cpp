@@ -4,6 +4,8 @@
 #include "state_player_move_dash.h"
 #include "state_player_idle.h"
 #include "state_player_dodge.h"
+#include "state_player_damage_large.h"
+#include "state_player_sheathe_sword.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
@@ -32,17 +34,14 @@ void CStatePlayerMoveRun::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer*
 	//******************************
 	// キー入力
 	//******************************
-	if (CInput::GetKeyTrigger(VK_SPACE) || CInput::GetGamepadTrigger(VK_PAD_A)) {
+	if (CInput::GetGamepadPress(RIGHT_TRRIGER) || CInput::GetKeyPress(VK_RSHIFT)) {
 
-		// 20F経ってから回避可能に
-		if (m_FrameCounter >= 20) {
-			pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
-			return;
+		if (pPlayer->WeaponState() == SWORD_STATE_DRAW) {
+			pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, true));
 		}
-	}
-	if (CInput::GetGamepadPress(RIGHT_TRRIGER))
-	{
-		pMoveState->ChangeState(new CStatePlayerMoveDash(pPlayer, m_MoveSpeed));
+		else {
+			pMoveState->ChangeState(new CStatePlayerMoveDash(pPlayer, m_MoveSpeed));
+		}
 		return;
 	}
 
@@ -51,7 +50,7 @@ void CStatePlayerMoveRun::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer*
 
 	// 徐々にカメラズームアウト
 	CCamera* camera = CCameraManager::GetCamera();
-	float lerp_deg = m_FrameCounter;
+	float lerp_deg = m_FrameCounter / 60.0f * 90.0f;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
 	camera->SetLengthToAt(lerp(m_StartLength, m_TargetLength, lerp_t));

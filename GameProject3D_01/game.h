@@ -2,7 +2,7 @@
 #define GAME_H_
 
 class CResult;
-
+#include "MathFunc.h"
 
 class CGame : public CScene
 {
@@ -27,11 +27,8 @@ public:
 		CCamera* camera = CCameraManager::GetCamera();		// 注視点
 		camera->SetAt(player, Vector3(0.0f, 2.5f, 0.0f));
 
-		// 数字の初期化
-		number = new CNumber;
-		number->Init();
-		number->SetPosition(XMFLOAT2(30.0f, 30.0f));
-		m_GameObject[CManager::E_UI].push_back(number);
+		// BGM再生
+		CSound::Play(SOUND_LABEL_BGM_GAME);
 
 		m_time = 0.0f;
 		FrameCount = 0;
@@ -40,6 +37,7 @@ public:
 	void Uninit()
 	{
 		// ゲームの終了処理
+		CSound::StopSound(SOUND_LABEL_BGM_GAME);
 
 		// 継承元の終了処理
 		CScene::Uninit();
@@ -49,10 +47,6 @@ public:
 	{
 		CScene::Update();
 
-		// タイム計測
-		m_time += 1.6f;
-		number->SetNum(m_time);
-
 		//if (FrameCount % 100 == 0) {
 
 		//	int index;
@@ -60,9 +54,9 @@ public:
 		//	AddGameObject<CEnemy>(CManager::E_3D)->SetPosition(XMFLOAT3(EnemySpawnPlace[index].x, 6.0f, EnemySpawnPlace[index].y));
 		//}
 
-		if (IsClear()) {
-			CManager::SetScene<CResult>();
-		}
+		//if (IsClear()) {
+		//	CManager::SetScene<CResult>();
+		//}
 
 		FrameCount++;
 	}
@@ -83,7 +77,6 @@ public:
 
 private:
 	float m_time;
-	CNumber* number;
 	XMFLOAT2 EnemySpawnPlace[20];
 	int FrameCount;
 

@@ -30,9 +30,6 @@ public:
 			// typeid()‚ÍŒ^‚ð’²‚×‚é
 			if (typeid(*shader) == typeid(T)) {
 
-				T* shaderInstance = new T;
-				shaderInstance;
-
 				return (T*)shader;
 			}
 		}

@@ -136,7 +136,7 @@ void CSkyDome::Init()
 
 	// テクスチャ読み込み /////
 	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/image/CGSkies_0101_free.png");
+	m_Texture->LoadSTB("asset/image/skydome.png");
 
 	// シェーダー読み込み //////
 	m_Shader = ShaderManager::GetShader<CShaderDefault>();
