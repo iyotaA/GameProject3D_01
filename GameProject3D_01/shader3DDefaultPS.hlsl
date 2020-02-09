@@ -1,9 +1,15 @@
 
-//*****************************************************************************
-// グローバル変数
-//*****************************************************************************
-Texture2D		g_Texture : register(t0);
-SamplerState	g_SamplerState : register(s0);
+// マトリクスバッファ
+cbuffer MatrixBuffer : register(b0)
+{
+    matrix World;
+    matrix View;
+    matrix Projection;
+    float4 CameraPosition;
+}
+
+Texture2D		Texture : register(t0);
+SamplerState	Sampler : register(s0);
 
 struct InputData
 {
@@ -20,9 +26,8 @@ float4 main(in InputData input) : SV_Target
 {
 	float4 outDiffuse;
 
-	outDiffuse = g_Texture.Sample(g_SamplerState, input.texCoord);
+	outDiffuse = Texture.Sample(Sampler, input.texCoord);
 	outDiffuse *= input.diffuse;
 
 	return outDiffuse;
-	//return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

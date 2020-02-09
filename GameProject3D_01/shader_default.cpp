@@ -109,6 +109,15 @@ void CShaderDefault::Set()
 	// 定数バッファ設定
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
 
+		LIGHT light;
+	Vector3 dir = Vector3(0.0f, -1.0f, 1.0f);
+	dir.Normalize();
+	light.Direction = XMFLOAT4(dir.x, dir.y, dir.z, 0.0f);
+	light.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	light.Ambient = COLOR(0.6f, 0.6f, 0.6f, 1.0f);
+
+	CRenderer::GetDeviceContext()->UpdateSubresource(m_LightBuffer, 0, NULL, &light, 0, 0);
+
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(1, 1, &m_LightBuffer);
 
 	CRenderer::GetDeviceContext()->VSSetConstantBuffers(2, 1, &m_MaterialBuffer);

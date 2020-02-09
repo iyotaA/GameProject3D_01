@@ -14,20 +14,17 @@ struct UV
 	float ev;
 };
 
+
+class CTexture;
+class CShader2D;
+
 class CPolygon2D
 {
 public:
-	CPolygon2D()
-		: m_Position()
-		, m_Size(XMFLOAT2(50.0f, 50.0f))
-		, m_UV(UV())
-		, m_Color(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f))
-		, m_RotateDeg(0.0f)
-	{}
+	CPolygon2D(char* pFileName);
+	~CPolygon2D();
 
-	void Init(char* pFileName);
-	void Uninit();
-	void Draw();
+	virtual void Draw() = 0;
 
 	void SetPosition(XMFLOAT2 position) { m_Position = position; }
 	void SetSize(XMFLOAT2 size) { m_Size = size; }// pixels
@@ -37,21 +34,22 @@ public:
 
 	XMFLOAT2& Size() { return m_Size; }
 
-private:
-	void SetBuffer();
+protected:
 
-private:
 	ID3D11Buffer*	m_VertexBufer = NULL;
 	CTexture*		m_Texture = NULL;
 	CShader2D*		m_Shader = NULL;
 
-private:
 	XMFLOAT2	m_Position;
 	UV			m_UV;
 	XMFLOAT2	m_Size;
 	XMFLOAT4	m_Color;
 	float		m_RotateDeg;
 
+private:
+	CPolygon2D(){}
+
 };
 
 #endif
+

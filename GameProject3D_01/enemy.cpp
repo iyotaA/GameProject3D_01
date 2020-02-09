@@ -9,6 +9,7 @@
 #include "shader_all.h"
 #include "skinmesh_animation.h"
 #include "main.h"
+#include "state_enemy_idle.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
@@ -17,52 +18,75 @@ static double t = 0.0;
 
 void CEnemy::Init()
 {
-	// モデルの初期化
+	//---   モデルの初期化   ---------------------------------------------------------------------------------
 	m_pModel = new CSkinModel();
 	m_pModel->Load("asset/model/dragon.fbx", 2.0f, "asset/image/dragon.png", "asset/NodeNameFiles/doragon.txt");
-	m_pModel->SetAnimationSpeed(2.0f);
 
-	// 影
+
+	//---   状態   ---------------------------------------------------------------------------------------------
+	m_pState = new CStateEnemyIdle(this);
+
+
+	//---   影   -----------------------------------------------------------------------------------------------
 	m_Shadow = new CPolygon3D();
 	m_Shadow->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(6.0f, 1.0f, 12.0f), Vector3(0.0f, 0.0f, 0.0f), "asset/image/shadow.png");
 
-	// トランスフォーム初期化
-	m_Position = Vector3(70.0f, 0.0f, -90.0f);
-	//m_Rotation = Vector3(0.0f, 180.0f * 3.14f / 180.0f, 0.0f);
+
+	//---   トランスフォーム初期化   -------------------------------------------------------------------------
+	m_Position = Vector3(-10.0f, 0.0f, 30.0f);
 	m_Rotation = Vector3(0.0f, 180.0f * 3.14f / 180.0f, 0.0f);
 	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 
-	// Front_Up_Rightベクトル初期化
+
+	//---   Front_Up_Rightベクトル初期化   -------------------------------------------------------------------
 	m_DirVec.SetFrontUpRight(Vector3(0.0f, 0.0f, 1.0f));
 
-	// コリジョンの初期化
-	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
-	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
-	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
-	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
-	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
-	m_CollisionSphere.push_back(new CCollisionSphere(Vector3( m_Position.x, m_Position.y + 7.0f, m_Position.z), 7.0f));
+
+	//---   コリジョンの初期化   -----------------------------------------------------------------------------
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f), "B_Head"));				// 頭
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_Chin"));				// 顎
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f), "B_Hip"));				// 尻
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f), "B_Pelvis"));			// 胴
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.5f), "B_Spine"));			// 背骨
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_R_Back_Leg"));	// 後ろ右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_L_Back_Leg"));	// 後ろ左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_R_Back_Foot"));	// 後ろ右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_L_Back_Foot"));	// 後ろ左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_R_Front_Leg"));	// 前右脚
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_L_Front_Leg"));	// 前左脚
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f), "B_R_Front_Foot")); // 前右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f), "B_L_Front_Foot")); // 前左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f), "B_Tail.001"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_Tail.002"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.003"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.004"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.005"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.006"));			// 尻尾
+
 	m_CollisionOBB = new CCollisionOBB(m_Position, m_DirVec, Vector3(1.0f, 2.0f, 1.0f));
 
-	// ダメージ関連ステータスの初期化
-	m_DamageManager = new CDamage(100, 15);
-	m_DamageManager->GetCollisionSphere()->SetRadius(0.2f);
 
+	//---   その他メンバの初期化   ----------------------------------------------------------------------------
 	m_MoveDistance = Vector3(0.0f, 0.0f, 0.0f);
-	m_BonePosition = Vector3(0.0f, 0.0f, 0.0f);
-	m_MoveSpeed = m_DefaultSpeed;
+	m_MoveSpeed = m_DEFAULT_SPEED;
 	m_IsCollision = false;
 	m_IsPressMovingEntry = false;
+
+	m_StateFlags.Damage = false;
+	m_StateFlags.Dodge = false;
+	m_StateFlags.Attack = false;
+	m_StateFlags.Block = false;
 }
 
 void CEnemy::Uninit()
 {
-	delete m_DamageManager;
 	delete m_CollisionOBB;
-	m_CollisionSphere.clear();
+	m_CollisionBody.clear();
 
 	m_Shadow->Uninit();
 	delete m_Shadow;
+
+	delete m_pState;
 
 	m_pModel->Unload();
 	delete m_pModel;
@@ -70,6 +94,8 @@ void CEnemy::Uninit()
 
 void CEnemy::Update()
 {
+	// 状態更新
+	m_pState->Update(this);
 
 	// 移動
 	Move();
@@ -83,15 +109,6 @@ void CEnemy::Update()
 
 void CEnemy::Draw()
 {
-	// カリング
-	//CCamera* camera;
-	//camera = CManager::GetScene()->GetGameObject<CCamera>(CManager::E_Camera);
-
-	//if (camera->GetVisivility(&m_Position) == false) {
-	//	return;
-	//}
-
-
 	// マトリクス設定
 	XMMATRIX world;
 	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
@@ -116,12 +133,9 @@ void CEnemy::DrawCollisionGrid()
 {
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
-	for (CCollisionSphere* coll : m_CollisionSphere) {
-		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll, &color);
+	for (CCollisionWithBone* coll : m_CollisionBody) {
+		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll->GetSphere(), &color);
 	}
-
-	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_DamageManager->GetCollisionSphere(), &color);
 
 	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(m_CollisionOBB, &color);
@@ -137,7 +151,7 @@ void CEnemy::Move()
 	// 重力加算
 	AddGlavity();
 
-	m_Rotation.y -= DEGREE_TO_RADIAN;
+	//m_Rotation.y -= DEGREE_TO_RADIAN * 0.5f;
 	// 方向ベクトル回転
 	Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
 	XMMATRIX rotationMtx;
@@ -150,11 +164,12 @@ void CEnemy::Move()
 	m_DirVec.right.Normalize();
 
 
-	m_Position += m_DirVec.front * 0.4f;
+	//m_Position += m_DirVec.front * 0.4f;
 
-	// 影の更新
-	m_Shadow->SetPosition(&Vector3(m_Position.x, 0.01f, m_Position.z));
-	m_Shadow->SetRotation(&Vector3(m_Rotation.x, 0.0f, m_Rotation.z));
+	// 影の更新（胴体の位置に移動）
+	Vector3 pos = m_CollisionBody[3]->GetSphere()->GetCenter();
+	m_Shadow->SetPosition(&Vector3(pos.x, 0.01f, pos.z));
+	m_Shadow->SetRotation(&Vector3(m_Rotation.x, m_Rotation.y, m_Rotation.z));
 	m_Shadow->Update();
 
 	UpdateCollision();
@@ -175,24 +190,10 @@ void CEnemy::UpdateCollision()
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
 	// 特定のボーンの位置を取得
-	m_BonePosition = m_pModel->GetWorldPosition(&world, "B_R_Back_Leg");
-	m_DamageManager->GetCollisionSphere()->SetCenter(&m_pModel->GetWorldPosition(&world, "B_Head"));
-	m_DamageManager->GetCollisionSphere()->SetRadius(2.0f);
-	m_CollisionSphere[0]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_Hip"));
-	m_CollisionSphere[0]->SetRadius(3.0f);
-	m_CollisionSphere[1]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_Spine.001"));
-	m_CollisionSphere[1]->SetRadius(3.0f);
-	m_CollisionSphere[2]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_R_Back_Leg"));
-	m_CollisionSphere[2]->SetRadius(2.0f);
-	m_CollisionSphere[3]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_L_Back_Leg"));
-	m_CollisionSphere[3]->SetRadius(2.0f);
-	m_CollisionSphere[4]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_R_Front_Leg"));
-	m_CollisionSphere[4]->SetRadius(2.0f);
-	m_CollisionSphere[5]->SetCenter(&m_pModel->GetWorldPosition(&world, "B_L_Front_Leg"));
-	m_CollisionSphere[5]->SetRadius(2.0f);
-	m_CollisionOBB->SetPosition(&m_BonePosition);
+	for (CCollisionWithBone* coll : m_CollisionBody) {
 
-	//m_CollisionSphere->SetCenter(&Vector3(m_Position.x, m_Position.y + 7.0f, m_Position.z));
+		coll->GetSphere()->SetCenter(&m_pModel->GetWorldPosition(&world, coll->GetBoneName()));
+	}
 }
 
 void CEnemy::AddGlavity()
@@ -230,5 +231,36 @@ bool CEnemy::IsLanding()
 			return false;
 		}
 	}
+}
+
+bool CEnemy::CurrentAnimationFinish(void)const
+{
+	return m_pModel->CurrentAnimationFinish();
+}
+
+int CEnemy::GetCurrentAnimFrameNum()const
+{
+	return m_pModel->GetCurrentAnimFrameNum();
+}
+
+bool& CEnemy::AnimationBlending(void)
+{
+	return m_pModel->AnimationBlending();
+}
+
+void CEnemy::SetAnimation(const unsigned int _id, const float _startBlendNum)
+{
+	m_pModel->SetAnimation(_id, _startBlendNum);
+}
+
+void CEnemy::SetAnimationSpeed(const float _speed)
+{
+	m_pModel->SetAnimationSpeed(_speed);
+}
+
+void CEnemy::ChangeState(CStateEnemy* pState)
+{
+	delete m_pState;
+	m_pState = pState;
 }
 

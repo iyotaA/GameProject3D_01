@@ -26,6 +26,8 @@ private:
 
 private:
 	CStatePlayerMove* m_pStateMove;
+	int m_FrameCounter;
+
 };
 
 

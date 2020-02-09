@@ -5,6 +5,7 @@
 #include "state_player_dodge.h"
 #include "state_player_move_run.h"
 #include "state_player_move_dash.h"
+#include "state_player_damage_large.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
@@ -15,7 +16,7 @@ CStatePlayerMoveDash::CStatePlayerMoveDash(CPlayer* pPlayer, float StartSpeed)
 	, m_StartSpeed(StartSpeed)
 	, m_TargetSpeed(1.25f)
 	, m_StartLength(CCameraManager::GetCamera()->GetLengthToAt())
-	, m_TargetLength(6.5f)
+	, m_TargetLength(5.5f)
 	, m_FrameCounter(0)
 	, m_Volocity(Vector3(0.0f, 0.0f, 0.0f))
 {
@@ -33,16 +34,8 @@ void CStatePlayerMoveDash::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer
 	//******************************
 	// キー入力
 	//******************************
-	if (CInput::GetKeyTrigger(VK_SPACE) || CInput::GetGamepadTrigger(VK_PAD_A)) {
+	if (CInput::GetGamepadRelease(RIGHT_TRRIGER) || CInput::GetKeyRelease(VK_RSHIFT)) {
 
-		// 20F経ってから回避可能に
-		if (m_FrameCounter >= 20) {
-			pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
-			return;
-		}
-	}
-	if (CInput::GetGamepadRelease(RIGHT_TRRIGER))
-	{
 		pMoveState->ChangeState(new CStatePlayerMoveRun(pPlayer, m_MoveSpeed));
 		return;
 	}
@@ -52,7 +45,7 @@ void CStatePlayerMoveDash::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer
 
 	// 徐々にカメラズームアウト
 	CCamera* camera = CCameraManager::GetCamera();
-	float lerp_deg = m_FrameCounter;
+	float lerp_deg = m_FrameCounter / 30.0f * 90.0f;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
 	camera->SetLengthToAt(lerp(m_StartLength, m_TargetLength, lerp_t));

@@ -13,6 +13,8 @@ public:
 private:
 	CStatePlayerIdle() {}	// デフォルトコンストラクタ封印
 	void Move(CPlayer* pPlayer);
+	void Action(CPlayer* pPlayer);
+
 	bool MoveEntry() {
 		return CInput::GetIsInputStick(LEFT_STICK) ||
 			CInput::GetKeyPress('W') || CInput::GetKeyPress('A') ||

@@ -2,9 +2,10 @@
 #include "state_player_idle.h"
 #include "state_player_move_run.h"
 #include "state_player_attack.h"
-#include "state_player_damage_large.h"
-#include "state_player_damage_small.h"
-#include "game_objects_all.h"
+#include "state_player_damage.h"
+#include "state_player_draw_sword.h"
+#include "state_player_sheathe_sword.h"
+#include "state_player_block.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
@@ -27,18 +28,8 @@ CStatePlayerIdle::~CStatePlayerIdle()
 
 void CStatePlayerIdle::Update(CPlayer* pPlayer)
 {
-	// 移動ステートに遷移
-	if (MoveEntry()) {
-		pPlayer->ChangeState(new CStatePlayerMove(pPlayer));
-		return;
-	}
-
-	// ダメージステートに遷移
-	if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X)) {
-
-		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
-		return;
-	}
+	// 入力・状態遷移
+	Action(pPlayer);
 
 	// 移動処理
 	Move(pPlayer);
@@ -69,3 +60,54 @@ void CStatePlayerIdle::Move(CPlayer* pPlayer)
 	m_MoveSpeed *= 0.95f;
 	if (m_MoveSpeed <= 1.0f) { m_MoveSpeed = 1.0f; }
 }
+
+void CStatePlayerIdle::Action(CPlayer* pPlayer)
+{
+	// 移動ステートに遷移
+	if (MoveEntry()) {
+		pPlayer->ChangeState(new CStatePlayerMove(pPlayer));
+		return;
+	}
+
+	// ダメージステートに遷移
+	if (pPlayer->Damaged()){
+
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		return;
+	}
+
+	// 抜刀・攻撃ステートに遷移
+	if ((m_FrameCounter >= 10) &&
+		(CInput::GetGamepadTrigger(XINPUT_GAMEPAD_Y) || CInput::GetKeyTrigger('I'))){
+
+		// 抜刀時は攻撃ステートに遷移
+		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
+
+			pPlayer->ChangeState(new CStatePlayerAttack(pPlayer, PLAYER_STATE_ATTACK_VIRTICAL));
+		}
+		// 納刀時は抜刀ステートに遷移
+		else if((pPlayer->WeaponState() == SWORD_STATE_SHEATHE)) {
+
+			pPlayer->ChangeState(new CStatePlayerDrawSword(pPlayer, false));
+		}
+		return;
+	}
+
+	// 防御ステートに遷移
+	if (CInput::GetGamepadPress(LEFT_TRRIGER) || CInput::GetKeyPress(VK_LSHIFT)){
+
+		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
+			pPlayer->ChangeState(new CStatePlayerBlock(pPlayer));
+			return;
+		}
+	}
+
+	// 納刀ステートに遷移
+	if ((pPlayer->WeaponState() == SWORD_STATE_DRAW) &&
+		(CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X) || CInput::GetKeyTrigger('K'))){
+
+		pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, false));
+		return;
+	}
+}
+

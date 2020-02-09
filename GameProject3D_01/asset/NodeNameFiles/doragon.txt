@@ -1,8 +1,5 @@
 RootNode
-(親)RootNode => Group56496
 (親)RootNode => Armature
-(親)Armature => IK_At
-(親)IK_At => IK_At_end
 (親)Armature => IK_Tail_Top
 (親)IK_Tail_Top => IK_Tail_Top_end
 (親)Armature => IK_L_Front_Foot
@@ -36,8 +33,8 @@ RootNode
 (親)B_L_Back_Foot => B_L_Back_Foot_end
 (親)B_Hip => B_R_Back_Leg
 (親)B_R_Back_Leg => B_R_Back_Shin
-(親)B_R_Back_Shin => Bone.013_R.003
-(親)Bone.013_R.003 => Bone.013_R.003_end
+(親)B_R_Back_Shin => B_R_Back_Foot
+(親)B_R_Back_Foot => B_R_Back_Foot_end
 (親)B_Hip => B_Tail
 (親)B_Tail => B_Tail.001
 (親)B_Tail.001 => B_Tail.002
@@ -70,3 +67,4 @@ RootNode
 (親)B_R_Wing.005 => B_R_Wing.005_end
 (親)Armature => IK_R_Wing_Top
 (親)IK_R_Wing_Top => IK_R_Wing_Top_end
+(親)RootNode => Group56496

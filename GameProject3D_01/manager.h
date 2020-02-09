@@ -12,7 +12,6 @@ public:
 		E_Background,
 		E_3D,
 		E_Effect,
-		E_UI,
 		E_Max
 	};
 

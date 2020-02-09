@@ -9,7 +9,8 @@
 CStatePlayerDamage::CStatePlayerDamage(CPlayer* pPlayer)
 	: m_pStateDamage(new CStatePlayerDamageLarge(pPlayer))
 {
-
+	// Œø‰Ê‰¹Ä¶
+	//CSound::Play(SOUND_LABEL_SE_HIT);
 }
 
 CStatePlayerDamage::~CStatePlayerDamage()

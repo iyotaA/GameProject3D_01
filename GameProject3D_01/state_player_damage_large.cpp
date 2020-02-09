@@ -3,7 +3,6 @@
 #include "state_player_damage_large.h"
 #include "modelAnimation.h"
 #include "player.h"
-#include "state_player_damage.h"
 
 CStatePlayerDamageLarge::CStatePlayerDamageLarge(CPlayer* pPlayer)
 	: m_FrameCounter(0)
@@ -23,12 +22,15 @@ void CStatePlayerDamageLarge::UpdateDamageState(CStatePlayerDamage* pStateDamage
 {
 	// 移動処理
 	Move(pPlayer);
+
+	// カウンター更新
 	m_FrameCounter++;
 
 	if (pPlayer->AnimationBlending()) return;
-	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum() - 40) return;
+	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum() - 20) return;
 
 	// ダメージステート終了
+	pPlayer->Damaged() = false;
 	pStateDamage->ChangeState(new CStatePlayerDamageNone(pPlayer));
 }
 

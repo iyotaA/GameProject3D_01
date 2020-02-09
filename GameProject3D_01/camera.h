@@ -25,6 +25,7 @@ public:
 	void SetAt(CGameObject* pPlayer, Vector3 offset);
 	void SetPos(Vector3* pPos);
 	void SetLengthToAt(float length) { m_LengthToAt = length; }
+	void SetShake() { m_Shake = true; }
 
 	void AddPos(Vector3* pAddPos);
 	void Pan(CCameraManager::CameraRotate _rotate_dir);
@@ -33,26 +34,31 @@ public:
 
 private:
 
-	Vector3 m_Position, m_Rotation;
 	CGameObject* m_pAtPoint;
-	RECT		 m_Viewport;
-	Vector3X3    m_DirVec;
-	Vector3      m_At;
-	Vector3      m_Offset;
+	RECT				m_Viewport;
+	Vector3			m_Position;
+	Vector3			m_Rotation;
+	Vector3X3		m_DirVec;
+	Vector3			m_At;
+	Vector3			m_Offset;
 
 	XMFLOAT4X4 m_ViewMatrix;
 	XMFLOAT4X4 m_ProjectionMatrix;
 	XMFLOAT4X4 m_InvViewMatrix;
 
 	unsigned int m_CameraId;
+	int			m_FrameCounter;
 	float		m_LengthToAt;
 	float		m_SpinVerticall;
 	float		m_SpinHorizontal;
 	float		m_RotateSpeed;
 	float		m_MoveSpeedScale;
 	bool		m_BindAtObject;
+	bool		m_Shake;
 
-	bool IsRange();
+	void IsRange();
+	bool CollisionTerrian();
+	void Shake();
 
 };
 

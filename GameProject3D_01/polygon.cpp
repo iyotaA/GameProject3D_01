@@ -8,8 +8,16 @@
 #include "polygon.h"
 #include <regex>
 #include <iostream>
-void CPolygon2D::Init(char* pFileName)
+
+
+CPolygon2D::CPolygon2D(char* pFileName)
+	: m_Position(XMFLOAT2(0.0f, 0.0f))
+	, m_UV(UV())
+	, m_Size(XMFLOAT2(50.0f, 50.0f))
+	, m_Color(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f))
+	, m_RotateDeg(0.0f)
 {
+
 	VERTEX_2D vertices[4] = {
 
 		Vector3(m_Position.x, m_Position.y, 0.0f),
@@ -63,65 +71,9 @@ void CPolygon2D::Init(char* pFileName)
 	m_Shader = ShaderManager::GetShader<CShader2D>();
 }
 
-void CPolygon2D::Uninit()
+CPolygon2D::~CPolygon2D()
 {
 	m_VertexBufer->Release();
 	delete m_Texture;
 }
 
-void CPolygon2D::Draw()
-{
-	SetBuffer();
-
-	UINT Stride = sizeof(VERTEX_2D);
-	UINT offdet = 0;
-	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBufer, &Stride, &offdet);
-	CRenderer::SetTexture(m_Texture);
-
-	m_Shader->Set();
-
-	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	CRenderer::GetDeviceContext()->Draw(4, 0);
-}
-
-void CPolygon2D::SetBuffer()
-{
-	// 回転した後の4点を求める（1.0f / 2.0f = 0.5f）
-	float px[4], py[4];
-	px[0] = -0.5f * m_Size.x * cos(m_RotateDeg) + 0.5f * m_Size.y * sin(m_RotateDeg);
-	py[0] = -0.5f * m_Size.x * sin(m_RotateDeg) - 0.5f * m_Size.y * cos(m_RotateDeg);
-	px[1] =  0.5f * m_Size.x * cos(m_RotateDeg) + 0.5f * m_Size.y * sin(m_RotateDeg);
-	py[1] =  0.5f * m_Size.x * sin(m_RotateDeg) - 0.5f * m_Size.y * cos(m_RotateDeg);
-	py[2] = -0.5f * m_Size.x * sin(m_RotateDeg) + 0.5f * m_Size.y * cos(m_RotateDeg);
-	px[2] = -0.5f * m_Size.x * cos(m_RotateDeg) - 0.5f * m_Size.y * sin(m_RotateDeg);
-	px[3] =  0.5f * m_Size.x * cos(m_RotateDeg) - 0.5f * m_Size.y * sin(m_RotateDeg);
-	py[3] =  0.5f * m_Size.x * sin(m_RotateDeg) + 0.5f * m_Size.y * cos(m_RotateDeg);
-
-	// 頂点情報セット
-	VERTEX_2D vertices[4] = {
-
-		Vector3(px[0] + m_Position.x, py[0] + m_Position.y, 0.0f),
-		m_Color,
-		XMFLOAT2(m_UV.su, m_UV.sv),
-
-		Vector3(px[1] + m_Position.x, py[1] + m_Position.y, 0.0f),
-		m_Color,
-		XMFLOAT2(m_UV.eu, m_UV.sv),
-
-		Vector3(px[2] + m_Position.x, py[2] + m_Position.y, 0.0f),
-		m_Color,
-		XMFLOAT2(m_UV.su, m_UV.ev),
-
-		Vector3(px[3] + m_Position.x, py[3] + m_Position.y, 0.0f),
-		m_Color,
-		XMFLOAT2(m_UV.eu, m_UV.ev),
-	};
-
-	// VertexBuffer書き換え
-	{
-		D3D11_MAPPED_SUBRESOURCE msr;
-		CRenderer::GetDeviceContext()->Map(m_VertexBufer, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-		memcpy(msr.pData, vertices, sizeof(VERTEX_2D) * 4);
-		CRenderer::GetDeviceContext()->Unmap(m_VertexBufer, 0);
-	}
-}

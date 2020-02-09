@@ -7,60 +7,6 @@ class CResult : public CScene
 public:
 	void Init()
 	{
-		//// カメラの初期化
-		//CCamera* camera;
-		//camera = AddGameObject<CCamera>(CManager::E_Camera);
-
-		// フィールドの初期化
-		AddGameObject<CField>(CManager::E_Background);
-
-		// スカイドームの初期化
-		AddGameObject<CSkyDome>(CManager::E_Background);
-
-		// 壁の初期化
-		for (int i = 0; i < 4; i++) {
-			CWall* wall;
-			wall = AddGameObject<CWall>(CManager::E_Background);
-			switch (i)
-			{
-			case 0:
-				wall->SetPosition(&Vector3(15.0f, 2.5f, 0.0f));
-				wall->SetRotation(&Vector3(90.0f, 90.0f, 0.0f));
-				break;
-
-			case 1:
-				wall->SetPosition(&Vector3(0.0f, 2.5f, -15.0f));
-				wall->SetRotation(&Vector3(90.0f, 180.0f, 0.0f));
-				break;
-
-			case 2:
-				wall->SetPosition(&Vector3(-15.0f, 2.5f, 0.0f));
-				wall->SetRotation(&Vector3(90.0f, 270.0f, 0.0f));
-				break;
-
-			case 3:
-				wall->SetPosition(&Vector3(0.0f, 2.5f, 15.0f));
-				wall->SetRotation(&Vector3(90.0f, 0.0f, 0.0f));
-				break;
-
-			}
-		}
-
-		//// タイトルロゴの初期化
-		//CPolygon2D* ui = new CPolygon2D;
-		//ui->Init(XMFLOAT2(350, 70), XMFLOAT2(670, 200), "asset/score.tga");
-		//m_GameObject[CManager::E_UI].push_back(ui);
-
-		//CPolygon2D* ui2 = new CPolygon2D;
-		//ui2->Init(XMFLOAT2(530, 600), XMFLOAT2(315, 75), "asset/press.tga");
-		//m_GameObject[CManager::E_UI].push_back(ui2);
-
-		// 数字の初期化
-		CNumber* number = new CNumber;
-		number->Init();
-		number->SetPosition(XMFLOAT2(550.0f, 300.0f));
-		number->SetNum(static_cast<float>(CManager::GetScore()));
-		m_GameObject[CManager::E_UI].push_back(number);
 
 		FrameCount = 0;
 	}

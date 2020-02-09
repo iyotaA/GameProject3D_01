@@ -150,8 +150,8 @@ void CField::Init()
 	m_Texture[1] = new CTexture();
 	m_Texture[2] = new CTexture();
 	m_Texture[0]->LoadSTB("asset/image/white.png");
-	m_Texture[1]->LoadSTB("asset/image/field_dart001.png");
-	m_Texture[2]->LoadSTB("asset/image/rock.png");
+	m_Texture[1]->LoadSTB("asset/image/dart000.png");
+	m_Texture[2]->LoadSTB("asset/image/normal_map/terrian000.png");
 
 	// トランスフォーム初期化
 	m_Position = Vector3(0.0f, 0.0f, 0.0f);

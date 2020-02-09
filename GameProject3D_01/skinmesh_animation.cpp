@@ -498,9 +498,10 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 			MATERIAL material;
 			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 
-			material.Ambient = COLOR(ambient.r * 2, ambient.g * 2, ambient.b * 2, ambient.a);
+			material.Ambient = COLOR(ambient.r *1.2f, ambient.g * 1.2f, ambient.b * 1.2f, ambient.a);
 
 			m_Shader->SetMaterial(material);
+			m_Shader->SetCameraPositoin(&CCameraManager::GetCamera()->GetPosition());
 			m_Shader->Set();
 
 			aiString path;

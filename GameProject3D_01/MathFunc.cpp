@@ -1,5 +1,42 @@
+// インクルード ////////////////////////////////////
+#include "main.h"
+#include "game_objects_all.h"
+#include "scene.h"
+#include "camera_manager.h"
 #include "MathFunc.h"
 
-float lerp(float start, float end, float t) {
+float lerp(float start, float end, float t)
+{
     return (1 - t) * start + t * end;
 }
+
+XMFLOAT2 GetScreenPos(Vector3 World_Pos)
+{
+	CCamera* camera = CCameraManager::GetCamera();
+
+	XMMATRIX g_View = XMLoadFloat4x4(&camera->GetViewMatrix());
+	XMMATRIX g_Projection = XMLoadFloat4x4(&camera->GetProjectionMatrix());
+
+	float w = SCREEN_WIDTH / 2.0f;
+	float h = SCREEN_HEIGHT / 2.0f;
+	XMMATRIX viewport = {
+	w, 0, 0, 0,
+	0, -h, 0, 0,
+	0, 0, 1, 0,
+	w, h, 0, 1
+	};
+
+	// ビュー変換とプロジェクション変換
+	World_Pos = XMVector3Transform(World_Pos, g_View);
+	World_Pos = XMVector3Transform(World_Pos, g_Projection);
+
+	XMFLOAT3 temp;
+	XMStoreFloat3(&temp, World_Pos);
+	// zで割って-1~1の範囲に収める
+	// スクリーン変換
+	Vector3  view_vec = XMVectorSet(temp.x / temp.z, temp.y / temp.z, 1.0f, 1.0f);
+	view_vec = XMVector3Transform(view_vec, viewport);
+
+	return XMFLOAT2(view_vec.x, view_vec.y);
+}
+

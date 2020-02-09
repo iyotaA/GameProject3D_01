@@ -3,7 +3,8 @@
 
 class CPlayer;
 
-enum
+
+typedef enum
 {
 	PLAYER_STATE_ATTACK_COMBO,
 	PLAYER_STATE_ATTACK_HORIZONTAL,
@@ -22,7 +23,13 @@ enum
 	PLAYER_STATE_RUN,
 	PLAYER_STATE_ROOL,
 	PLAYER_STATE_SHEATHE_A_SWORD,
-};
+}PLAYER_STATE;
+
+typedef enum
+{
+	SWORD_STATE_SHEATHE, // î[ìÅ
+	SWORD_STATE_DRAW	 // î≤ìÅ
+}SWORD_STATE;
 
 class CStatePlayer
 {

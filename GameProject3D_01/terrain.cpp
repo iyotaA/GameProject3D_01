@@ -9,14 +9,14 @@
 #include "camera_manager.h"
 #include "camera.h"
 
-#define GRID_SIZE 1.5f
+#define GRID_SIZE 1.0f
 
 
 void CTerrain::Init()
 {
 	bool result;
 
-	result = LoadHeightMap("asset/image/height_map001.bmp");
+	result = LoadHeightMap("asset/image/terrian/height_map.bmp");
 	assert(result);
 
 	// テクスチャ読み込み //////
@@ -28,9 +28,9 @@ void CTerrain::Init()
 	// シェーダー読み込み //////
 	m_Shader = ShaderManager::GetShader<CShaderNormalMap>();
 
-	m_Texture[0]->LoadSTB("asset/image/field_dart001.png");
-	m_Texture[1]->LoadSTB("asset/image/field_grass001.png");
-	m_Texture[2]->LoadSTB("asset/image/normal_map_terrian000.png");
+	m_Texture[0]->LoadSTB("asset/image/terrian/dart000.png");
+	m_Texture[1]->LoadSTB("asset/image/terrian/grass002.png");
+	m_Texture[2]->LoadSTB("asset/image/normal_map/terrian000.png");
 
 	result = InitializeBuffers();
 	assert(result);
@@ -121,10 +121,12 @@ bool CTerrain::LoadHeightMap(char* filename)
 	assert(count == 1);
 	assert(filePtr);
 
+	int type = bitmapInfoHeader.biBitCount / 8;
+
 	m_terrainWidth = bitmapInfoHeader.biWidth;
 	m_terrainHeight = bitmapInfoHeader.biHeight;
 
-	imageSize = m_terrainWidth * m_terrainHeight * 3;
+	imageSize = bitmapInfoHeader.biSizeImage;
 
 	bitmapImage = new unsigned char[imageSize];
 	assert(bitmapImage);
@@ -152,13 +154,13 @@ bool CTerrain::LoadHeightMap(char* filename)
 		{
 			height = bitmapImage[k];
 
-			index = (m_terrainHeight * z) + x;
+			index = (m_terrainWidth * z) + x;
 
 			m_heightMap[index].x = (float)x * GRID_SIZE - offset_x;
-			m_heightMap[index].y = (float)height / 15.0f * GRID_SIZE; // NormalizeHeight
+			m_heightMap[index].y = (1.0f >= (float)height / 15.0f * GRID_SIZE) ? 0.0f : (float)height / 15.0f * GRID_SIZE; // NormalizeHeight
 			m_heightMap[index].z = (float)z * GRID_SIZE - offset_z;
 
-			k += 3;
+			k += type;
 		}
 	}
 
@@ -212,7 +214,7 @@ bool CTerrain::InitializeBuffers()
 					Vector3(1.0f, 0.0f, 0.0f),
 					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-					XMFLOAT2(x * 0.33f, z * 0.33f),
+					XMFLOAT2(x * 0.2f, z * 0.2f),
 					max((rand() % blend) * (1.0f / blend), m_heightMap[m_terrainHeight * z + x].y / (10.0f * GRID_SIZE))
 				};
 			}

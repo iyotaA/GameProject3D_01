@@ -7,16 +7,19 @@
 #define _SOUND_H_
 
 #include <windows.h>
-#include "xaudio2.h"						// サウンド処理で必要
+#include "xaudio2.h"				// サウンド処理で必要
 
 //*****************************************************************************
 // サウンドファイル
 //*****************************************************************************
 typedef enum
 {
-	SOUND_LABEL_SE_SHOOT,			// 発射音
-	SOUND_LABEL_SE_HIT,				// 発射音
-	SOUND_LABEL_SE_ATTACK,			// 攻撃音
+	SOUND_LABEL_BGM_GAME,			// 戦闘時BGM
+	SOUND_LABEL_SE_ATTACK_SMALL,	// 攻撃（小）
+	SOUND_LABEL_SE_ATTACK_LARGE,	// 攻撃（大）
+	SOUND_LABEL_SE_GARD,			// ガード
+	SOUND_LABEL_SE_SWING,			// 空振り
+	SOUND_LABEL_SE_STEP,			// 足音
 	SOUND_LABEL_MAX,
 } SOUND_LABEL;
 
@@ -25,8 +28,8 @@ typedef enum
 //*****************************************************************************
 enum
 {
-	LOOP = -1,
-	ONCE,
+	LOOP = XAUDIO2_LOOP_INFINITE,
+	ONCE = 0,
 };
 
 //*****************************************************************************
@@ -60,7 +63,7 @@ private:
 	static IXAudio2MasteringVoice* m_pMasteringVoice;				// マスターボイス
 	static IXAudio2SourceVoice* m_apSourceVoice[SOUND_LABEL_MAX];	// ソースボイス
 	static BYTE* m_apDataAudio[SOUND_LABEL_MAX];					// オーディオデータ
-	static DWORD m_aSizeAudio[SOUND_LABEL_MAX];						// オーディオデータサイズ																
+	static DWORD m_aSizeAudio[SOUND_LABEL_MAX];						// オーディオデータサイズ
 	static SOUNDPARAM m_aParam[SOUND_LABEL_MAX];					// 各音素材のパラメータ
 
 };

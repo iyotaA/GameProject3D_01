@@ -2,6 +2,7 @@
 #include "state_player_dodge.h"
 #include "state_player_move.h"
 #include "state_player_idle.h"
+#include "state_player_damage_large.h"
 #include "modelAnimation.h"
 #include "player.h"
 
@@ -13,6 +14,7 @@ CStatePlayerDodge::CStatePlayerDodge(CPlayer* pPlayer)
 	pPlayer->SetAnimation(PLAYER_STATE_ROOL, 1.0f);
 	pPlayer->SetAnimationSpeed(1.2f);
 	pPlayer->SetMoveSpeed(1.0f);
+	pPlayer->Dodged() = true;
 }
 
 CStatePlayerDodge::~CStatePlayerDodge()
@@ -21,10 +23,19 @@ CStatePlayerDodge::~CStatePlayerDodge()
 
 void CStatePlayerDodge::Update(CPlayer* pPlayer)
 {
+	// ダメージステートに遷移
+	if (pPlayer->Damaged()) {
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		return;
+	}
+
 	// 移動処理
 	Move(pPlayer);
 
 	if (pPlayer->AnimationBlending()) return;
+
+	if(m_FrameCounter == 30){ pPlayer->Dodged() = false; }
+
 	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum() - 40) return;
 
 	// 移動入力されたか？

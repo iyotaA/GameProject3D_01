@@ -18,7 +18,6 @@
 #include "texture.h"
 #include "2dAnimation.h"
 #include "number.h"
-#include "score.h"
 #include "shader_all.h"
 #include "terrain.h"
 
@@ -115,7 +114,7 @@ public:
 
 		for (int i = 0; i < CManager::E_Max; i++) {
 
-			if (i == CManager::E_UI) {
+			if (i == CManager::E_Effect) {
 				// コリジョングリッド描画
 				CDebugPrimitive::DebugPrimitive_BatchRun();
 			}

@@ -5,7 +5,7 @@
 class CStatePlayerAttackJump : public CStatePlayerAttack
 {
 public:
-	CStatePlayerAttackJump(CPlayer* pPlayer);
+	CStatePlayerAttackJump(CPlayer* pPlayer, bool isMove);
 	virtual ~CStatePlayerAttackJump();
 	virtual void Update(CPlayer* pPlayer) override{}
 	virtual void UpdateAttackState(CStatePlayerAttack* pAttackState, CPlayer* pPlayer) override;
@@ -18,6 +18,7 @@ private:
 	int m_FrameCounter;
 	Vector3 m_Velocity;
 	Vector3 m_DirFront;
+	bool	m_Move;
 
 };
 

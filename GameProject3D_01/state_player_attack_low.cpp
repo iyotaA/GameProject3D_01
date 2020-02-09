@@ -1,7 +1,6 @@
 #include "game_objects_all.h"
 #include "state_player_dodge.h"
 #include "state_player_move.h"
-#include "state_player_idle.h"
 #include "state_player_attack.h"
 #include "state_player_attack_low.h"
 #include "modelAnimation.h"
@@ -13,7 +12,7 @@ CStatePlayerAttackLow::CStatePlayerAttackLow(CPlayer* pPlayer)
 	, m_DirFront(pPlayer->GetFront())
 {
 	pPlayer->SetAnimation(PLAYER_STATE_ATTACK_LOW, 1.0f);
-	pPlayer->SetAnimationSpeed(1.0f);
+	pPlayer->SetAnimationSpeed(1.2f);
 }
 
 CStatePlayerAttackLow::~CStatePlayerAttackLow()
@@ -25,10 +24,19 @@ void CStatePlayerAttackLow::UpdateAttackState(CStatePlayerAttack* pAttackState, 
 {
 	// 移動処理
 	Move(pPlayer);
+	m_FrameCounter++;
 
-	if (pPlayer->AnimationBlending()) return;
-	if (m_FrameCounter++ <= pPlayer->GetCurrentAnimFrameNum() - 80) return;
+	// 攻撃可能状態にする
+	if (m_FrameCounter == 40) {
 
+		CSound::Play(SOUND_LABEL_SE_SWING); // 効果音再生
+		pPlayer->Attacked() = true;
+	}
+
+	// アニメーションのブレンドが終わるまで以下の処理を実行させない
+	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum() / 1.2f - 10) return;
+
+	pPlayer->Attacked() = false;
 	pAttackState->ChangeState(new CStatePlayerAttackNone(pPlayer));
 }
 

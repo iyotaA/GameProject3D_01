@@ -67,7 +67,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	// 初期化処理(ウィンドウを作成してから行う)
 	CManager::Init();
-	CSound::InitSound(g_Window);
 
 	// ウインドウの表示(初期化処理の後に行う)
 	ShowWindow(g_Window, nCmdShow);
@@ -119,7 +118,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	UnregisterClass(CLASS_NAME, wcex.hInstance);
 
 	// 終了処理
-	CSound::UninitSound();
 	CManager::Uninit();
 
 	return (int)msg.wParam;

@@ -61,12 +61,27 @@
     <Filter Include="State\PlayerState\StateDamage">
       <UniqueIdentifier>{954bb98c-37ad-4c01-938d-1fd3e2a8f3a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="State\EnemyState">
+      <UniqueIdentifier>{6b1e4f13-82d3-4f02-bb5b-8dbbb5a4d969}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\EnemyState\StateSarch">
+      <UniqueIdentifier>{5e3ff2de-8755-4633-bf61-bcc3cb8eb9e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\EnemyState\StateBattle">
+      <UniqueIdentifier>{c74c4af1-e873-4c33-bec2-54ef648bd12e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\EnemyState\StateIdle">
+      <UniqueIdentifier>{fec75d72-923e-44ab-a635-10ddab8e0981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\EnemyState\StateMove">
+      <UniqueIdentifier>{f0b87e18-4a07-43b2-8a35-e7966b688a2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\EnemyState\StateAttack">
+      <UniqueIdentifier>{17a8984f-7933-4ea1-8a4f-e27bcf7a9f98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="field.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="polygon.cpp">
       <Filter>ソース ファイル\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="polygon3d.cpp">
@@ -228,15 +243,69 @@
     <ClCompile Include="state_player_damage_small.cpp">
       <Filter>State\PlayerState\StateDamage</Filter>
     </ClCompile>
+    <ClCompile Include="state_player_block.cpp">
+      <Filter>State\PlayerState\StateBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_block_idle.cpp">
+      <Filter>State\PlayerState\StateBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_block_react.cpp">
+      <Filter>State\PlayerState\StateBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_sheathe_sword.cpp">
+      <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_draw_sword.cpp">
+      <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_manager.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="polygon.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_attack.cpp">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_attack_hook.cpp">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_attack_jump.cpp">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_attack_ather.cpp">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_move.cpp">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_move_rotate.cpp">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_move_run.cpp">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_move_walk.cpp">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_idle.cpp">
+      <Filter>State\EnemyState\StateIdle</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_idle_stop.cpp">
+      <Filter>State\EnemyState\StateIdle</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_idle_watch_around.cpp">
+      <Filter>State\EnemyState\StateIdle</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_damage.cpp">
+      <Filter>State\EnemyState</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="field.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="gameObject.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="polygon3d.h">
@@ -344,9 +413,6 @@
     <ClInclude Include="modelAnimation.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="score.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="terrain.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
@@ -445,6 +511,66 @@
     </ClInclude>
     <ClInclude Include="state_player_damage_small.h">
       <Filter>State\PlayerState\StateDamage</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_block.h">
+      <Filter>State\PlayerState\StateBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_block_idle.h">
+      <Filter>State\PlayerState\StateBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_block_react.h">
+      <Filter>State\PlayerState\StateBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_sheathe_sword.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_draw_sword.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_manager.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="polygon.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_attack.h">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_attack_hook.h">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_attack_jump.h">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_attack_ather.h">
+      <Filter>State\EnemyState\StateAttack</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_move.h">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_move_rotate.h">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_move_run.h">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_move_walk.h">
+      <Filter>State\EnemyState\StateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_idle.h">
+      <Filter>State\EnemyState\StateIdle</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_idle_stop.h">
+      <Filter>State\EnemyState\StateIdle</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_idle_watch_around.h">
+      <Filter>State\EnemyState\StateIdle</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy.h">
+      <Filter>State\EnemyState</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_damage.h">
+      <Filter>State\EnemyState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

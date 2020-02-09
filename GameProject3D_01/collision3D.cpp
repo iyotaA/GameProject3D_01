@@ -38,6 +38,36 @@ bool CCollision3DJudge::Collision3D_Spher_Point(CCollisionSphere* pSA, XMFLOAT3*
 	return sqrtf(sub.x * sub.x + sub.y * sub.y + sub.z * sub.z) <= pSA->GetRadius() ? true : false;
 }
 
+// 球とOBBの衝突判定
+bool CCollision3DJudge::Collision3D_Sphere_OBB(CCollisionSphere* pSphere, CCollisionOBB& obb)
+{
+	Vector3 Vec(0, 0, 0);   // 最終的に長さを求めるベクトル
+
+	// 各軸についてはみ出た部分のベクトルを算出
+	for (int i = 0; i < 3; i++)
+	{
+		FLOAT L = obb.GetDirect(i).Length() * obb.GetLen_W(i);
+		if (L <= 0) continue;  // L=0は計算できない
+		FLOAT s = obb.GetDirect(i).VDot((pSphere->GetCenter() - obb.GetPos_W())) / L;
+
+		// sの値から、はみ出した部分があればそのベクトルを加算
+		s = fabs(s);
+		if (s > 1) {
+			Vec += (1 - s) * L * obb.GetDirect(i) * obb.GetLen_W(i);   // はみ出した部分のベクトル算出
+		}
+	}
+
+	float length = Vec.Length();   // 長さを出力
+
+	if ((length <= pSphere->GetRadius())) {
+		length = pSphere->GetRadius() - length;
+		pSphere->SetCenter(&(pSphere->GetCenter() + Vec * length));
+		return true;
+	}
+
+	return false;
+}
+
 bool CCollision3DJudge::Collision3D_OBB_OBB(CCollisionOBB& obb1, CCollisionOBB& obb2)
 {
 	// 各方向ベクトルの確保
@@ -167,5 +197,29 @@ bool CCollision3DJudge::Collision3D_OBB_OBB(CCollisionOBB& obb1, CCollisionOBB& 
 
 	// 分離平面が存在しないので「衝突している」
 	return true;
+}
+
+// 点とOBBの距離を求める
+float CCollision3DJudge::LenOBBToPoint(CCollisionOBB& obb, Vector3* p)
+{
+	Vector3 Vec(0, 0, 0);   // 最終的に長さを求めるベクトル
+
+	// 各軸についてはみ出た部分のベクトルを算出
+	for (int i = 0; i < 3; i++)
+	{
+		FLOAT L = obb.GetDirect(i).Length() * obb.GetLen_W(i);
+		if (L <= 0) continue;  // L=0は計算できない
+		FLOAT s = obb.GetDirect(i).VDot((*p - obb.GetPos_W())) / L;
+
+		// sの値から、はみ出した部分があればそのベクトルを加算
+		s = fabs(s);
+		if (s > 1) {
+			Vec += (1 - s) * L * obb.GetDirect(i) * obb.GetLen_W(i);   // はみ出した部分のベクトル算出
+		}
+	}
+
+	float length = Vec.Length();
+	*p += Vec;
+	return Vec.Length();   // 長さを出力
 }
 
