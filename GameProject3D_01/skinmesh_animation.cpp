@@ -420,7 +420,7 @@ void CSkinModel::DrawStaticMesh()
 		MATERIAL material;
 		material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 
-		material.Ambient = COLOR(ambient.r * 2, ambient.g * 2, ambient.b * 2, ambient.a);
+		material.Ambient = COLOR(0.8f, 0.8f, 0.8f, ambient.a);
 		m_Shader->SetMaterial(material);
 		m_Shader->Set();
 
@@ -498,7 +498,7 @@ void CSkinModel::DrawMesh(const aiNode* pNode)
 			MATERIAL material;
 			material.Diffuse = COLOR(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 
-			material.Ambient = COLOR(ambient.r *1.2f, ambient.g * 1.2f, ambient.b * 1.2f, ambient.a);
+			material.Ambient = COLOR(0.2f, 0.2f, 0.2f, 0.1f);
 
 			m_Shader->SetMaterial(material);
 			m_Shader->SetCameraPositoin(&CCameraManager::GetCamera()->GetPosition());
@@ -556,8 +556,10 @@ void CSkinModel::update(int addAnimationFrame)
 	// アニメーションデータを持っているか
 	if (!m_pScene->HasAnimations()) return;
 
+	if (m_StopMotion)return;
+
 	// アニメーションブレンドするか？しないか？
-	m_IsAnimationBlending ? AnimationBlend(addAnimationFrame) : Animation(addAnimationFrame);
+	m_AnimationBlending ? AnimationBlend(addAnimationFrame) : Animation(addAnimationFrame);
 
 	// ボーンの各行列を計算
 	CalculateBoneMatrix();
@@ -706,8 +708,8 @@ void CSkinModel::AnimationBlend(int addAnimationFrame)
 	for (auto c = 0; c < pAnimationCurrent->mNumChannels; c++) {
 
 		// 現在フレームのアニメーション行列の回転・平行移動成分を取得
-		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_CurrentAnimationFrame);
-		int CurrentFrameTarget = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_TargetAnimationFrame);
+		int CurrentFrame = m_StopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_CurrentAnimationFrame);
+		int CurrentFrameTarget = m_StopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_TargetAnimationFrame);
 
 		// ノードアニメーション取得
 		aiNodeAnim* pNodeAnimCurrent = pAnimationCurrent->mChannels[c];
@@ -741,7 +743,7 @@ void CSkinModel::AnimationBlend(int addAnimationFrame)
 	// ブレンド値を更新
 	m_PerBlend += 0.05f;
 	if (m_PerBlend >= m_PerBlendEnd) {
-		m_IsAnimationBlending = false;
+		m_AnimationBlending = false;
 		m_CurrentAnimationFrame = m_TargetAnimationFrame;
 
 		m_CurrentAnimId = m_TargetAnimId;
@@ -772,7 +774,7 @@ void CSkinModel::Animation(int addAnimationFrame)
 	for (auto c = 0; c < pAnimationCurrent->mNumChannels; c++) {
 
 		// 現在フレームのアニメーション行列の回転・平行移動成分を取得
-		int CurrentFrame = m_IsStopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_CurrentAnimationFrame);
+		int CurrentFrame = m_StopMotion ? (int)pAnimationCurrent->mDuration * (m_MotionFrame / 100.0f) : static_cast<int>(m_CurrentAnimationFrame);
 
 		// ノードアニメーション取得
 		aiNodeAnim* pNodeAnimCurrent = pAnimationCurrent->mChannels[c];
@@ -924,7 +926,7 @@ void CSkinModel::SetAnimation(const unsigned int _id, const float _end_blend_num
 {
 	if (m_TargetAnimId == _id)return;
 
-	m_IsAnimationBlending = true;
+	m_AnimationBlending = true;
 	m_TargetAnimationFrame = 0.0f;
 	m_PerBlend = 0.0f;
 	m_PerBlendEnd = _end_blend_num;

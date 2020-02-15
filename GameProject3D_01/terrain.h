@@ -12,6 +12,8 @@ public:
 	void Uninit();
 	void Update();
 	void Draw();
+	void DrawGUI();
+	const Vector3 GetAt() { return m_Position; }
 
 	int GetIndexCount();
 	float GetHeight(XMFLOAT3* _position);
@@ -37,7 +39,6 @@ private:
 	bool InitializeBuffers();
 	void UninitBuffers();
 	void DrawBuffers();
-	void DrawGUI();
 
 	int             m_terrainWidth, m_terrainHeight;
 	int             m_vertexCount, m_indexCount;

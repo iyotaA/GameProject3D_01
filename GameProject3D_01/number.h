@@ -12,7 +12,7 @@ public:
 	{}
 	~CNumber(){}
 
-	void Draw()override;
+	virtual void Draw()override;
 	void SetNum(float num) { m_Num = num; }
 
 private:

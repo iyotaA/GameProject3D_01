@@ -6,7 +6,7 @@
 class CStateEnemyMoveWalk : public CStateEnemyMove
 {
 public:
-	CStateEnemyMoveWalk(CEnemy* pEnemy, float StartSpeed);
+	CStateEnemyMoveWalk(CEnemy* pEnemy);
 	virtual ~CStateEnemyMoveWalk();
 	virtual void Update(CEnemy* pEnemy) override{}
 	virtual void UpdateMoveState(CStateEnemyMove* pMoveState, CEnemy* pEnemy) override;
@@ -17,7 +17,6 @@ private:
 
 private:
 	float m_MoveSpeed;
-	float m_StartSpeed;
 	float m_TargetSpeed;
 	float m_StartLength;
 	float m_TargetLength;

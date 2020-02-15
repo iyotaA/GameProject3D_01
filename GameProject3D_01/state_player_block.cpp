@@ -6,6 +6,7 @@
 #include "player.h"
 #include "state_player_block.h"
 #include "state_player_block_idle.h"
+#include "state_player_died.h"
 
 CStatePlayerBlock::CStatePlayerBlock(CPlayer* pPlayer)
 	: m_pStateBlock(new CStatePlayerBlockIdle(pPlayer))
@@ -22,6 +23,12 @@ CStatePlayerBlock::~CStatePlayerBlock()
 
 void CStatePlayerBlock::Update(CPlayer* pPlayer)
 {
+	// Ž€–SƒXƒe[ƒg‚É‘JˆÚ
+	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
 	if (m_FrameCountStart) {
 		m_FrameBeteweenGard++;
 	}

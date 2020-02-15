@@ -14,6 +14,8 @@ private:
 	CStateEnemyIdleStop() {}	// デフォルトコンストラクタ封印
 	void Move(CEnemy* pEnemy);
 	void Action(CEnemy* pEnemy);
+	void ChangeScoutingState(CStateEnemyIdle* pIdleState, CEnemy* pEnemy);
+	void ChangeBattleState(CEnemy* pEnemy);
 
 private:
 	int m_FrameCounter;

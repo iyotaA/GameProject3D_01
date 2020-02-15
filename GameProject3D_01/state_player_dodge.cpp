@@ -5,6 +5,7 @@
 #include "state_player_damage_large.h"
 #include "modelAnimation.h"
 #include "player.h"
+#include "state_player_died.h"
 
 CStatePlayerDodge::CStatePlayerDodge(CPlayer* pPlayer)
 	: m_FrameCounter(0)
@@ -14,15 +15,23 @@ CStatePlayerDodge::CStatePlayerDodge(CPlayer* pPlayer)
 	pPlayer->SetAnimation(PLAYER_STATE_ROOL, 1.0f);
 	pPlayer->SetAnimationSpeed(1.2f);
 	pPlayer->SetMoveSpeed(1.0f);
+	pPlayer->Stamina() -= 40;
 	pPlayer->Dodged() = true;
 }
 
 CStatePlayerDodge::~CStatePlayerDodge()
 {
+
 }
 
 void CStatePlayerDodge::Update(CPlayer* pPlayer)
 {
+	// 死亡ステートに遷移
+	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
 	// ダメージステートに遷移
 	if (pPlayer->Damaged()) {
 		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
@@ -53,6 +62,6 @@ void CStatePlayerDodge::Move(CPlayer* pPlayer)
 		return;
 	}
 
-	m_Velocity *= 0.99f;
+	m_Velocity *= 0.98f;
 	pPlayer->AddVelocity(m_Velocity);
 }

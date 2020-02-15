@@ -5,9 +5,14 @@
 #include "camera_manager.h"
 #include "MathFunc.h"
 
-float lerp(float start, float end, float t)
+float Lerp(float start, float end, float t)
 {
     return (1 - t) * start + t * end;
+}
+
+Vector3 Lerp(Vector3 start, Vector3 end, float t)
+{
+	return XMVectorLerp(start, end, t);
 }
 
 XMFLOAT2 GetScreenPos(Vector3 World_Pos)
@@ -38,5 +43,21 @@ XMFLOAT2 GetScreenPos(Vector3 World_Pos)
 	view_vec = XMVector3Transform(view_vec, viewport);
 
 	return XMFLOAT2(view_vec.x, view_vec.y);
+}
+
+float RotateDegree_Normalize(float deg)
+{
+	float fraction = deg - (int)deg;		// 端数（小数点以下）
+	int degree = 360 % (int)deg;
+	return fraction + degree;
+}
+
+float RotateRadian_Normalize(float rad)
+{
+	int deg_to_rad = (rad * RADIAN_TO_DEGREE);
+	if (deg_to_rad == 0)return 0.0f;
+
+	float radian = 360 % deg_to_rad;
+	return radian * DEGREE_TO_RADIAN;
 }
 

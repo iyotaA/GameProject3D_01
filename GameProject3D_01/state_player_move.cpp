@@ -9,6 +9,7 @@
 #include "state_player_sheathe_sword.h"
 #include "state_player_block.h"
 #include "state_player_dodge.h"
+#include "state_player_died.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
@@ -25,14 +26,22 @@ CStatePlayerMove::~CStatePlayerMove()
 
 void CStatePlayerMove::Update(CPlayer* pPlayer)
 {
+	// 死亡ステートに遷移
+	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
 	// ダメージステートに遷移
 	if (pPlayer->Damaged()) {
+		pPlayer->Dashed() = false;
 		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
 		return;
 	}
 
 	// 入力がされてなければ待機モーションに
 	if (!MoveEntry()) {
+		pPlayer->Dashed() = false;
 		pPlayer->ChangeState(new CStatePlayerIdle(pPlayer));
 		return;
 	}
@@ -53,11 +62,12 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 {
 	if (CInput::GetKeyTrigger(VK_SPACE) || CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A)) {
 
-		// 10F経ってから回避可能に
-		//if (m_FrameCounter >= 10) {
+		// スタミナが20以上あると回避ステートに遷移
+		if ((pPlayer->Stamina() > 40)) {
+			pPlayer->Dashed() = false;
 			pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
 			return true;
-		//}
+		}
 	}
 
 	// 攻撃ステートに遷移
@@ -69,6 +79,7 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 		//	pPlayer->ChangeState(new CStatePlayerDrawSword(pPlayer, true));
 		//	return true;
 		//}
+		pPlayer->Dashed() = false;
 		pPlayer->WeaponState() = SWORD_STATE_DRAW;
 		pPlayer->ChangeState(new CStatePlayerAttack(pPlayer, PLAYER_STATE_ATTACK_JUMP));
 		return true;
@@ -78,6 +89,7 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 	if (CInput::GetGamepadPress(LEFT_TRRIGER) || CInput::GetKeyPress(VK_LSHIFT)) {
 
 		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
+			pPlayer->Dashed() = false;
 			pPlayer->ChangeState(new CStatePlayerBlock(pPlayer));
 			return true;
 		}
@@ -87,6 +99,7 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 	if ((pPlayer->WeaponState() == SWORD_STATE_DRAW) &&
 		((CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X) || CInput::GetKeyTrigger('K')))) {
 
+		pPlayer->Dashed() = false;
 		pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, true));
 		return true;
 	}

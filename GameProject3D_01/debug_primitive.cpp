@@ -20,15 +20,15 @@
 #define CIRCLE_VERTEX_COUNT	(8)
 
 std::vector<VERTEX_3D>	CDebugPrimitive::m_Vertices;
-std::vector<WORD>       CDebugPrimitive::m_Indices;
-ID3D11Buffer*			CDebugPrimitive::m_VertexBufer;
-ID3D11Buffer*			CDebugPrimitive::m_IndexBufer;
-CShaderDefault*			CDebugPrimitive::m_Shader;
-CTexture*				CDebugPrimitive::m_Texture;
+std::vector<WORD>			CDebugPrimitive::m_Indices;
+ID3D11Buffer*					CDebugPrimitive::m_VertexBufer;
+ID3D11Buffer*					CDebugPrimitive::m_IndexBufer;
+CShaderDefault*				CDebugPrimitive::m_Shader;
+CTexture*							CDebugPrimitive::m_Texture;
 
-unsigned int			CDebugPrimitive::m_CircleCount;
-unsigned int            CDebugPrimitive::m_CubeCount;
-bool					CDebugPrimitive::m_IsDisplayed;
+unsigned int	CDebugPrimitive::m_CircleCount;
+unsigned int  CDebugPrimitive::m_CubeCount;
+bool				CDebugPrimitive::m_IsDisplayed;
 
 
 void CDebugPrimitive::DebugPrimitive_Init(void)
@@ -136,7 +136,7 @@ void CDebugPrimitive::DebugPrimitive_BatchRun(void)
 }
 
 
-void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere, const XMFLOAT4* _color)
+void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere)
 {
 	//•\Ž¦‚·‚éŽž‚Ì‚Ý
 	if (!m_IsDisplayed)return;
@@ -150,12 +150,12 @@ void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere,
 
 	for (int i = 0; i < CIRCLE_VERTEX_COUNT; i++) {
 		VERTEX_3D vertex;
-		vertex.Position.x = cos(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().x;
-		vertex.Position.y = sin(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().y;
-		vertex.Position.z = _sphere->GetCenter().z;
-		vertex.Normal     = Vector3(0.0f, 1.0f, 0.0f);
-		vertex.Diffuse    = *_color;
-		vertex.TexCoord   = XMFLOAT2(0.0f, 0.0f);
+		vertex.Position.x		= cos(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().x;
+		vertex.Position.y		= sin(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().y;
+		vertex.Position.z		= _sphere->GetCenter().z;
+		vertex.Normal		= Vector3(0.0f, 1.0f, 0.0f);
+		vertex.Diffuse			= _sphere->GetColor();
+		vertex.TexCoord		= XMFLOAT2(0.0f, 0.0f);
 
 		m_Vertices.push_back(vertex);
 	}
@@ -182,7 +182,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere,
 		vertex.Position.y = cos(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().y;
 		vertex.Position.z = sin(static_cast<double>(a) * static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().z;
 		vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-		vertex.Diffuse = *_color;
+		vertex.Diffuse = _sphere->GetColor();
 		vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 
 		m_Vertices.push_back(vertex);
@@ -212,7 +212,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere,
 		vertex.Position.y = _sphere->GetCenter().y;
 		vertex.Position.z = sin(static_cast<double>(a)* static_cast<double>(i)) * _sphere->GetRadius() + _sphere->GetCenter().z;
 		vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-		vertex.Diffuse = *_color;
+		vertex.Diffuse = _sphere->GetColor();
 		vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 
 		m_Vertices.push_back(vertex);
@@ -232,7 +232,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere,
 	m_CircleCount++;
 }
 
-void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const XMFLOAT4* _color)
+void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube)
 {
 	//•\Ž¦‚·‚éŽž‚Ì‚Ý
 	if (!m_IsDisplayed)return;
@@ -258,7 +258,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (-vFront.z * length3.z) + (vUp.z * length3.y) + (-vRigth.z * length3.x)
 		);
 	vertex.Normal   = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse  = *_color;
+	vertex.Diffuse  = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -269,7 +269,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (-vFront.z * length3.z) + (vUp.z * length3.y) + (vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -280,7 +280,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (-vFront.z * length3.z) + (-vUp.z * length3.y) + (vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -291,7 +291,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (-vFront.z * length3.z) + (-vUp.z * length3.y) + (-vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -305,7 +305,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (vFront.z * length3.z) + (vUp.z * length3.y) + (-vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -316,7 +316,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (vFront.z * length3.z) + (vUp.z * length3.y) + (vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -327,7 +327,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (vFront.z * length3.z) + (-vUp.z * length3.y) + (vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -338,7 +338,7 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 		center.z + (vFront.z * length3.z) + (-vUp.z * length3.y) + (-vRigth.z * length3.x)
 	);
 	vertex.Normal = Vector3(0.0f, 1.0f, 0.0f);
-	vertex.Diffuse = *_color;
+	vertex.Diffuse = _cube->GetColor();
 	vertex.TexCoord = XMFLOAT2(0.0f, 0.0f);
 	m_Vertices.push_back(vertex);
 
@@ -387,11 +387,5 @@ void CDebugPrimitive::DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const X
 
 void CDebugPrimitive::DrawGUI()
 {
-	using namespace ImGui;
-
-	Begin("Collision");
-	{
-		Checkbox("DisplayCollision", &m_IsDisplayed);
-	}
-	End();
+	ImGui::Checkbox("CollisionGrid", &m_IsDisplayed);
 }

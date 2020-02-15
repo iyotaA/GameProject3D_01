@@ -13,8 +13,8 @@ public:
 
 	static void DrawGUI();
 
-	static void DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere, const XMFLOAT4* _color);
-	static void DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube, const XMFLOAT4* _color);
+	static void DebugPrimitive_BatchCirecleDraw(CCollisionSphere* _sphere);
+	static void DebugPrimitive_BatchCubeDraw(CCollisionOBB* _cube);
 
 private:
 	static std::vector<VERTEX_3D>	m_Vertices;

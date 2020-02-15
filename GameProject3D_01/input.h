@@ -17,18 +17,28 @@ public:
 	static bool GetKeyTrigger(BYTE KeyCode);
 	static bool GetKeyRelease(BYTE KeyCode);
 
-	static bool GetGamepadPress(int state);
-	static bool GetGamepadTrigger(int state);
-	static bool GetGamepadRelease(int state);
+	static bool GetGamepadPress(int button);
+	static bool GetGamepadTrigger(int button);
+	static bool GetGamepadRelease(int button);
 	static bool GetIsInputStick(int stick);
 	static XMFLOAT2 GetGamepadLeftStick();
 	static XMFLOAT2 GetGamepadRightStick();
+
+	static void InputEnable(bool enable);
+	static void EnableKeyCode(BYTE code);
+	static void EnableGamepadButton(int button);
+	static void EnableGamepadStick(bool enable);
 
 private:
 	static bool InputLeftThumb();
 	static bool InputRightThumb();
 
 private:
+	static bool m_InputEnable;
+	static bool m_StickEnable;
+	static std::vector<BYTE> m_EnableKeyCode;
+	static std::vector<int> m_EnableGamepadButton;
+
 	// キーボード
 	static BYTE m_OldKeyState[256];
 	static BYTE m_KeyState[256];

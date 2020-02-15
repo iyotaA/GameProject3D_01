@@ -1,7 +1,6 @@
 
 // インクルード ////////////////////////////////////
 #include "game_objects_all.h"
-#include "user_interface_manager.h"
 #include "scene.h"
 #include "title.h"
 #include "game.h"
@@ -12,8 +11,8 @@
 
 // グローバル変数 ////////////////////////////////////
 CScene*	CManager::m_Scene;
-int CManager::m_Score;
-
+bool CManager::m_GameClear;
+bool CManager::m_GameFailed;
 
 void CManager::Init()
 {
@@ -26,27 +25,26 @@ void CManager::Init()
 	// サウンドの初期化
 	CSound::InitSound(GetWindow());
 
-	//カメラの生成
-	CCameraManager::CreateCamera();
-	CCameraManager::CreateCamera();
-
 	// シェーダーの初期化
 	ShaderManager::Init();
 
 	// コリジョングリッド初期化
 	CDebugPrimitive::DebugPrimitive_Init();
 
+	// フェードマネージャーの初期化
+	CFadeManager::Init();
+
 	// シーンの初期化
-	SetScene<CGame>();
+	SetScene<CResult>();
 
 	//カメラマネージャーの設定
-	CCameraManager::SetCurrentCameraId(0);
 	CCameraManager::Init();
 
 	// imgui初期化
 	CImgui::Init();
 
-	m_Score = 0;
+	m_GameClear = false;
+	m_GameFailed = false;
 }
 
 void CManager::Uninit()
@@ -58,17 +56,20 @@ void CManager::Uninit()
 	m_Scene->Uninit();
 	delete m_Scene;
 
+	// フェードマネージャーの終了処理
+	CFadeManager::Uninit();
+
 	// コリジョングリッド終了処理
 	CDebugPrimitive::DebugPrimitive_Uninit();
 
 	// シェーダーの終了処理
 	ShaderManager::Uninit();
 
-	// カメラ破壊
-	CCameraManager::DeleteCamera();
-
 	// UI破壊
 	CUserInterfaceManager::DeleteAllUI();
+
+	// カメラ破壊
+	CCameraManager::DeleteCamera();
 
 	// サウンドの終了処理
 	CSound::UninitSound();
@@ -88,6 +89,12 @@ void CManager::Update()
 	// カメラ更新
 	CCameraManager::Update();
 
+	// フェードマネージャー更新
+	CFadeManager::Update();
+
+	// UI更新
+	CUserInterfaceManager::Update();
+
 	// シーンの更新
 	m_Scene->Update();
 }
@@ -104,15 +111,14 @@ void CManager::Draw()
 	// 描画の開始
 	CRenderer::Begin();
 
-	// GUIの描画
-	DrawGUI();
-
 	// カメラ投影
 	CCameraManager::Project();
 
 	// シーンの描画
 	m_Scene->Draw();
+	m_Scene->DrawGUI();
 
+	// UI描画
 	CUserInterfaceManager::Draw();
 
 	// imgui描画
@@ -121,11 +127,6 @@ void CManager::Draw()
 	CRenderer::End();
 	// 描画の終了
 
-}
-
-void CManager::DrawGUI()
-{
-	DrawFPS();
 }
 
 CScene* CManager::GetScene()

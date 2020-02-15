@@ -4,6 +4,7 @@
 #include "player.h"
 #include "state_player_draw_sword.h"
 #include "state_player_attack_jump.h"
+#include "state_player_died.h"
 
 CStatePlayerDrawSword::CStatePlayerDrawSword(CPlayer* pPlayer, bool isMove)
 	: m_FrameCounter(0.0f)
@@ -11,6 +12,8 @@ CStatePlayerDrawSword::CStatePlayerDrawSword(CPlayer* pPlayer, bool isMove)
 {
 	pPlayer->SetAnimation(PLAYER_STATE_DRAW_A_SWORD, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
+
+	CSound::Play(SOUND_LABEL_SE_DRAW_A_SWORD);
 }
 
 CStatePlayerDrawSword::~CStatePlayerDrawSword()
@@ -20,6 +23,12 @@ CStatePlayerDrawSword::~CStatePlayerDrawSword()
 
 void CStatePlayerDrawSword::Update(CPlayer* pPlayer)
 {
+	// 死亡ステートに遷移
+	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
 	// カウンター更新
 	m_FrameCounter++;
 

@@ -12,6 +12,8 @@ public:
 	void Uninit();
 	void Update();
 	void Draw();
+	void DrawGUI(){}
+	const Vector3 GetAt() { return m_Position; }
 
 	void SetDirection(Vector3X3* direction) { m_Direction = *direction; }
 

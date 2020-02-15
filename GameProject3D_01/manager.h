@@ -8,18 +8,17 @@ class CManager
 public:
 	static 	enum
 	{
-		E_Camera = 0,
-		E_Background,
-		E_3D,
-		E_Effect,
-		E_Max
+		LAYER_CAMERA = 0,
+		LAYER_BACKGROUND,
+		LAYER_OBJECT,
+		LAYER_EFFECT,
+		LAYER_MAX
 	};
 
 	static void Init();
 	static void Uninit();
 	static void Update();
 	static void Draw();
-	static void DrawGUI();
 
 	static CScene* GetScene();
 
@@ -36,12 +35,13 @@ public:
 		m_Scene->Init();
 	}
 
-	static void AddScore() { m_Score++; }
-	static int GetScore() { return m_Score; }
+	static bool& Clear() { return m_GameClear; }
+	static bool& Failed() { return m_GameFailed; }
 
 private:
 	static CScene* m_Scene;
-	static int m_Score;
+	static bool m_GameClear;
+	static bool m_GameFailed;
 
 };
 

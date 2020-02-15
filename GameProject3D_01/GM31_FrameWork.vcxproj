@@ -25,7 +25,9 @@
     <ClCompile Include="camera_manager.cpp" />
     <ClCompile Include="collision3D.cpp" />
     <ClCompile Include="debug_primitive.cpp" />
+    <ClCompile Include="fade_manager.cpp" />
     <ClCompile Include="field.cpp" />
+    <ClCompile Include="image.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiManager.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -44,6 +46,7 @@
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="polygon3d.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="seqence_manager.cpp" />
     <ClCompile Include="shader_2d.cpp" />
     <ClCompile Include="shader_base.cpp" />
     <ClCompile Include="shader_default.cpp" />
@@ -61,6 +64,7 @@
     <ClCompile Include="state_enemy_attack_hook.cpp" />
     <ClCompile Include="state_enemy_attack_jump.cpp" />
     <ClCompile Include="state_enemy_damage.cpp" />
+    <ClCompile Include="state_enemy_died.cpp" />
     <ClCompile Include="state_enemy_idle.cpp" />
     <ClCompile Include="state_enemy_idle_stop.cpp" />
     <ClCompile Include="state_enemy_idle_watch_around.cpp" />
@@ -80,6 +84,7 @@
     <ClCompile Include="state_player_damage.cpp" />
     <ClCompile Include="state_player_damage_large.cpp" />
     <ClCompile Include="state_player_damage_small.cpp" />
+    <ClCompile Include="state_player_died.cpp" />
     <ClCompile Include="state_player_dodge.cpp" />
     <ClCompile Include="state_player_draw_sword.cpp" />
     <ClCompile Include="state_player_idle.cpp" />
@@ -101,11 +106,13 @@
     <ClInclude Include="collision3D.h" />
     <ClInclude Include="damage.h" />
     <ClInclude Include="debug_primitive.h" />
+    <ClInclude Include="fade_manager.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameObject.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="game_objects_all.h" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imguiManager.h" />
@@ -129,6 +136,7 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="seqence_manager.h" />
     <ClInclude Include="shader_2d.h" />
     <ClInclude Include="shader_all.h" />
     <ClInclude Include="shader_base.h" />
@@ -147,6 +155,7 @@
     <ClInclude Include="state_enemy_attack_hook.h" />
     <ClInclude Include="state_enemy_attack_jump.h" />
     <ClInclude Include="state_enemy_damage.h" />
+    <ClInclude Include="state_enemy_died.h" />
     <ClInclude Include="state_enemy_idle.h" />
     <ClInclude Include="state_enemy_idle_stop.h" />
     <ClInclude Include="state_enemy_idle_watch_around.h" />
@@ -167,6 +176,7 @@
     <ClInclude Include="state_player_damage.h" />
     <ClInclude Include="state_player_damage_large.h" />
     <ClInclude Include="state_player_damage_small.h" />
+    <ClInclude Include="state_player_died.h" />
     <ClInclude Include="state_player_dodge.h" />
     <ClInclude Include="state_player_draw_sword.h" />
     <ClInclude Include="state_player_idle.h" />

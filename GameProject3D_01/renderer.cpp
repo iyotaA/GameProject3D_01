@@ -9,14 +9,14 @@
 // グローバル変数 ////////////////////////////////////
 D3D_FEATURE_LEVEL        CRenderer::m_FeatureLevel     = D3D_FEATURE_LEVEL_11_0;
 
-ID3D11Device*            CRenderer::m_D3DDevice        = NULL;
-ID3D11DeviceContext*     CRenderer::m_ImmediateContext = NULL;
-IDXGISwapChain*          CRenderer::m_SwapChain        = NULL;
-ID3D11RenderTargetView*  CRenderer::m_RenderTargetView = NULL;
-ID3D11DepthStencilView*  CRenderer::m_DepthStencilView = NULL;
-ID3D11DepthStencilState* CRenderer::m_DepthStateEnable = NULL;
-ID3D11DepthStencilState* CRenderer::m_DepthStateDisable= NULL;
-ID3D11DepthStencilView*   CRenderer::m_LightDepthStencilView = NULL;
+ID3D11Device*					CRenderer::m_D3DDevice						= NULL;
+ID3D11DeviceContext*		CRenderer::m_ImmediateContext			= NULL;
+IDXGISwapChain*				CRenderer::m_SwapChain						= NULL;
+ID3D11RenderTargetView*  CRenderer::m_RenderTargetView			= NULL;
+ID3D11DepthStencilView*   CRenderer::m_DepthStencilView				= NULL;
+ID3D11DepthStencilState*  CRenderer::m_DepthStateEnable				= NULL;
+ID3D11DepthStencilState*  CRenderer::m_DepthStateDisable			= NULL;
+ID3D11DepthStencilView*   CRenderer::m_LightDepthStencilView		= NULL;
 ID3D11ShaderResourceView* CRenderer::m_LightDepthShaderResourceView = NULL;
 
 
@@ -207,11 +207,11 @@ void CRenderer::Init()
 void CRenderer::Uninit()
 {
 
-	if( m_ImmediateContext )	m_ImmediateContext->ClearState();
-	if( m_RenderTargetView )	m_RenderTargetView->Release();
-	if( m_SwapChain )			m_SwapChain->Release();
-	if( m_ImmediateContext )	m_ImmediateContext->Release();
-	if( m_D3DDevice )			m_D3DDevice->Release();
+	if( m_ImmediateContext )			m_ImmediateContext->ClearState();
+	if( m_RenderTargetView )			m_RenderTargetView->Release();
+	if( m_SwapChain )						m_SwapChain->Release();
+	if( m_ImmediateContext )			m_ImmediateContext->Release();
+	if( m_D3DDevice )						m_D3DDevice->Release();
 
 }
 
@@ -221,11 +221,11 @@ void CRenderer::Begin()
 {
 	// バックバッファクリア
 	float ClearColor[4] = { 0.0f / 255.0f, 92.0f / 255.0f, 175.0f / 255.0f, 1.0f };
+	m_ImmediateContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 	m_ImmediateContext->ClearRenderTargetView( m_RenderTargetView, ClearColor );
 	m_ImmediateContext->ClearDepthStencilView( m_DepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 }
-
 
 
 void CRenderer::End()
@@ -242,22 +242,6 @@ void CRenderer::SetDepthEnable( bool Enable )
 		m_ImmediateContext->OMSetDepthStencilState( m_DepthStateEnable, NULL );
 	else
 		m_ImmediateContext->OMSetDepthStencilState( m_DepthStateDisable, NULL );
-
-}
-
-void CRenderer::SetWorldViewProjection2D()
-{
-	//XMMATRIX world;
-	//world = XMMatrixIdentity();
-	//m_ImmediateContext->UpdateSubresource(m_WorldBuffer, 0, NULL, &XMMatrixTranspose(world), 0, 0);
-
-	//XMMATRIX view;
-	//view = XMMatrixIdentity();
-	//m_ImmediateContext->UpdateSubresource(m_ViewBuffer, 0, NULL, &XMMatrixTranspose(view), 0, 0);
-
-	//XMMATRIX projection;
-	//projection = XMMatrixOrthographicOffCenterLH( 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f, 0.0f, 1.0f );
-	//m_ImmediateContext->UpdateSubresource( m_ProjectionBuffer, 0, NULL, &XMMatrixTranspose(projection), 0, 0 );
 
 }
 
@@ -310,6 +294,8 @@ void CRenderer::SetTexture(CTexture** Texture, unsigned int Slot, unsigned int N
 	delete[] srv;
 
 }
+
+
 
 void CRenderer::DrawIndexed( unsigned int IndexCount, unsigned int StartIndexLocation, int BaseVertexLocation )
 {

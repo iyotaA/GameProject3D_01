@@ -6,6 +6,7 @@
 #include "state_player_draw_sword.h"
 #include "state_player_sheathe_sword.h"
 #include "state_player_block.h"
+#include "state_player_died.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
@@ -28,6 +29,12 @@ CStatePlayerIdle::~CStatePlayerIdle()
 
 void CStatePlayerIdle::Update(CPlayer* pPlayer)
 {
+	// 死亡ステートに遷移
+	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
 	// 入力・状態遷移
 	Action(pPlayer);
 
@@ -39,7 +46,7 @@ void CStatePlayerIdle::Update(CPlayer* pPlayer)
 	float lerp_deg = m_FrameCounter;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
-	camera->SetLengthToAt(lerp(m_LerpStart, m_LerpEnd, lerp_t));
+	camera->SetLengthToAt(Lerp(m_LerpStart, m_LerpEnd, lerp_t));
 
 	// カウンター更新
 	m_FrameCounter++;

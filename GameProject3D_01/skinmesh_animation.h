@@ -47,8 +47,8 @@ public:
 	Vector3 GetWorldPosition( XMMATRIX* _world,const char* _bone_name);
 	XMMATRIX* GetBoneMatrix(XMMATRIX* _world, const char* _bone_name);
 
-	void StopMotion(bool isStop) { m_IsStopMotion = isStop; }
-	void DrawNormal(bool DrawNormal) { m_IsDrawNormals = DrawNormal; }
+	void StopMotion(bool isStop) { m_StopMotion = isStop; }
+	void DrawNormal(bool DrawNormal) { m_DrawNormals = DrawNormal; }
 
 	// ˆø” / _next : true = Next / _next : false = Back
 	void SetAnimation(bool _next);
@@ -57,16 +57,16 @@ public:
 	int  GetCurrentAnimFrameNum();
 
 	char GetCurrentAnimId() { return m_CurrentAnimId; }
-	void SwitchFlag() { m_IsStopMotion = m_IsStopMotion ? false : true; }
+	void SwitchFlag() { m_StopMotion = m_StopMotion ? false : true; }
 	void SetAnimationSpeed(float _speed) { m_AnimationSpeed = _speed; }
 
 	int GetAnimationNum() { return m_pScene->mNumAnimations; }
 	float* AnimationSpeed() { return &m_AnimationSpeed; }
-	bool*  IsStopMotion() { return &m_IsStopMotion; }
+	bool*  IsStopMotion() { return &m_StopMotion; }
 	bool*  DrawAtLine() { return &m_DrawAtLine; }
 	int*   MotionFrame() { return &m_MotionFrame; }
 	char*  GetCurrentAnimName(){ return m_pScene->mAnimations[m_CurrentAnimId]->mName.data; }
-	bool&  AnimationBlending() { return m_IsAnimationBlending; }
+	bool&  AnimationBlending() { return m_AnimationBlending; }
 
 private:
 	std::unordered_map<std::string, CTexture*>	m_Texture;
@@ -82,10 +82,10 @@ private:
 	float    m_Size;
 
 	int  m_MotionFrame = 0;
-	bool m_IsStopMotion = false;
+	bool m_StopMotion = false;
 	bool m_DrawAtLine = false;
-	bool m_IsDrawNormals = false;
-	bool m_IsAnimationBlending = false;
+	bool m_DrawNormals = false;
+	bool m_AnimationBlending = false;
 	char m_CurrentAnimId = 0;
 	char m_TargetAnimId = 0;
 	float m_AnimationSpeed = 1.0f;

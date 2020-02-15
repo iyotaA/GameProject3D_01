@@ -24,7 +24,9 @@ HWND GetWindow()
 void DrawFPS()
 {
 	ImGui::Begin("System");
-	ImGui::Text("[fps]:%.1f", (1000.0 / (dwCurrentTime - dwExecLastTime)));
+	ImGui::Text("FPS: %.1f //", ImGui::GetIO().Framerate);
+	ImGui::SameLine();
+	ImGui::Text("%.2f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::End();
 }
 

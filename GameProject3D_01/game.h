@@ -9,29 +9,74 @@ class CGame : public CScene
 public:
 	void Init()
 	{
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		//		UIオブジェクトの初期化
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		{// ライフ・スタミナゲージのフレーム
+			CImage* image = new CImage("asset/image/user_interface/ui_header.png");
+			image->SetSize(XMFLOAT2(720.0f, 160.0f));
+			image->SetPosition(XMFLOAT2(360.0f, 80.0f));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+		}
+		{// クエストボード
+			CImage* image = new CImage("asset/image/user_interface/game_quest.png");
+			image->SetSize(XMFLOAT2(600.0f, 600.0f));
+			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_2);// UIに追加する
+			m_UI.push_back(image);
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		//		3Dオブジェクトの初期化
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+			//カメラの生成
+		CCameraManager::CreateCamera();
+
 		// スカイドームの初期化
-		AddGameObject<CSkyDome>(CManager::E_Background);
+		AddGameObject<CSkyDome>(CManager::LAYER_BACKGROUND);
 
 		// フィールドの初期化
-		AddGameObject<CTerrain>(CManager::E_Background);
-		//AddGameObject<CField>(CManager::E_Background);
+		AddGameObject<CTerrain>(CManager::LAYER_BACKGROUND);
 
 		// エネミーの初期化
-		AddGameObject<CEnemy>(CManager::E_3D);
+		AddGameObject<CEnemy>(CManager::LAYER_OBJECT);
 
 		// プレイヤーの初期化
 		CPlayer* player;
-		player = AddGameObject<CPlayer>(CManager::E_3D);
+		player = AddGameObject<CPlayer>(CManager::LAYER_OBJECT);
 
 		// カメラセット
 		CCamera* camera = CCameraManager::GetCamera();		// 注視点
-		camera->SetAt(player, Vector3(0.0f, 2.5f, 0.0f));
+		camera->SetAt(player, Vector3(0.0f, 2.3f, 0.0f));
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// 入力を禁止する
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		CInput::InputEnable(false);
+		// 特定のキーを入力可能にする
+		CInput::EnableKeyCode(VK_RETURN);
+		CInput::EnableGamepadButton(XINPUT_GAMEPAD_A);
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// シーケンスの初期化
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		CSeqenceManager::Init();
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		// BGM再生
-		CSound::Play(SOUND_LABEL_BGM_GAME);
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		CSound::Play(SOUND_LABEL_BGM_ENVIRONMENT);
 
 		m_time = 0.0f;
-		FrameCount = 0;
+		m_FrameCounter = 0;
+		m_Start = false;
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// フェードインスタート
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		CFadeManager::StartFadeIn(3.0f);
 	}
 
 	void Uninit()
@@ -39,46 +84,81 @@ public:
 		// ゲームの終了処理
 		CSound::StopSound(SOUND_LABEL_BGM_GAME);
 
+		// シーケンスの終了処理
+		CSeqenceManager::Uninit();
+
 		// 継承元の終了処理
 		CScene::Uninit();
 	}
 
 	void Update()
 	{
+		if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A) || CInput::GetKeyTrigger(VK_RETURN)) {
+			if (!m_Start) {
+				m_UI[0]->Delete() = true;
+				m_Start = true;
+
+				//===== 入力を可能に戻す ==============
+				CInput::InputEnable(true);
+			}
+		}
+
+		// クリア又は、失敗でシーン遷移 ===============================================
+		if (CManager::Clear() || CManager::Failed()) {
+			if (CFadeManager::FadeInComplete()) {
+				if (!CFadeManager::FadeOut()) {
+					CFadeManager::StartFadeOut(3.0f);						// フェードアウト開始
+					m_FrameCounter = 0;
+				}
+			}
+		}
+
+		// フェードアウト終了でシーン遷移 ===========================================
+		if (CManager::Clear() || CManager::Failed()) {
+			if (CFadeManager::FadeOutComplete()) {
+				CManager::SetScene<CResult>();
+				return;
+			}
+		}
+
+		// シーケンスの終了処理
+		CSeqenceManager::Update();
+
 		CScene::Update();
-
-		//if (FrameCount % 100 == 0) {
-
-		//	int index;
-		//	index = rand() % 20;
-		//	AddGameObject<CEnemy>(CManager::E_3D)->SetPosition(XMFLOAT3(EnemySpawnPlace[index].x, 6.0f, EnemySpawnPlace[index].y));
-		//}
-
-		//if (IsClear()) {
-		//	CManager::SetScene<CResult>();
-		//}
-
-		FrameCount++;
+		m_FrameCounter++;
 	}
 
 	void Draw()
 	{
-
-		ImGui::Begin("System");
-		ImGui::SetWindowFontScale(1.2f);
-		ImGui::Text("[Scene]:Game");
-		//ImGui::Columns(3, "System", true);
-		ImGui::End();
-
 		CScene::Draw();
 	}
 
-	bool IsClear(void) { return (m_time <= 0.0f) ? true : false; }
+	void DrawGUI()
+	{
+		ImGui::Begin("System");
+		ImGui::SetWindowFontScale(1.3f);
+		ImGui::Text("[Scene : GAME]");
+
+		// FPS表示
+		DrawFPS();
+
+		// コリジョン用のデバッグ表示
+		CDebugPrimitive::DrawGUI();
+		ImGui::End();
+
+
+		// カメラのデバッグ表示
+		CCameraManager::DrawGUI();
+
+		// 各ゲームオブジェクトのデバッグ表示
+		CScene::DrawGUI();
+	}
 
 private:
+	std::vector<CImage*> m_UI;
 	float m_time;
-	XMFLOAT2 EnemySpawnPlace[20];
-	int FrameCount;
+	int m_FrameCounter;
+	bool m_Start;
 
 };
 

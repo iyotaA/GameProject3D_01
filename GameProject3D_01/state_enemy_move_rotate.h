@@ -5,7 +5,7 @@
 class CStateEnemyMoveRotate : public CStateEnemyMove
 {
 public:
-	CStateEnemyMoveRotate(CEnemy* pEnemy, float StartSpeed);
+	CStateEnemyMoveRotate(CEnemy* pEnemy);
 	virtual ~CStateEnemyMoveRotate();
 	virtual void Update(CEnemy* pEnemy) override{}
 	virtual void UpdateMoveState(CStateEnemyMove* pMoveState, CEnemy* pEnemy) override;
@@ -15,8 +15,8 @@ private:
 	bool Rotate(CEnemy* pEnemy);
 
 private:
-	float m_StartDegree;
-	float m_TargetDegree;
+	float m_StartRadian;
+	float m_TargetRadian;
 	int   m_FrameCounter;
 
 };

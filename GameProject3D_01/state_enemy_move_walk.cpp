@@ -5,9 +5,8 @@
 #include "MathFunc.h"
 
 
-CStateEnemyMoveWalk::CStateEnemyMoveWalk(CEnemy* pEnemy, float StartSpeed)
+CStateEnemyMoveWalk::CStateEnemyMoveWalk(CEnemy* pEnemy)
 	: m_MoveSpeed(1.0f)
-	, m_StartSpeed(StartSpeed)
 	, m_TargetSpeed(1.0f)
 	, m_StartLength(CCameraManager::GetCamera()->GetLengthToAt())
 	, m_TargetLength(5.0f)
