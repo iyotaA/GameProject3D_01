@@ -90,7 +90,7 @@ void CTerrain::Draw()
 	m_Shader->Set();
 
 	DrawBuffers();
-	DrawGUI();
+	//DrawGUI();
 }
 
 
@@ -367,8 +367,6 @@ void CTerrain::DrawGUI()
 	if (ImGui::CollapsingHeader("Field"))
 	{
 		ImGui::Columns(2, "Field");
-
-		if (ImGui::CollapsingHeader("PlayerAreaPosition"))
 		{
 			int id = ImGui::GetColumnIndex();
 			float width = ImGui::GetColumnWidth(id);
@@ -381,11 +379,9 @@ void CTerrain::DrawGUI()
 			ImGui::Text("StandArea_z = %.1f", PlayerArea.z);
 			ImGui::EndChildFrame();
 		}
-
 		ImGui::NextColumn();
 
 		//ÅÉ:: Animation ::ÅÑ
-		if (ImGui::CollapsingHeader("PlayerAreaStatus"))
 		{
 			int id = ImGui::GetColumnIndex();
 			float width = ImGui::GetColumnWidth(id);
@@ -400,7 +396,6 @@ void CTerrain::DrawGUI()
 
 			ImGui::EndChildFrame();
 		}
-
 	}
 
 	ImGui::End();
@@ -444,15 +439,15 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	// va Å~ vb ÇÃ y ê¨ï™ > 0.0f
 	if ((va.z * vb.x - va.x * vb.z > 0.0f) || (va.z * vb.x - va.x * vb.z == 0.0f)) {
 
-		p0 = m_Vertex[x + m_terrainWidth * (z + 1)].Position;		// p1|Å_
-		p1 = m_Vertex[x + m_terrainWidth * z].Position;				//   |Å@Å_
-		p2 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position; // p0|____Å_p2
+		p0 = m_Vertex[x + m_terrainWidth * (z + 1)].Position;				// p1|Å_
+		p1 = m_Vertex[x + m_terrainWidth * z].Position;							//     |Å@Å_
+		p2 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position;		// p0|____Å_p2
 	}
 	// va Å~ vb ÇÃ y ê¨ï™ < 0.0f
 	else {
-		p0 = m_Vertex[(x + 1) + m_terrainWidth * z].Position;       // p2Å_'''''|p0
-		p1 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position; //     Å_   |
-		p2 = m_Vertex[x + m_terrainWidth * z].Position;             //   Å@   Å_|p1
+		p0 = m_Vertex[(x + 1) + m_terrainWidth * z].Position;				// p2Å_'''''''''''|p0
+		p1 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position;		//         Å_    |
+		p2 = m_Vertex[x + m_terrainWidth * z].Position;							//   Å@       Å_|p1
 	}
 
 	// p1 - p0

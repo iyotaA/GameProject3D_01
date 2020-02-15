@@ -8,18 +8,22 @@
 #include "MathFunc.h"
 
 
-CStateEnemyMoveRotate::CStateEnemyMoveRotate(CEnemy* pEnemy, float StartSpeed)
+CStateEnemyMoveRotate::CStateEnemyMoveRotate(CEnemy* pEnemy)
 	: m_FrameCounter(0)
 {
+	// ---   ‰Šú‰»   ------------------------------------------------------------------------------------
 	pEnemy->SetAnimation(ENEMY_STATE_WALK, 1.0f);
 	pEnemy->SetAnimationSpeed(1.0f);
+	m_StartRadian = atan2f(pEnemy->GetFront().x, pEnemy->GetFront().z);
 
-	m_StartDegree = atan2f(pEnemy->GetFront().x, pEnemy->GetFront().z);
+	// ---   ¶‰E”»’è‚Æ‰ñ“]Šp“xŒvŽZ   ------------------------------------------------------------------
+	CPlayer* player = CManager::GetScene()->GetGameObject<CPlayer>(CManager::LAYER_OBJECT);
 
-	CPlayer* player = CManager::GetScene()->GetGameObject<CPlayer>(CManager::E_3D);
 	Vector3 dir_to_player = *player->GetPosition() - *pEnemy->GetPosition();
-	dir_to_player.Normalize();
-	m_TargetDegree = atan2f(dir_to_player.x, dir_to_player.z);
+	//dir_to_player.Normalize();
+
+	Vector3 enemy_front = pEnemy->GetFront();
+	m_TargetRadian = atan2f(dir_to_player.x, dir_to_player.z);
 }
 
 CStateEnemyMoveRotate::~CStateEnemyMoveRotate()
@@ -46,7 +50,7 @@ bool CStateEnemyMoveRotate::Rotate(CEnemy* pEnemy)
 	float lerp_deg = m_FrameCounter * DELTA_TIME / 2.0f * 90.0f;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
-	pEnemy->Rotation().y =  lerp(m_StartDegree, m_TargetDegree, lerp_t);
+	pEnemy->Rotation().y =  Lerp(m_StartRadian, m_TargetRadian, lerp_t);
 
 	return (lerp_t >= 1.0f) ? true: false;
 }

@@ -17,11 +17,7 @@ private:
 	void Action(CEnemy* pEnemy);
 
 private:
-	float m_LerpStart;
-	float m_LerpEnd;
-	float m_FrameCounter;
-	float m_MoveSpeed;
-	Vector3 m_Volocity;
+	int m_FrameCounter;
 
 };
 

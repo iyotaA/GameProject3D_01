@@ -20,12 +20,11 @@ void CCameraManager::Init()
 // カメラ生成
 void CCameraManager::CreateCamera()
 {
-
 	CCamera* _camera = new CCamera();
 	_camera->Init(m_pCamera.size());
 
 	m_pCamera.push_back(_camera);
-
+	m_CurrentId = (m_pCamera.size() > 0) ? m_pCamera.size() - 1: 0;
 }
 
 // カメラ更新
@@ -44,11 +43,7 @@ void CCameraManager::Update()
 // カメラ投影
 void CCameraManager::Project()
 {
-
 	m_pCamera[m_CurrentId]->Project();
-
-	DrawGUI();
-
 }
 
 // 全カメラ破壊
@@ -72,6 +67,7 @@ bool CCameraManager::DeleteCamera(const unsigned int _id)
 
 	m_pCamera[_id]->Uninit();
 	m_pCamera.erase(m_pCamera.begin() + _id);
+	m_CurrentId--;
 	return true;
 }
 
@@ -150,7 +146,6 @@ void CCameraManager::Rotate()
 	if (m_InputRightStick.y <= -16383.0f) {
 		m_pCamera[m_CurrentId]->Tilt(RotateDown);
 	}
-
 }
 
 
@@ -165,15 +160,14 @@ void CCameraManager::DrawGUI()
 {
 	ImGui::Begin("System");
 
-	ImGuiID Window_Camera_Id = ImGui::GetID("FocusCamera");
+	ImGuiID Window_Camera_Id = ImGui::GetID("Camera");
 
-	if (ImGui::CollapsingHeader("FocusCamera"))
+	if (ImGui::CollapsingHeader("Camera"))
 	{
-		// 入力値
-		ImGui::InputFloat2("Input", (float*)&m_InputRightStick);
+		// カメラの個数表示
+		ImGui::Text("COUNT : [%d]", m_pCamera.size());
+		ImGui::Text("CurrentID : [%d]", m_CurrentId);
 
-		// カメラ番号
-		ImGui::InputInt("Id", (int*)&m_CurrentId);
 		{
 			if (m_CurrentId >= m_pCamera.size()) {
 				m_CurrentId = 0;

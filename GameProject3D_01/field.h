@@ -8,6 +8,8 @@ public:
 	void Uninit();
 	void Update();
 	void Draw();
+	void DrawGUI() {}
+	const Vector3 GetAt() { return m_Position; }
 
 	float GetHeight(XMFLOAT3* _position);
 

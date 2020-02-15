@@ -36,7 +36,7 @@ void CBullet::Update()
 {
 	std::vector<CEnemy*> enemys;
 
-	enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::E_3D);
+	enemys = CManager::GetScene()->GetGameObjects<CEnemy>(CManager::LAYER_OBJECT);
 
 	// コリジョン位置の更新
 	m_CollisionSphere->SetCenter(&m_Position);
@@ -85,6 +85,6 @@ void CBullet::Draw()
 
 	// デバッググリッドセット
 	XMFLOAT4 color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere, &color);
+	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(m_CollisionSphere);
 }
 

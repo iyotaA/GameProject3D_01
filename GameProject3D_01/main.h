@@ -17,6 +17,7 @@
 #include "sound.h"
 #include <Xinput.h>
 #include "input.h"
+#include "MathFunc.h"
 
 #include "imGui_all.h"
 
@@ -30,6 +31,7 @@ using namespace std;
 //#define SCREEN_HEIGHT		(1080) 			// ウインドウの高さ
 #define PI					(3.1415926535f)	// 円周率
 #define DEGREE_TO_RADIAN	(PI / 180.0f)
+#define RADIAN_TO_DEGREE	(180.0f / PI)
 #define FAILD_NUM			(-99)
 #define DELTA_TIME			(1.0 / 60.0)
 

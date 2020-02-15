@@ -2,6 +2,7 @@
 // インクルード ////////////////////////////////////
 #include "game_objects_all.h"
 #include "scene.h"
+#include "fade_manager.h"
 #include "title.h"
 #include "game.h"
 #include "result.h"
@@ -10,6 +11,8 @@
 #include "skinmesh_animation.h"
 #include "main.h"
 #include "state_enemy_idle.h"
+#include "state_enemy_died.h"
+#include "MathFunc.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
@@ -43,27 +46,30 @@ void CEnemy::Init()
 
 
 	//---   コリジョンの初期化   -----------------------------------------------------------------------------
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f), "B_Head"));				// 頭
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_Chin"));				// 顎
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f), "B_Hip"));				// 尻
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f), "B_Pelvis"));			// 胴
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.5f), "B_Spine"));			// 背骨
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_R_Back_Leg"));	// 後ろ右足
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_L_Back_Leg"));	// 後ろ左足
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_R_Back_Foot"));	// 後ろ右足
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_L_Back_Foot"));	// 後ろ左足
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_R_Front_Leg"));	// 前右脚
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_L_Front_Leg"));	// 前左脚
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f), "B_R_Front_Foot")); // 前右足
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f), "B_L_Front_Foot")); // 前左足
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f), "B_Tail.001"));			// 尻尾
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f), "B_Tail.002"));			// 尻尾
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.003"));			// 尻尾
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.004"));			// 尻尾
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.005"));			// 尻尾
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f), "B_Tail.006"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Head"));			// 頭
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Pelvis"));			// 胴
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Hip"));				// 尻
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Chin"));				// 顎
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Spine"));			// 背骨
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Back_Leg"));	// 後ろ右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Back_Leg"));	// 後ろ左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Back_Foot"));	// 後ろ右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Back_Foot"));	// 後ろ左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Front_Leg"));	// 前右脚
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Front_Leg"));	// 前左脚
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Front_Foot")); // 前右足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Front_Foot")); // 前左足
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.001"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.002"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.003"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.004"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.005"));			// 尻尾
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.006"));			// 尻尾
 
-	m_CollisionOBB = new CCollisionOBB(m_Position, m_DirVec, Vector3(1.0f, 2.0f, 1.0f));
+
+	//---   判定コリジョンの初期化   -----------------------------------------------------------------------------
+	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 8.0f, XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));	// 近距離攻撃範囲
+	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 35.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));	// 索敵範囲
 
 
 	//---   その他メンバの初期化   ----------------------------------------------------------------------------
@@ -72,15 +78,22 @@ void CEnemy::Init()
 	m_IsCollision = false;
 	m_IsPressMovingEntry = false;
 
-	m_StateFlags.Damage = false;
-	m_StateFlags.Dodge = false;
-	m_StateFlags.Attack = false;
-	m_StateFlags.Block = false;
+	// フラグ初期化
+	m_StateFlags.Damage				= false;
+	m_StateFlags.Died						= false;
+	m_StateFlags.Scouting				= false;
+	m_StateFlags.Attack					= false;
+	m_StateFlags.Battle					= false;
+	m_StateFlags.InScoutingArea		= false;
+	m_StateFlags.InNearArea			= false;
+
+	// ライフ初期化
+	m_Status.Life = 1000;
 }
 
 void CEnemy::Uninit()
 {
-	delete m_CollisionOBB;
+	m_JudgeArea.clear();
 	m_CollisionBody.clear();
 
 	m_Shadow->Uninit();
@@ -103,6 +116,9 @@ void CEnemy::Update()
 	// 行動
 	Action();
 
+	// コリジョン判定
+	CheckCollision();
+
 	// モデル更新
 	m_pModel->update(1);
 }
@@ -121,29 +137,83 @@ void CEnemy::Draw()
 	// 影描画
 	m_Shadow->Draw();
 
-	// コリジョン描画
+	// コリジョン判定
 	DrawCollisionGrid();
-
-	// ImGui描画
-	DrawGUI();
 }
 
+void CEnemy::CheckCollision()
+{
+	// プレイヤーゲット
+	CPlayer* player = CManager::GetScene()->GetGameObject<CPlayer>(CManager::LAYER_OBJECT);
+	if (player->Died() || Died()) {	// プレイヤー又は、自分が死亡していたら更新しない
+		m_StateFlags.InNearArea = false;
+		m_StateFlags.InScoutingArea = false;
+
+		if (m_StateFlags.InScoutingArea) {
+			ChangeState(new CStateEnemyIdle(this));
+		}
+		return;
+	}
+
+	// 範囲内かチェック（playerの胴との判定）
+	m_StateFlags.InNearArea		= CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[0], player->GetCollisionSphere(1)->GetSphere());
+	m_StateFlags.InScoutingArea = CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[1], player->GetCollisionSphere(1)->GetSphere());
+
+	// 戦闘状態じゃないか?
+	if (!m_StateFlags.Battle) {
+		if (m_StateFlags.InScoutingArea) {
+			m_StateFlags.Battle = m_StateFlags.InScoutingArea;
+			m_JudgeArea[1]->SetRadius(50.0f);
+			CSound::StopSound(SOUND_LABEL_BGM_ENVIRONMENT);
+			CSound::Play(SOUND_LABEL_BGM_GAME);
+		}
+	}
+	else {
+		if (!m_StateFlags.InScoutingArea) {
+			m_StateFlags.Battle = m_StateFlags.InScoutingArea;
+			m_JudgeArea[1]->SetRadius(35.0f);
+			CSound::StopSound(SOUND_LABEL_BGM_GAME);
+			CSound::Play(SOUND_LABEL_BGM_ENVIRONMENT);
+		}
+	}
+}
 
 void CEnemy::DrawCollisionGrid()
 {
-	// デバッググリッドセット
-	XMFLOAT4 color = XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+	// コリジョン表示（水色）
 	for (CCollisionWithBone* coll : m_CollisionBody) {
-		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll->GetSphere(), &color);
+		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll->GetSphere());
 	}
 
-	color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	CDebugPrimitive::DebugPrimitive_BatchCubeDraw(m_CollisionOBB, &color);
+	// 索敵範囲描画（青）
+	for (CCollisionSphere* coll : m_JudgeArea) {
+		CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll);
+	}
 }
 
 void CEnemy::DrawGUI()
 {
+	ImGui::Begin("System");
+	ImGuiID Window_System_Id = ImGui::GetID("System");
+	ImGui::GetItemRectSize();
+	ImVec2 size = ImGui::GetWindowSize();
 
+	if (ImGui::CollapsingHeader("Enemy"))
+	{
+		//＜:: Status ::＞
+		{
+			ImGuiID Window_Status_Id = ImGui::GetID("Status");
+
+			ImGui::BeginChildFrame(Window_Status_Id, ImVec2(size.x, 100));
+			ImGui::InputFloat3("Position", (float*)&m_Position);
+			ImGui::InputFloat3("Rotation", (float*)&m_Rotation);
+			ImGui::InputInt("HP", (int*)&m_Status.Life);
+			ImGui::Checkbox("Stop", m_pModel->IsStopMotion());
+			ImGui::EndChildFrame();
+		}
+	}
+
+	ImGui::End();
 }
 
 void CEnemy::Move()
@@ -151,12 +221,20 @@ void CEnemy::Move()
 	// 重力加算
 	AddGlavity();
 
-	//m_Rotation.y -= DEGREE_TO_RADIAN * 0.5f;
+
+	// 回転角度正規化(0 ～ 360)
+	if (m_Rotation.y >= 360.0f * DEGREE_TO_RADIAN) {
+		m_Rotation.y = 0.0f;
+	}
+
+
 	// 方向ベクトル回転
 	Vector3 front = Vector3(0.0f, 0.0f, 1.0f);
 	XMMATRIX rotationMtx;
 	rotationMtx = XMMatrixRotationY(m_Rotation.y);
 
+
+	// 三方向ベクトル更新
 	front = XMVector3TransformNormal(front, rotationMtx);
 	front.Normalize();
 	m_DirVec.front = front;
@@ -164,14 +242,14 @@ void CEnemy::Move()
 	m_DirVec.right.Normalize();
 
 
-	//m_Position += m_DirVec.front * 0.4f;
-
 	// 影の更新（胴体の位置に移動）
-	Vector3 pos = m_CollisionBody[3]->GetSphere()->GetCenter();
+	Vector3 pos = m_CollisionBody[1]->GetSphere()->GetCenter();
 	m_Shadow->SetPosition(&Vector3(pos.x, 0.01f, pos.z));
 	m_Shadow->SetRotation(&Vector3(m_Rotation.x, m_Rotation.y, m_Rotation.z));
 	m_Shadow->Update();
 
+
+	// コリジョン位置更新
 	UpdateCollision();
 }
 
@@ -191,8 +269,12 @@ void CEnemy::UpdateCollision()
 
 	// 特定のボーンの位置を取得
 	for (CCollisionWithBone* coll : m_CollisionBody) {
-
 		coll->GetSphere()->SetCenter(&m_pModel->GetWorldPosition(&world, coll->GetBoneName()));
+	}
+
+	// 範囲を中心座標にセットする
+	for (CCollisionSphere* coll : m_JudgeArea) {
+		coll->SetCenter(&m_CollisionBody[2]->GetSphere()->GetCenter());
 	}
 }
 
@@ -220,7 +302,7 @@ void CEnemy::AddGlavity()
 bool CEnemy::IsLanding()
 {
 	// 地面とのコリジョン
-	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::E_Background);
+	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::LAYER_BACKGROUND);
 	float height = pTerrain->GetHeight(&m_Position);
 	if (FAILD_NUM != (int)height) {
 		if (m_Position.y <= height) {
@@ -256,6 +338,11 @@ void CEnemy::SetAnimation(const unsigned int _id, const float _startBlendNum)
 void CEnemy::SetAnimationSpeed(const float _speed)
 {
 	m_pModel->SetAnimationSpeed(_speed);
+}
+
+void CEnemy::SetMotionStop(const bool _stop)
+{
+	m_pModel->StopMotion(_stop);
 }
 
 void CEnemy::ChangeState(CStateEnemy* pState)

@@ -1,6 +1,9 @@
 #ifndef SCENE_H_
 #define SCENE_H_
 
+#include "user_interface_manager.h"
+#include "fade_manager.h"
+#include "seqence_manager.h"
 #include "collision3D.h"
 #include "shader_all.h"
 #include "debug_primitive.h"
@@ -18,6 +21,7 @@
 #include "texture.h"
 #include "2dAnimation.h"
 #include "number.h"
+#include "image.h"
 #include "shader_all.h"
 #include "terrain.h"
 
@@ -74,9 +78,11 @@ public:
 	// 全てのゲームオブジェクトの終了処理
 	virtual void Uninit()
 	{
-		for (int i = 0; i < CManager::E_Max; i++) {
-			//		C++11から追加されたfor文の書き方
-			//								↓ここがリストであることが条件
+		// UI破壊
+		CUserInterfaceManager::DeleteExpectUI(CUserInterfaceManager::LAYER_FOREGROUND);
+
+		// ゲームオブジェクト終了処理
+		for (int i = 0; i < CManager::LAYER_MAX; i++) {
 			for (CGameObject* object : m_GameObject[i]) {
 
 				object->Uninit();
@@ -86,12 +92,18 @@ public:
 			// リストのクリア
 			m_GameObject[i].clear();
 		}
+
+		// カメラ破壊
+		CCameraManager::DeleteCamera();
+
+		// 入力を有効にするする
+		CInput::InputEnable(true);
 	}
 
 	// 全てのゲームオブジェクトの更新
 	virtual void Update()
 	{
-		for (int i = 0; i < CManager::E_Max; i++) {
+		for (int i = 0; i < CManager::LAYER_MAX; i++) {
 			for (CGameObject* object : m_GameObject[i]) {
 
 				object->Update();
@@ -107,14 +119,12 @@ public:
 	// 全てのゲームオブジェクトの描画
 	virtual void Draw()
 	{
-		CDebugPrimitive::DrawGUI();
-
 		// コリジョングリッド準備
 		CDebugPrimitive::DebugPrimitive_BatchBegin();
 
-		for (int i = 0; i < CManager::E_Max; i++) {
+		for (int i = 0; i < CManager::LAYER_MAX; i++) {
 
-			if (i == CManager::E_Effect) {
+			if (i == CManager::LAYER_EFFECT) {
 				// コリジョングリッド描画
 				CDebugPrimitive::DebugPrimitive_BatchRun();
 			}
@@ -126,6 +136,17 @@ public:
 		}
 	}
 
+	virtual void DrawGUI()
+	{
+		for (int i = 0; i < CManager::LAYER_MAX; i++) {
+
+			for (CGameObject* object : m_GameObject[i]) {
+
+				object->DrawGUI();
+			}
+		}
+	}
+
 	// ゲームオブジェクトの動的削除
 	void DestroyGameObject(CGameObject* GameObject)
 	{
@@ -133,7 +154,7 @@ public:
 	}
 
 protected:
-	std::list<CGameObject*> m_GameObject[CManager::E_Max];
+	std::list<CGameObject*> m_GameObject[CManager::LAYER_MAX];
 
 };
 

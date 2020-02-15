@@ -61,7 +61,6 @@ void C2DAnimation::Draw(XMFLOAT2 position, XMFLOAT2 uv0, XMFLOAT2 cutSize)
 	UINT offdet = 0;
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBufer, &Stride, &offdet);
 	CRenderer::SetTexture(m_Texture);
-	CRenderer::SetWorldViewProjection2D();
 	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	CRenderer::GetDeviceContext()->Draw(4, 0);
 

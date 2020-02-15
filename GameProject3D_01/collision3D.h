@@ -9,17 +9,24 @@
 class CCollisionSphere
 {
 public:
-	CCollisionSphere() : m_CenterPos(Vector3(0.0f, 0.0f, 0.0f)), m_Radius(1.0f){}
-	CCollisionSphere(Vector3 _pos, float _radius) : m_CenterPos(_pos), m_Radius(_radius){}
+	CCollisionSphere() : m_CenterPos(Vector3(0.0f, 0.0f, 0.0f)), m_Radius(1.0f), m_Color(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)) {}
+	CCollisionSphere(Vector3 _pos, float _radius, XMFLOAT4 _color)
+		: m_CenterPos(_pos)
+		, m_Radius(_radius)
+		, m_Color(_color)
+	{}
 
 	void SetCenter(Vector3* center) { m_CenterPos = *center; }
+	void SetColor(XMFLOAT4* color) { m_Color = *color; }
 	void SetRadius(float radius) { m_Radius = radius; }
 	Vector3 GetCenter(void) { return m_CenterPos; }
+	XMFLOAT4 GetColor(void) { return m_Color; }
 	float GetRadius(void) { return m_Radius; }
 
 private:
-	Vector3	m_CenterPos;
-	float	m_Radius;
+	Vector3			m_CenterPos;
+	XMFLOAT4		m_Color;
+	float				m_Radius;
 
 };
 
@@ -55,29 +62,36 @@ private:
 class CCollisionOBB
 {
 public:
-	CCollisionOBB(Vector3 _pos, Vector3X3 _vec3, Vector3 _len):
-		m_Pos(_pos),
-		m_NormaDirect(_vec3),
-		m_fLength(_len){}
+	CCollisionOBB(Vector3 _pos, Vector3X3 _vec3, Vector3 _len, XMFLOAT4 _color)
+		: m_Pos(_pos)
+		, m_NormaDirect(_vec3)
+		, m_fLength(_len)
+		, m_Color(_color)
+	{}
 
 	CCollisionOBB() :
 		m_Pos(),
 		m_NormaDirect(),
-		m_fLength() {}
+		m_fLength()
+		, m_Color()
+	{}
 
-	void SetStatus(Vector3* _pos, Vector3X3* _vec3, Vector3* _len)
+	void SetStatus(Vector3* _pos, Vector3X3* _vec3, Vector3* _len, XMFLOAT4* _color)
 	{
 		m_Pos = *_pos;
 		m_NormaDirect.front = _vec3->front;
 		m_NormaDirect.right = _vec3->right;
 		m_NormaDirect.up    = _vec3->up;
 		m_fLength = *_len;
+		m_Color = *_color;
 	}
 
 	void SetPosition(Vector3* _pos){ m_Pos = *_pos;	}
 	void SetVec3Dir(Vector3X3* _vec3){ m_NormaDirect = *_vec3;	}
 	void Set3Length(Vector3* _len){ m_fLength = *_len;	}
+	void SetColor(XMFLOAT4* _color){ m_Color = *_color;	}
 
+	XMFLOAT4 GetColor() { return m_Color; }
 
 	// 指定軸番号の方向ベクトルを取得
 	// 0 : right / 1 : up / 2 : front
@@ -112,10 +126,10 @@ public:
 	Vector3 GetPos_W() { return m_Pos; }
 
 private:
-	Vector3    m_Pos;              // 位置
-	Vector3X3  m_NormaDirect;	   // 方向ベクトル
-	Vector3    m_fLength;          // 各軸方向の長さ
-
+	Vector3    m_Pos;					// 位置
+	Vector3X3  m_NormaDirect;	// 方向ベクトル
+	Vector3    m_fLength;				// 各軸方向の長さ
+	XMFLOAT4		m_Color;			// 表示色
 
 };
 

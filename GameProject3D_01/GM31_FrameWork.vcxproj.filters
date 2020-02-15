@@ -144,9 +144,6 @@
     <ClCompile Include="imguiManager.cpp">
       <Filter>ソース ファイル\System\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="number.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="2dAnimation.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
@@ -300,6 +297,24 @@
     <ClCompile Include="state_enemy_damage.cpp">
       <Filter>State\EnemyState</Filter>
     </ClCompile>
+    <ClCompile Include="image.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="number.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="state_player_died.cpp">
+      <Filter>State\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="state_enemy_died.cpp">
+      <Filter>State\EnemyState</Filter>
+    </ClCompile>
+    <ClCompile Include="fade_manager.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="seqence_manager.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="field.h">
@@ -330,9 +345,6 @@
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="model.h">
       <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
@@ -379,9 +391,6 @@
     </ClInclude>
     <ClInclude Include="imguiManager.h">
       <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="number.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="2dAnimation.h">
       <Filter>ヘッダー ファイル\System</Filter>
@@ -571,6 +580,27 @@
     </ClInclude>
     <ClInclude Include="state_enemy_damage.h">
       <Filter>State\EnemyState</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="number.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="state_player_died.h">
+      <Filter>State\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>ヘッダー ファイル\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="state_enemy_died.h">
+      <Filter>State\EnemyState</Filter>
+    </ClInclude>
+    <ClInclude Include="fade_manager.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="seqence_manager.h">
+      <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

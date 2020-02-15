@@ -20,6 +20,8 @@ public:
 	virtual void Uninit() {}
 	virtual void Update() {}
 	virtual void Draw() {}
+	virtual void DrawGUI() {}
+	virtual const Vector3 GetAt() = 0;
 
 	void SetDestroy() { m_Destroy = true; }
 	bool Destroy()

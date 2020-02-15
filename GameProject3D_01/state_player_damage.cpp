@@ -5,6 +5,7 @@
 #include "modelAnimation.h"
 #include "player.h"
 #include "state_player_damage.h"
+#include "state_player_died.h"
 
 CStatePlayerDamage::CStatePlayerDamage(CPlayer* pPlayer)
 	: m_pStateDamage(new CStatePlayerDamageLarge(pPlayer))
@@ -20,6 +21,12 @@ CStatePlayerDamage::~CStatePlayerDamage()
 
 void CStatePlayerDamage::Update(CPlayer* pPlayer)
 {
+	// 死亡ステートに遷移
+	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
 	// ダメージステートが無ければ待機ステートに
 	if (typeid(*m_pStateDamage) == typeid(CStatePlayerDamageNone)) {
 

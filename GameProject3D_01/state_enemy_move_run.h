@@ -5,23 +5,19 @@
 class CStateEnemyMoveRun : public CStateEnemyMove
 {
 public:
-	CStateEnemyMoveRun(CEnemy* pEnemy, float StartSpeed);
+	CStateEnemyMoveRun(CEnemy* pEnemy);
 	virtual ~CStateEnemyMoveRun();
 	virtual void Update(CEnemy* pEnemy) override{}
 	virtual void UpdateMoveState(CStateEnemyMove* pMoveState, CEnemy* pEnemy) override;
 
 private:
 	CStateEnemyMoveRun() {} // デフォルトコンストラクタ封印
-	void Move(CEnemy* pEnemy);
+	bool Move(CEnemy* pEnemy);
 
 private:
-	float m_MoveSpeed;
-	float m_StartSpeed;
-	float m_TargetSpeed;
-	float m_StartLength;
-	float m_TargetLength;
+	Vector3 m_TargetPosition;
+	Vector3 m_StartPosition;
 	int   m_FrameCounter;
-	Vector3 m_Volocity;
 
 };
 

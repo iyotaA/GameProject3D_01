@@ -34,6 +34,7 @@ class CModel : public CGameObject
 {
 public:
 	void Draw(XMMATRIX* pWorld);
+	const Vector3 GetAt() { return m_Position; }
 
 	void Load(const char* FileName);
 	void Unload();

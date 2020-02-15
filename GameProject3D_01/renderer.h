@@ -84,7 +84,6 @@ public:
 	static void End();
 
 	static void SetDepthEnable(bool Enable);
-	static void SetWorldViewProjection2D();
 	static void SetTexture( CTexture* Texture );
 	static void SetTexture(CTexture* Texture, unsigned int Slot);
 	static void SetTexture(CTexture** Texture, unsigned int Slot, unsigned int NumTextures);
@@ -103,9 +102,9 @@ private:
 
 	static D3D_FEATURE_LEVEL			m_FeatureLevel;
 
-	static ID3D11Device*				m_D3DDevice;
+	static ID3D11Device*						m_D3DDevice;
 	static ID3D11DeviceContext*			m_ImmediateContext;
-	static IDXGISwapChain*				m_SwapChain;
+	static IDXGISwapChain*					m_SwapChain;
 	static ID3D11RenderTargetView*		m_RenderTargetView;
 	static ID3D11DepthStencilView*		m_DepthStencilView;
 	static ID3D11DepthStencilState*		m_DepthStateEnable;

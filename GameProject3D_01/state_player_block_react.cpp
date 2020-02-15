@@ -17,6 +17,7 @@ CStatePlayerBlockReact::CStatePlayerBlockReact(CStatePlayerBlock* pStateBlock, C
 
 	pPlayer->SetAnimation(PLAYER_STATE_BLOCK_REACT, 1.0f);
 	pPlayer->SetAnimationSpeed(2.0f);
+	pPlayer->Life() = (pPlayer->Life() > 2) ? pPlayer->Life() - 2 : 0;
 
 	// ガード有効時間計測開始
 	pStateBlock->StartGardEnable();

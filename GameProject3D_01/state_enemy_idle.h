@@ -11,6 +11,8 @@ public:
 	void Update(CEnemy* pEnemy) override;
 	virtual void UpdateIdleState(CStateEnemyIdle* pIdleState, CEnemy* pEnemy) {};
 
+	void ChangeState(CStateEnemyIdle* pIdleState);
+
 protected:
 	CStateEnemyIdle() {}	// デフォルトコンストラクタ封印
 

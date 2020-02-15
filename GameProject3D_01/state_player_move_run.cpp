@@ -35,25 +35,29 @@ void CStatePlayerMoveRun::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer*
 	// キー入力
 	//******************************
 	if (CInput::GetGamepadPress(RIGHT_TRRIGER) || CInput::GetKeyPress(VK_RSHIFT)) {
-
-		if (pPlayer->WeaponState() == SWORD_STATE_DRAW) {
-			pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, true));
+		if (!pPlayer->EmptyStamina()) {
+			if (pPlayer->WeaponState() == SWORD_STATE_DRAW) {
+				pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, true));
+			}
+			else {
+				pMoveState->ChangeState(new CStatePlayerMoveDash(pPlayer, m_MoveSpeed));
+			}
+			return;
 		}
-		else {
-			pMoveState->ChangeState(new CStatePlayerMoveDash(pPlayer, m_MoveSpeed));
-		}
-		return;
 	}
 
 	// 移動処理
 	Move(pPlayer);
+
+	// 足音
+	if (m_FrameCounter % 23 == 0) { CSound::Play(SOUND_LABEL_SE_FOOTSTEP); }
 
 	// 徐々にカメラズームアウト
 	CCamera* camera = CCameraManager::GetCamera();
 	float lerp_deg = m_FrameCounter / 60.0f * 90.0f;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
-	camera->SetLengthToAt(lerp(m_StartLength, m_TargetLength, lerp_t));
+	camera->SetLengthToAt(Lerp(m_StartLength, m_TargetLength, lerp_t));
 
 	// カウンター更新
 	m_FrameCounter++;
@@ -112,5 +116,5 @@ void CStatePlayerMoveRun::Move(CPlayer* pPlayer)
 	float lerp_deg = m_FrameCounter;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
-	m_MoveSpeed = lerp(m_StartSpeed, m_TargetSpeed, lerp_t);
+	m_MoveSpeed = Lerp(m_StartSpeed, m_TargetSpeed, lerp_t);
 }

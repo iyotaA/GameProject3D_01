@@ -8,6 +8,8 @@ public:
 	void Uninit();
 	void Update(const Vector3 pos);
 	void Draw();
+	void DrawGUI() {}
+	const Vector3 GetAt() { return m_Position; }
 
 private:
 	ID3D11Buffer*	m_VertexBufer = NULL;

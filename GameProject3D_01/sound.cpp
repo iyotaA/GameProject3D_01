@@ -21,12 +21,22 @@ DWORD CSound::m_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 // 各音素材のパラメータ
 SOUNDPARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 {
-	{ "asset/sound/bgm_game_battle.wav"	, LOOP, 0.2f }, // 戦闘時BGM
-	{ "asset/sound/attack_small.wav"	, ONCE, 0.3f },	// 攻撃（小）
-	{ "asset/sound/attack_large.wav"	, ONCE, 0.3f },	// 攻撃（大）
-	{ "asset/sound/gard.wav"			, ONCE, 0.3f },	// ガード
-	{ "asset/sound/sword_swing.wav"		, ONCE, 0.3f },	// 空振り
-	{ "asset/sound/step.wav"			, ONCE, 0.3f },	// 足音
+	{ "asset/sound/bgm/bgm_game_battle.wav"	, LOOP, 0.5f },	// 戦闘時BGM
+	{ "asset/sound/bgm/bgm_environment.wav"	, LOOP, 0.5f },	// 環境音BGM
+	{ "asset/sound/bgm/bgm_title.wav"				, LOOP, 0.5f },	// タイトルBGM
+	{ "asset/sound/bgm/bgm_victory.wav"			, LOOP, 0.5f },	// 勝利BGM
+	{ "asset/sound/se/title_return.wav"				, ONCE, 1.0f },	// タイトルシーンの入力時
+	{ "asset/sound/se/hit.wav"								, ONCE, 1.0f },	// ドンッ！
+	{ "asset/sound/se/victory.wav"						, ONCE, 0.3f },	// 戦闘勝利時
+	{ "asset/sound/se/attack_small.wav"				, ONCE, 0.3f },	// 攻撃（小）
+	{ "asset/sound/se/attack_large.wav"				, ONCE, 0.3f },	// 攻撃（大）
+	{ "asset/sound/se/draw_a_sword.wav"			, ONCE, 0.6f },	// 抜刀
+	{ "asset/sound/se/gard.wav"							, ONCE, 0.3f },	// ガード
+	{ "asset/sound/se/sword_swing.wav"				, ONCE, 0.3f },	// 空振り
+	{ "asset/sound/se/step.wav"							, ONCE, 0.3f },	// 足音
+	{ "asset/sound/se/wing.wav"							, ONCE, 1.0f },	// 羽ばたく音
+	{ "asset/sound/se/damage.wav"						, ONCE, 1.0f },	// ダメージ
+	{ "asset/sound/se/landing.wav"						, ONCE, 0.8f },	// 着地
 };
 
 //=============================================================================

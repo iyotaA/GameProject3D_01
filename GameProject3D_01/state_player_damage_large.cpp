@@ -11,6 +11,7 @@ CStatePlayerDamageLarge::CStatePlayerDamageLarge(CPlayer* pPlayer)
 {
 	pPlayer->SetAnimation(PLAYER_STATE_DAMAGE_LARGE, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
+	pPlayer->Life() = (pPlayer->Life() > 100) ? pPlayer->Life() - 100 : 0;
 }
 
 CStatePlayerDamageLarge::~CStatePlayerDamageLarge()

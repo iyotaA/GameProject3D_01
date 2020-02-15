@@ -22,6 +22,8 @@ CStatePlayerMoveDash::CStatePlayerMoveDash(CPlayer* pPlayer, float StartSpeed)
 {
 	pPlayer->SetAnimation(PLAYER_STATE_DASH, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
+
+	pPlayer->Dashed() = true;
 }
 
 CStatePlayerMoveDash::~CStatePlayerMoveDash()
@@ -31,14 +33,19 @@ CStatePlayerMoveDash::~CStatePlayerMoveDash()
 
 void CStatePlayerMoveDash::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer* pPlayer)
 {
-	//******************************
-	// キー入力
-	//******************************
-	if (CInput::GetGamepadRelease(RIGHT_TRRIGER) || CInput::GetKeyRelease(VK_RSHIFT)) {
+	//***********************************************************
+	// 右トリガーを離すか、スタミナが０になったら強制遷移
+	//***********************************************************
+	if (CInput::GetGamepadRelease(RIGHT_TRRIGER) || CInput::GetKeyRelease(VK_RSHIFT) ||
+		pPlayer->EmptyStamina()) {
 
+		pPlayer->Dashed() = false;
 		pMoveState->ChangeState(new CStatePlayerMoveRun(pPlayer, m_MoveSpeed));
 		return;
 	}
+
+	// 足音
+	if (m_FrameCounter % 16 == 0) { CSound::Play(SOUND_LABEL_SE_FOOTSTEP); }
 
 	// 移動処理
 	Move(pPlayer);
@@ -48,7 +55,7 @@ void CStatePlayerMoveDash::UpdateMoveState(CStatePlayerMove* pMoveState, CPlayer
 	float lerp_deg = m_FrameCounter / 30.0f * 90.0f;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
-	camera->SetLengthToAt(lerp(m_StartLength, m_TargetLength, lerp_t));
+	camera->SetLengthToAt(Lerp(m_StartLength, m_TargetLength, lerp_t));
 
 	// カウンター更新
 	m_FrameCounter++;
@@ -107,5 +114,5 @@ void CStatePlayerMoveDash::Move(CPlayer* pPlayer)
 	float lerp_deg = m_FrameCounter;
 	if (lerp_deg >= 90.0f) { lerp_deg = 90.0f; }
 	float lerp_t = sinf(lerp_deg * DEGREE_TO_RADIAN);
-	m_MoveSpeed = lerp(m_StartSpeed, m_TargetSpeed, lerp_t);
+	m_MoveSpeed = Lerp(m_StartSpeed, m_TargetSpeed, lerp_t);
 }

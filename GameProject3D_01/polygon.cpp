@@ -16,6 +16,7 @@ CPolygon2D::CPolygon2D(char* pFileName)
 	, m_Size(XMFLOAT2(50.0f, 50.0f))
 	, m_Color(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f))
 	, m_RotateDeg(0.0f)
+	, m_Delete(false)
 {
 
 	VERTEX_2D vertices[4] = {
@@ -68,7 +69,9 @@ CPolygon2D::CPolygon2D(char* pFileName)
 	}
 
 	// シェーダー
-	m_Shader = ShaderManager::GetShader<CShader2D>();
+	//m_Shader = ShaderManager::GetShader<CShader2D>();
+	m_Shader = new CShader2D();
+	m_Shader->Init("asset/shader/shader2DVS.cso", "asset/shader/shader2DPS.cso");
 }
 
 CPolygon2D::~CPolygon2D()

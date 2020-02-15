@@ -49,6 +49,9 @@ public:
 	// 指定カメラ変更
 	static bool SetCurrentCameraId(const unsigned int _id);
 
+	// ImGui
+	static void DrawGUI();
+
 	// インスタンスを取得
 	static CCameraManager& GetInstance() {
 
@@ -75,10 +78,6 @@ private:
 
 	// 指定カメラ移動可能範囲内か？
 	static void CheckIsRange();
-
-	// ImGui
-	static void DrawGUI();
-
 };
 
 #endif // !CAMERA_MANAGER_H_

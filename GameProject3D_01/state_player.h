@@ -46,4 +46,3 @@ public:
 };
 
 #endif // !STATE_PLAYER_H_
-

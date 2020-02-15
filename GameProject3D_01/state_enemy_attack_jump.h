@@ -2,6 +2,7 @@
 #define STATE_ENEMY_ATTACK_JUMP_H_
 
 #include "state_enemy_attack.h"
+class CPlayer;
 class CStateEnemyAttackJump : public CStateEnemyAttack
 {
 public:
@@ -16,8 +17,11 @@ private:
 
 private:
 	int m_FrameCounter;
-	Vector3 m_Velocity;
-	Vector3 m_DirFront;
+	CPlayer* m_pPlayer;
+	Vector3	 m_StartPosition;
+	Vector3	 m_TargetPosition;
+	float		 m_StartRotation;
+	float		 m_TargetRotation;
 	bool	m_Move;
 
 };

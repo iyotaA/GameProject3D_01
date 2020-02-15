@@ -31,6 +31,7 @@ public:
 	void SetUV(UV uv) { m_UV = uv; }
 	void SetColor(XMFLOAT4 color) { m_Color = color; }
 	void SetRotate(float deg) { m_RotateDeg = deg; }
+	bool& Delete() { return m_Delete; }
 
 	XMFLOAT2& Size() { return m_Size; }
 
@@ -45,6 +46,7 @@ protected:
 	XMFLOAT2	m_Size;
 	XMFLOAT4	m_Color;
 	float		m_RotateDeg;
+	bool		m_Delete;
 
 private:
 	CPolygon2D(){}
