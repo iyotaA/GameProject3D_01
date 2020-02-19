@@ -16,8 +16,6 @@ private:
 
 private:
 	int m_FrameCounter;
-	Vector3 m_Velocity;
-	Vector3 m_DirFront;
 
 };
 

@@ -5,7 +5,7 @@
 class CStatePlayerDamageSmall : public CStatePlayerDamage
 {
 public:
-	CStatePlayerDamageSmall(CPlayer* pPlayer);
+	CStatePlayerDamageSmall(CPlayer* pPlayer, int damage);
 	virtual ~CStatePlayerDamageSmall();
 	virtual void Update(CPlayer* pPlayer) override {}
 	virtual void UpdateDamageState(CStatePlayerDamage* pStateDamage, CPlayer* pPlayer);

@@ -5,6 +5,9 @@
 #include "player.h"
 #include "state_player_sheathe_sword.h"
 #include "state_player_died.h"
+#include "state_player_damage.h"
+#include "scene.h"
+#include "enemy.h"
 
 CStatePlayerSheatheSword::CStatePlayerSheatheSword(CPlayer* pPlayer, bool isMove)
 	: m_FrameCounter(0)
@@ -26,6 +29,13 @@ void CStatePlayerSheatheSword::Update(CPlayer* pPlayer)
 	// 死亡ステートに遷移
 	if (pPlayer->Life() <= 0.0f) {
 		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		return;
+	}
+
+	// ダメージステートに遷移
+	if (pPlayer->Damaged()) {
+		CEnemy* enemy = CManager::GetScene()->GetGameObject<CEnemy>(CManager::LAYER_OBJECT);
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer, enemy->Attack()));
 		return;
 	}
 

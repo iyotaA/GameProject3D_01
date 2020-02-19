@@ -26,6 +26,8 @@ public:
 
 	virtual void Draw() = 0;
 
+	XMFLOAT2* GetPosition() { return &m_Position; }
+
 	void SetPosition(XMFLOAT2 position) { m_Position = position; }
 	void SetSize(XMFLOAT2 size) { m_Size = size; }// pixels
 	void SetUV(UV uv) { m_UV = uv; }

@@ -10,6 +10,8 @@
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
+#include "scene.h"
+#include "enemy.h"
 
 CStatePlayerIdle::CStatePlayerIdle(CPlayer* pPlayer)
 	: m_LerpStart(CCameraManager::GetCamera()->GetLengthToAt())
@@ -20,6 +22,7 @@ CStatePlayerIdle::CStatePlayerIdle(CPlayer* pPlayer)
 {
 	pPlayer->SetAnimation(PLAYER_STATE_IDLE, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
+	pPlayer->Idle() = true;
 }
 
 CStatePlayerIdle::~CStatePlayerIdle()
@@ -31,6 +34,7 @@ void CStatePlayerIdle::Update(CPlayer* pPlayer)
 {
 	// 死亡ステートに遷移
 	if (pPlayer->Life() <= 0.0f) {
+		pPlayer->Idle() = false;
 		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
 		return;
 	}
@@ -72,14 +76,16 @@ void CStatePlayerIdle::Action(CPlayer* pPlayer)
 {
 	// 移動ステートに遷移
 	if (MoveEntry()) {
+		pPlayer->Idle() = false;
 		pPlayer->ChangeState(new CStatePlayerMove(pPlayer));
 		return;
 	}
 
 	// ダメージステートに遷移
 	if (pPlayer->Damaged()){
-
-		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		pPlayer->Idle() = false;
+		CEnemy* enemy = CManager::GetScene()->GetGameObject<CEnemy>(CManager::LAYER_OBJECT);
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer, enemy->Attack()));
 		return;
 	}
 
@@ -90,11 +96,13 @@ void CStatePlayerIdle::Action(CPlayer* pPlayer)
 		// 抜刀時は攻撃ステートに遷移
 		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
 
+			pPlayer->Idle() = false;
 			pPlayer->ChangeState(new CStatePlayerAttack(pPlayer, PLAYER_STATE_ATTACK_VIRTICAL));
 		}
 		// 納刀時は抜刀ステートに遷移
 		else if((pPlayer->WeaponState() == SWORD_STATE_SHEATHE)) {
 
+			pPlayer->Idle() = false;
 			pPlayer->ChangeState(new CStatePlayerDrawSword(pPlayer, false));
 		}
 		return;
@@ -104,6 +112,7 @@ void CStatePlayerIdle::Action(CPlayer* pPlayer)
 	if (CInput::GetGamepadPress(LEFT_TRRIGER) || CInput::GetKeyPress(VK_LSHIFT)){
 
 		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
+			pPlayer->Idle() = false;
 			pPlayer->ChangeState(new CStatePlayerBlock(pPlayer));
 			return;
 		}
@@ -113,8 +122,16 @@ void CStatePlayerIdle::Action(CPlayer* pPlayer)
 	if ((pPlayer->WeaponState() == SWORD_STATE_DRAW) &&
 		(CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X) || CInput::GetKeyTrigger('K'))){
 
+		pPlayer->Idle() = false;
 		pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, false));
 		return;
+	}
+
+	// アイテム使用
+	if ((pPlayer->WeaponState() == SWORD_STATE_SHEATHE) &&
+		((CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X) || CInput::GetKeyTrigger('K')))) {
+
+		pPlayer->UseItem();
 	}
 }
 

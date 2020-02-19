@@ -26,7 +26,9 @@ SOUNDPARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 	{ "asset/sound/bgm/bgm_title.wav"				, LOOP, 0.5f },	// タイトルBGM
 	{ "asset/sound/bgm/bgm_victory.wav"			, LOOP, 0.5f },	// 勝利BGM
 	{ "asset/sound/se/title_return.wav"				, ONCE, 1.0f },	// タイトルシーンの入力時
+	{ "asset/sound/se/button.wav"						, ONCE, 0.5f },	// ボタン
 	{ "asset/sound/se/hit.wav"								, ONCE, 1.0f },	// ドンッ！
+	{ "asset/sound/se/katya.wav"							, ONCE, 0.7f },	// カチャッ
 	{ "asset/sound/se/victory.wav"						, ONCE, 0.3f },	// 戦闘勝利時
 	{ "asset/sound/se/attack_small.wav"				, ONCE, 0.3f },	// 攻撃（小）
 	{ "asset/sound/se/attack_large.wav"				, ONCE, 0.3f },	// 攻撃（大）
@@ -37,6 +39,7 @@ SOUNDPARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 	{ "asset/sound/se/wing.wav"							, ONCE, 1.0f },	// 羽ばたく音
 	{ "asset/sound/se/damage.wav"						, ONCE, 1.0f },	// ダメージ
 	{ "asset/sound/se/landing.wav"						, ONCE, 0.8f },	// 着地
+	{ "asset/sound/se/recovery.wav"					, ONCE, 0.8f },	// 回復
 };
 
 //=============================================================================

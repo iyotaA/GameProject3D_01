@@ -12,7 +12,10 @@ CStatePlayerAttackLow::CStatePlayerAttackLow(CPlayer* pPlayer)
 	, m_DirFront(pPlayer->GetFront())
 {
 	pPlayer->SetAnimation(PLAYER_STATE_ATTACK_LOW, 1.0f);
-	pPlayer->SetAnimationSpeed(1.2f);
+	pPlayer->SetAnimationSpeed(1.5f);
+
+	// 攻撃力設定
+	pPlayer->AttackValue() = 32;
 }
 
 CStatePlayerAttackLow::~CStatePlayerAttackLow()
@@ -33,8 +36,20 @@ void CStatePlayerAttackLow::UpdateAttackState(CStatePlayerAttack* pAttackState, 
 		pPlayer->Attacked() = true;
 	}
 
+	// 入力可能までのフレーム(F)
+	if (m_FrameCounter < 60)return;
+
+	if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A) || CInput::GetKeyTrigger('K')) {
+
+		// *** 回避 ***
+		pPlayer->Attacked() = false;
+		pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
+		return;
+	}
+
+
 	// アニメーションのブレンドが終わるまで以下の処理を実行させない
-	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum() / 1.2f - 10) return;
+	if (m_FrameCounter <= pPlayer->GetCurrentAnimFrameNum() / 1.5f - 10) return;
 
 	pPlayer->Attacked() = false;
 	pAttackState->ChangeState(new CStatePlayerAttackNone(pPlayer));

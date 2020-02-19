@@ -23,6 +23,7 @@
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="camera_manager.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="collision3D.cpp" />
     <ClCompile Include="debug_primitive.cpp" />
     <ClCompile Include="fade_manager.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="polygon3d.cpp" />
+    <ClCompile Include="recovery_drag.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="seqence_manager.cpp" />
     <ClCompile Include="shader_2d.cpp" />
@@ -124,6 +126,7 @@
     <ClInclude Include="imstb_textedit.h" />
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="MathFunc.h" />
@@ -133,6 +136,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="polygon3d.h" />
+    <ClInclude Include="recovery_drag.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />

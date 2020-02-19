@@ -25,8 +25,8 @@ CStateEnemyIdleStop::~CStateEnemyIdleStop()
 void CStateEnemyIdleStop::UpdateIdleState(CStateEnemyIdle* pIdleState, CEnemy* pEnemy)
 {
 	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//		2秒間は待機...
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	//		2秒間は待機...
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	if (m_FrameCounter++ * DELTA_TIME <= 2.0f)return;
 
 
@@ -83,9 +83,23 @@ void CStateEnemyIdleStop::ChangeScoutingState(CStateEnemyIdle* pIdleState, CEnem
 
 void CStateEnemyIdleStop::ChangeBattleState(CEnemy* pEnemy)
 {
+	CPlayer* player = CManager::GetScene()->GetGameObject<CPlayer>(CManager::LAYER_OBJECT);
+
+	//--------------------------------------------------------------------------
+	// 正面ベクトルとプレイヤーまでの方向ベクトルの角度と距離を求める
+	Vector3 enemy_to_player = *player->GetPosition() - *pEnemy->GetPosition();
+	float length = enemy_to_player.Length();
+
 	//--------------------------------------------------------------------------
 	// 近距離可能範囲内にプレイヤーがいるか？
-	if (pEnemy->InNearArea()) {
+	if (pEnemy->InNearArea()) {	// 飛翔攻撃
+
+		// プレイヤーが前方にいるか？
+		if (pEnemy->InNearFrontArea()) {
+			pEnemy->ChangeState(new CStateEnemyAttack(pEnemy, ENEMY_STATE_ATTACK_HOOK));
+			return;
+		}
+
 		pEnemy->ChangeState(new CStateEnemyAttack(pEnemy, ENEMY_STATE_ATTACK_JUMP));
 		return;
 	}
@@ -93,13 +107,11 @@ void CStateEnemyIdleStop::ChangeBattleState(CEnemy* pEnemy)
 
 	//--------------------------------------------------------------------------
 	// 正面ベクトルとプレイヤーまでの方向ベクトルの角度の差分を求める
-	CPlayer* player = CManager::GetScene()->GetGameObject<CPlayer>(CManager::LAYER_OBJECT);
-	Vector3 enemy_to_player = *player->GetPosition() - *pEnemy->GetPosition();
 	float front_to_player_difference = fabs(atan2f(enemy_to_player.x, enemy_to_player.z) - atan2f(pEnemy->GetFront().x, pEnemy->GetFront().z));
 
 
 	//--------------------------------------------------------------------------
-	// 角度差分が30度より小さければ走行ステートに遷移
+	// 角度差分が45度より小さければ走行ステートに遷移
 	if (front_to_player_difference <= 45.0f * DEGREE_TO_RADIAN) {
 		pEnemy->ChangeState(new CStateEnemyMove(pEnemy, STATE_RUN));
 		return;

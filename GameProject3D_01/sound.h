@@ -19,7 +19,9 @@ typedef enum
 	SOUND_LABEL_BGM_TITLE,				// タイトルBGM
 	SOUND_LABEL_BGM_VICTORY,			// 勝利BGM
 	SOUND_LABEL_SE_TITLE_RETURN,	// タイトルシーンの入力時
+	SOUND_LABEL_SE_BUTTON,				// ボタン
 	SOUND_LABEL_SE_DON,					// ドンッ！
+	SOUND_LABEL_SE_KATYA,					// カチャッ
 	SOUND_LABEL_SE_VICTORY,				// 戦闘勝利
 	SOUND_LABEL_SE_ATTACK_SMALL,	// 攻撃（小）
 	SOUND_LABEL_SE_ATTACK_LARGE,	// 攻撃（大）
@@ -30,6 +32,7 @@ typedef enum
 	SOUND_LABEL_SE_WING,					// 羽ばたく音
 	SOUND_LABEL_SE_DAMAGE,				// ダメージ音
 	SOUND_LABEL_SE_LANDING,				// 着地音
+	SOUND_LABEL_SE_RECOVERY,			// 回復音
 	SOUND_LABEL_MAX,
 } SOUND_LABEL;
 

@@ -4,14 +4,19 @@
 #include "modelAnimation.h"
 #include "player.h"
 
-CStatePlayerDamageLarge::CStatePlayerDamageLarge(CPlayer* pPlayer)
+CStatePlayerDamageLarge::CStatePlayerDamageLarge(CPlayer* pPlayer, int damage)
 	: m_FrameCounter(0)
 	, m_Velocity(Vector3())
 	, m_DirFront(-pPlayer->GetFront())
 {
 	pPlayer->SetAnimation(PLAYER_STATE_DAMAGE_LARGE, 1.0f);
 	pPlayer->SetAnimationSpeed(1.0f);
-	pPlayer->Life() = (pPlayer->Life() > 100) ? pPlayer->Life() - 100 : 0;
+
+	// ƒ_ƒ[ƒWˆ—
+	pPlayer->Life() = (pPlayer->Life() > damage) ? pPlayer->Life() - damage : 0;
+
+	// Œø‰Ê‰¹Ä¶
+	CSound::Play(SOUND_LABEL_SE_DON);
 }
 
 CStatePlayerDamageLarge::~CStatePlayerDamageLarge()

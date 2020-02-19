@@ -3,6 +3,7 @@
 #include "user_interface_manager.h"
 #include "fade_manager.h"
 #include "state_player_died.h"
+#include "state_player_idle.h"
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
@@ -26,7 +27,10 @@ CStatePlayerDied::CStatePlayerDied(CPlayer* pPlayer)
 
 CStatePlayerDied::~CStatePlayerDied()
 {
-
+	// 全てのUIのデリートフラグON
+	for (CImage* ui : m_UI) {
+		ui->Delete() = true;
+	}
 }
 
 void CStatePlayerDied::Update(CPlayer* pPlayer)
@@ -36,12 +40,54 @@ void CStatePlayerDied::Update(CPlayer* pPlayer)
 		pPlayer->SetMotionStop(true);
 	}
 
-	if (pPlayer->DeadTimes() == 3 && m_FrameCounter == 60 * 7) {
-		CImage* image= new CImage("asset/image/user_interface/quest_failed.png");
-		image->SetSize(XMFLOAT2(450 * 1.2f, 276 * 1.2f));
-		image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
-		image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-		CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);// UIに追加する
+	if (m_FrameCounter == 60 * 1) {
+		{	// 「力尽きました」
+			CImage* image = new CImage("asset/image/user_interface/died.png");
+			image->SetSize(XMFLOAT2(818 * 0.6f, 241 * 0.6f));
+			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+			m_UI.push_back(image);
+		}
+		CSound::Play(SOUND_LABEL_SE_KATYA);
+	}
+
+	if ( m_FrameCounter == 60 * 4.5) {
+		m_UI[m_UI.size()-1]->Delete() = true;	// ひとつ前のUIを消す
+
+		if (pPlayer->DeadTimes() < 3) {
+			{	// 「スタート位置に戻ります」
+				CImage* image = new CImage("asset/image/user_interface/startpoint_return.png");
+				image->SetSize(XMFLOAT2(1000 * 0.6f, 241 * 0.6f));
+				image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
+				image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+				CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+				m_UI.push_back(image);
+			}
+			CSound::Play(SOUND_LABEL_SE_KATYA);
+		}
+		else {
+			{	// 「スタート位置に戻ります」
+				CImage* image = new CImage("asset/image/user_interface/game_over.png");
+				image->SetSize(XMFLOAT2(1000 * 0.6f, 241 * 0.6f));
+				image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
+				image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+				CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+				m_UI.push_back(image);
+			}
+			CSound::Play(SOUND_LABEL_SE_KATYA);
+		}
+	}
+	if (pPlayer->DeadTimes() == 3 && m_FrameCounter == 60 * 8) {
+		m_UI[m_UI.size() - 1]->Delete() = true;	// ひとつ前のUIを消す
+		{	// 「Quest Failed」
+			CImage* image = new CImage("asset/image/user_interface/quest_failed.png");
+			image->SetSize(XMFLOAT2(450 * 1.2f, 276 * 1.2f));
+			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+		}
+		CSound::Play(SOUND_LABEL_SE_DON);
 	}
 
 	// ===== フェードアウトスタート ===========================
@@ -50,7 +96,6 @@ void CStatePlayerDied::Update(CPlayer* pPlayer)
 		if (pPlayer->DeadTimes() < 3) {
 			if (!CFadeManager::FadeOut()) {
 				CFadeManager::StartFadeOut(2.0f);	// フェードアウト開始
-				m_FrameCounter = 0;
 			}
 		}
 		else {	// 3回死んだら失敗
@@ -61,9 +106,10 @@ void CStatePlayerDied::Update(CPlayer* pPlayer)
 
 	// フェードアウト終了でシーン遷移 ===============================
 	if (CFadeManager::FadeOutComplete()) {
-		CFadeManager::StartFadeIn(2.0f);	// フェードアウト開始
 		pPlayer->SetMotionStop(false);
+		pPlayer->ChangeState(new CStatePlayerIdle(pPlayer));
 		pPlayer->ReSpwan();		// リスポーン
+		CFadeManager::StartFadeIn(3.0f);	// フェードアウト開始
 		return;
 	}
 

@@ -8,6 +8,8 @@
 #include "state_player_damage.h"
 #include "modelAnimation.h"
 #include "player.h"
+#include "scene.h"
+#include "enemy.h"
 
 CStatePlayerAttack::CStatePlayerAttack(CPlayer* pPlayer, PLAYER_STATE state_index)
 	: m_Lerp_t(0.0f)
@@ -32,7 +34,8 @@ void CStatePlayerAttack::Update(CPlayer* pPlayer)
 {
 	// ダメージステートに遷移
 	if (pPlayer->Damaged()) {
-		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		CEnemy* enemy = CManager::GetScene()->GetGameObject<CEnemy>(CManager::LAYER_OBJECT);
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer, enemy->Attack()));
 		return;
 	}
 

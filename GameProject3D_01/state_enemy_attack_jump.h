@@ -17,6 +17,7 @@ private:
 
 private:
 	int m_FrameCounter;
+	Vector3 m_MoveSpeed;
 	CPlayer* m_pPlayer;
 	Vector3	 m_StartPosition;
 	Vector3	 m_TargetPosition;

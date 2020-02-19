@@ -132,12 +132,16 @@ public:
 	{
 		ImGui::Begin("System");
 		ImGui::SetWindowFontScale(1.3f);
-		ImGui::Text("[Scene : Title]");
+		ImGui::Text("[SCENE : TITLE]");
 
 		// FPS表示
 		DrawFPS();
-
+		// コリジョン用のデバッグ表示
+		CDebugPrimitive::DrawGUI();
 		ImGui::End();
+
+		// カメラのデバッグ表示
+		CCameraManager::DrawGUI();
 	}
 
 private:
