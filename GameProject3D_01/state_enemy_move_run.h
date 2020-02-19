@@ -2,6 +2,7 @@
 #define STATE_ENEMY_MOVE_RUN_H_
 
 #include "state_enemy_move.h"
+class CPlayer;
 class CStateEnemyMoveRun : public CStateEnemyMove
 {
 public:
@@ -15,8 +16,8 @@ private:
 	bool Move(CEnemy* pEnemy);
 
 private:
-	Vector3 m_TargetPosition;
-	Vector3 m_StartPosition;
+	Vector3 m_MoveSpeed;
+	CPlayer* m_PlayerAccesser;
 	int   m_FrameCounter;
 
 };

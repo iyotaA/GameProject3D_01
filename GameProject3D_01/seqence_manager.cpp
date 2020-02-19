@@ -25,8 +25,8 @@ void CSeqenceManager::Init()
 			5.0f));
 	m_Sequences[SEQUENCE_CLEAR].push_back(
 		new SeqenceTrack(
-			SequenceParam(Vector3(0.0f, 8.0f, 7.0f), Vector3(90.0f, 0.0f, 0.0f), 5.0f),
-			SequenceParam(Vector3(0.0f, 8.0f, -7.0f), Vector3(90.0f, 0.0f, 0.0f), 5.0f),
+			SequenceParam(Vector3(0.0f, 10.0f, 7.0f), Vector3(90.0f, 0.0f, 0.0f), 5.0f),
+			SequenceParam(Vector3(0.0f, 10.0f, -7.0f), Vector3(90.0f, 0.0f, 0.0f), 5.0f),
 			5.0f));
 	m_Sequences[SEQUENCE_CLEAR].push_back(
 		new SeqenceTrack(
@@ -40,9 +40,9 @@ void CSeqenceManager::Init()
 	//===============================================
 	m_Sequences[SEQUENCE_DIED].push_back(
 		new SeqenceTrack(
-			SequenceParam(Vector3(0.0f, 0.0f, 0.0f),Vector3(60.0f, 0.0f, 0.0f), 5.0f),
-			SequenceParam(Vector3(0.0f, 0.0f, 0.0f), Vector3(20.0f, 90.0f, 0.0f), 2.0f),
-			13.0f));
+			SequenceParam(Vector3(0.0f, 0.0f, 0.0f), Vector3(20.0f, 90.0f, 0.0f), 3.0f),
+			SequenceParam(Vector3(0.0f, 0.0f, 0.0f),Vector3(80.0f, -180.0f, 0.0f), 10.0f),
+			12.0f));
 
 	m_PlaySequence = false;
 	m_CurrentSequenceId = 0;

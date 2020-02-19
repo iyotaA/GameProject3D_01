@@ -13,10 +13,13 @@
 #include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
+#include "scene.h"
+#include "enemy.h"
 
 CStatePlayerMove::CStatePlayerMove(CPlayer* pPlayer)
 	: m_pStateMove(new CStatePlayerMoveRun(pPlayer, 1.0f))
 {
+	pPlayer->Moved() = true;
 }
 
 CStatePlayerMove::~CStatePlayerMove()
@@ -29,19 +32,23 @@ void CStatePlayerMove::Update(CPlayer* pPlayer)
 	// 死亡ステートに遷移
 	if (pPlayer->Life() <= 0.0f) {
 		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
+		pPlayer->Moved() = false;
 		return;
 	}
 
 	// ダメージステートに遷移
 	if (pPlayer->Damaged()) {
 		pPlayer->Dashed() = false;
-		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		pPlayer->Moved() = false;
+		CEnemy* enemy = CManager::GetScene()->GetGameObject<CEnemy>(CManager::LAYER_OBJECT);
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer, enemy->Attack()));
 		return;
 	}
 
 	// 入力がされてなければ待機モーションに
 	if (!MoveEntry()) {
 		pPlayer->Dashed() = false;
+		pPlayer->Moved() = false;
 		pPlayer->ChangeState(new CStatePlayerIdle(pPlayer));
 		return;
 	}
@@ -63,8 +70,9 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 	if (CInput::GetKeyTrigger(VK_SPACE) || CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A)) {
 
 		// スタミナが20以上あると回避ステートに遷移
-		if ((pPlayer->Stamina() > 40)) {
+		if ((pPlayer->Stamina() > 20)) {
 			pPlayer->Dashed() = false;
+			pPlayer->Moved() = false;
 			pPlayer->ChangeState(new CStatePlayerDodge(pPlayer));
 			return true;
 		}
@@ -73,15 +81,17 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 	// 攻撃ステートに遷移
 	if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_Y) || CInput::GetKeyTrigger('I')) {
 
-		//// 納刀時は抜刀ステートに遷移
-		//if ((pPlayer->WeaponState() == SWORD_STATE_SHEATHE)) {
-
-		//	pPlayer->ChangeState(new CStatePlayerDrawSword(pPlayer, true));
-		//	return true;
-		//}
 		pPlayer->Dashed() = false;
-		pPlayer->WeaponState() = SWORD_STATE_DRAW;
-		pPlayer->ChangeState(new CStatePlayerAttack(pPlayer, PLAYER_STATE_ATTACK_JUMP));
+		pPlayer->Moved() = false;
+
+		// 抜刀時は縦攻撃
+		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
+			pPlayer->ChangeState(new CStatePlayerAttack(pPlayer, PLAYER_STATE_ATTACK_VIRTICAL));
+		}
+		else if (pPlayer->WeaponState() == SWORD_STATE_SHEATHE) {	// 納刀時はジャンプ攻撃
+			pPlayer->WeaponState() = SWORD_STATE_DRAW;
+			pPlayer->ChangeState(new CStatePlayerAttack(pPlayer, PLAYER_STATE_ATTACK_JUMP));
+		}
 		return true;
 	}
 
@@ -90,6 +100,7 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 
 		if ((pPlayer->WeaponState() == SWORD_STATE_DRAW)) {
 			pPlayer->Dashed() = false;
+			pPlayer->Moved() = false;
 			pPlayer->ChangeState(new CStatePlayerBlock(pPlayer));
 			return true;
 		}
@@ -100,8 +111,16 @@ bool CStatePlayerMove::Action(CPlayer* pPlayer)
 		((CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X) || CInput::GetKeyTrigger('K')))) {
 
 		pPlayer->Dashed() = false;
+		pPlayer->Moved() = false;
 		pPlayer->ChangeState(new CStatePlayerSheatheSword(pPlayer, true));
 		return true;
+	}
+
+	// アイテム使用
+	if ((pPlayer->WeaponState() == SWORD_STATE_SHEATHE) &&
+		((CInput::GetGamepadTrigger(XINPUT_GAMEPAD_X) || CInput::GetKeyTrigger('K')))) {
+
+		pPlayer->UseItem();
 	}
 
 	return false;

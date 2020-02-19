@@ -2,10 +2,12 @@
 #include "state_player_dodge.h"
 #include "state_player_move.h"
 #include "state_player_idle.h"
-#include "state_player_damage_large.h"
+#include "state_player_died.h"
+#include "state_player_damage.h"
 #include "modelAnimation.h"
 #include "player.h"
-#include "state_player_died.h"
+#include "scene.h"
+#include "enemy.h"
 
 CStatePlayerDodge::CStatePlayerDodge(CPlayer* pPlayer)
 	: m_FrameCounter(0)
@@ -15,7 +17,7 @@ CStatePlayerDodge::CStatePlayerDodge(CPlayer* pPlayer)
 	pPlayer->SetAnimation(PLAYER_STATE_ROOL, 1.0f);
 	pPlayer->SetAnimationSpeed(1.2f);
 	pPlayer->SetMoveSpeed(1.0f);
-	pPlayer->Stamina() -= 40;
+	pPlayer->Stamina() -= 20;
 	pPlayer->Dodged() = true;
 }
 
@@ -34,7 +36,8 @@ void CStatePlayerDodge::Update(CPlayer* pPlayer)
 
 	// ダメージステートに遷移
 	if (pPlayer->Damaged()) {
-		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer));
+		CEnemy* enemy = CManager::GetScene()->GetGameObject<CEnemy>(CManager::LAYER_OBJECT);
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer, enemy->Attack()));
 		return;
 	}
 

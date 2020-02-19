@@ -51,6 +51,9 @@ void CEnemy::Init()
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Hip"));				// K
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Chin"));				// Š{
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 2.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Spine"));			// ”wœ
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Spine.002"));		// ”wœ
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Spine.003"));		// ”wœ
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Spine.004"));		// ”wœ
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Back_Leg"));	// Œã‚ë‰E‘«
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Back_Leg"));	// Œã‚ë¶‘«
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Back_Foot"));	// Œã‚ë‰E‘«
@@ -59,17 +62,19 @@ void CEnemy::Init()
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Front_Leg"));	// ‘O¶‹r
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_R_Front_Foot")); // ‘O‰E‘«
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.7f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_L_Front_Foot")); // ‘O¶‘«
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.001"));			// K”ö
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.002"));			// K”ö
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.003"));			// K”ö
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.004"));			// K”ö
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.005"));			// K”ö
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.006"));			// K”ö
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.001"));		 // K”ö
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.002"));		 // K”ö
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.003"));		 // K”ö
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.004"));		 // K”ö
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.005"));		 // K”ö
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.8f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "B_Tail.006"));		 // K”ö
 
 
 	//---   ”»’èƒRƒŠƒWƒ‡ƒ“‚Ì‰Šú‰»   -----------------------------------------------------------------------------
 	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 8.0f, XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));	// ‹ß‹——£UŒ‚”ÍˆÍ
+	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 4.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));	// ‹ß‹——£‘O•ûUŒ‚”ÍˆÍ
 	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 35.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));	// õ“G”ÍˆÍ
+	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 5.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));	// ’nŒ`‚Æ‚Ì“–‚½‚è”»’è
 
 
 	//---   ‚»‚Ì‘¼ƒƒ“ƒo‚Ì‰Šú‰»   ----------------------------------------------------------------------------
@@ -78,17 +83,19 @@ void CEnemy::Init()
 	m_IsCollision = false;
 	m_IsPressMovingEntry = false;
 
-	// ƒtƒ‰ƒO‰Šú‰»
-	m_StateFlags.Damage				= false;
-	m_StateFlags.Died						= false;
-	m_StateFlags.Scouting				= false;
-	m_StateFlags.Attack					= false;
-	m_StateFlags.Battle					= false;
-	m_StateFlags.InScoutingArea		= false;
-	m_StateFlags.InNearArea			= false;
+	//---   ƒtƒ‰ƒO‰Šú‰» --------------------------------------------------------------------------------------
+	m_StateFlags.Damage			= false;
+	m_StateFlags.Died					= false;
+	m_StateFlags.Scouting			= false;
+	m_StateFlags.Attack				= false;
+	m_StateFlags.Battle				= false;
+	m_StateFlags.InScoutingArea	= false;
+	m_StateFlags.InNearArea		= false;
+	m_StateFlags.InNearFrontArea= false;
+	m_StateFlags.CollisionTerrian	= false;
 
-	// ƒ‰ƒCƒt‰Šú‰»
-	m_Status.Life = 1000;
+	m_Status.Life = 300;
+	m_Status.Attack = 0;
 }
 
 void CEnemy::Uninit()
@@ -156,14 +163,15 @@ void CEnemy::CheckCollision()
 	}
 
 	// ”ÍˆÍ“à‚©ƒ`ƒFƒbƒNiplayer‚Ì“·‚Æ‚Ì”»’èj
-	m_StateFlags.InNearArea		= CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[0], player->GetCollisionSphere(1)->GetSphere());
-	m_StateFlags.InScoutingArea = CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[1], player->GetCollisionSphere(1)->GetSphere());
+	m_StateFlags.InNearArea		 = CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[0], player->GetCollisionSphere(1)->GetSphere());
+	m_StateFlags.InNearFrontArea = CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[1], player->GetCollisionSphere(1)->GetSphere());
+	m_StateFlags.InScoutingArea   = CCollision3DJudge::Collision3D_Spher_Spher(m_JudgeArea[2], player->GetCollisionSphere(1)->GetSphere());
 
 	// í“¬ó‘Ô‚¶‚á‚È‚¢‚©?
 	if (!m_StateFlags.Battle) {
 		if (m_StateFlags.InScoutingArea) {
 			m_StateFlags.Battle = m_StateFlags.InScoutingArea;
-			m_JudgeArea[1]->SetRadius(50.0f);
+			m_JudgeArea[2]->SetRadius(50.0f);
 			CSound::StopSound(SOUND_LABEL_BGM_ENVIRONMENT);
 			CSound::Play(SOUND_LABEL_BGM_GAME);
 		}
@@ -171,7 +179,7 @@ void CEnemy::CheckCollision()
 	else {
 		if (!m_StateFlags.InScoutingArea) {
 			m_StateFlags.Battle = m_StateFlags.InScoutingArea;
-			m_JudgeArea[1]->SetRadius(35.0f);
+			m_JudgeArea[2]->SetRadius(35.0f);
 			CSound::StopSound(SOUND_LABEL_BGM_GAME);
 			CSound::Play(SOUND_LABEL_BGM_ENVIRONMENT);
 		}
@@ -276,6 +284,11 @@ void CEnemy::UpdateCollision()
 	for (CCollisionSphere* coll : m_JudgeArea) {
 		coll->SetCenter(&m_CollisionBody[2]->GetSphere()->GetCenter());
 	}
+	Vector3 pos = m_CollisionBody[4]->GetSphere()->GetCenter();
+	pos += m_DirVec.front *2;
+	pos.y = 0.0f;
+	m_JudgeArea[1]->SetCenter(&pos);	// ‹ß‹——£‘O•ûUŒ‚”ÍˆÍ
+	m_JudgeArea[m_JudgeArea.size() - 1]->SetCenter(&Vector3(m_Position.x, 0.0f, m_Position.z));  // ’nŒ`‚Æ‚Ì“–‚½‚è”»’è
 }
 
 void CEnemy::AddGlavity()
@@ -302,7 +315,17 @@ void CEnemy::AddGlavity()
 bool CEnemy::IsLanding()
 {
 	// ’n–Ê‚Æ‚ÌƒRƒŠƒWƒ‡ƒ“
+	// ’n–Ê‚Æ‚ÌƒRƒŠƒWƒ‡ƒ“
 	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::LAYER_BACKGROUND);
+
+	Vector3 push_Vec;
+	if (pTerrain->GetCollision(m_JudgeArea[m_JudgeArea.size() - 1], push_Vec)) {
+		m_Position += Vector3(push_Vec.x, 0.0f, push_Vec.z);
+		m_StateFlags.CollisionTerrian = true;
+	}
+	else {
+		m_StateFlags.CollisionTerrian = false;
+	}
 	float height = pTerrain->GetHeight(&m_Position);
 	if (FAILD_NUM != (int)height) {
 		if (m_Position.y <= height) {

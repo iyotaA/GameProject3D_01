@@ -5,6 +5,9 @@
 #include "state_player_draw_sword.h"
 #include "state_player_attack_jump.h"
 #include "state_player_died.h"
+#include "state_player_damage.h"
+#include "scene.h"
+#include "enemy.h"
 
 CStatePlayerDrawSword::CStatePlayerDrawSword(CPlayer* pPlayer, bool isMove)
 	: m_FrameCounter(0.0f)
@@ -28,6 +31,14 @@ void CStatePlayerDrawSword::Update(CPlayer* pPlayer)
 		pPlayer->ChangeState(new CStatePlayerDied(pPlayer));
 		return;
 	}
+
+	// ダメージステートに遷移
+	if (pPlayer->Damaged()) {
+		CEnemy* enemy = CManager::GetScene()->GetGameObject<CEnemy>(CManager::LAYER_OBJECT);
+		pPlayer->ChangeState(new CStatePlayerDamage(pPlayer, enemy->Attack()));
+		return;
+	}
+
 
 	// カウンター更新
 	m_FrameCounter++;

@@ -17,7 +17,7 @@ public:
 
 	int GetIndexCount();
 	float GetHeight(XMFLOAT3* _position);
-	//Vector3 GetNormal
+	bool GetCollision(CCollisionSphere* collision, Vector3& _vec);
 
 private:
 	const unsigned int m_TextureNum = 3;
@@ -39,6 +39,7 @@ private:
 	bool InitializeBuffers();
 	void UninitBuffers();
 	void DrawBuffers();
+	void CreateCollision();
 
 	int             m_terrainWidth, m_terrainHeight;
 	int             m_vertexCount, m_indexCount;
@@ -49,6 +50,7 @@ private:
 	VERTEX_3D_NOMAL_MAP* m_Vertex = nullptr;
 	CTexture**      m_Texture = nullptr;
 	CShaderNormalMap* m_Shader = nullptr;
+	std::vector<CCollisionSphere*> m_Collisions;
 
 	// デバッグ用
 	XMFLOAT3 PlayerArea = XMFLOAT3(0.0f, 0.0f, 0.0f);

@@ -17,7 +17,7 @@ private:
 
 private:
 	int m_FrameCounter;
-	CImage* m_UI;
+	std::vector< CImage*> m_UI;
 
 };
 

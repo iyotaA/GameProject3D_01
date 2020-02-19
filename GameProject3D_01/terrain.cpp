@@ -5,12 +5,13 @@
 #include "texture.h"
 #include "gameObject.h"
 #include "shader_all.h"
+#include "collision3D.h"
+#include "debug_primitive.h"
 #include "terrain.h"
 #include "camera_manager.h"
 #include "camera.h"
 
 #define GRID_SIZE 1.0f
-
 
 void CTerrain::Init()
 {
@@ -34,6 +35,8 @@ void CTerrain::Init()
 
 	result = InitializeBuffers();
 	assert(result);
+
+	CreateCollision();
 }
 
 
@@ -44,6 +47,8 @@ void CTerrain::Uninit()
 	m_indexBuffer->Release();
 
 	UnloadHeightMap();
+
+	m_Collisions.clear();
 
 	return;
 }
@@ -90,6 +95,11 @@ void CTerrain::Draw()
 	m_Shader->Set();
 
 	DrawBuffers();
+
+	//for (CCollisionSphere* coll : m_Collisions) {
+	//	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll);
+	//}
+
 	//DrawGUI();
 }
 
@@ -157,8 +167,8 @@ bool CTerrain::LoadHeightMap(char* filename)
 			index = (m_terrainWidth * z) + x;
 
 			m_heightMap[index].x = (float)x * GRID_SIZE - offset_x;
-			m_heightMap[index].y = (1.0f >= (float)height / 15.0f * GRID_SIZE) ? 0.0f : (float)height / 15.0f * GRID_SIZE; // NormalizeHeight
 			m_heightMap[index].z = (float)z * GRID_SIZE - offset_z;
+			m_heightMap[index].y = (1.0f >= (float)height / 15.0f * GRID_SIZE) ? 0.0f : (float)height / 15.0f * GRID_SIZE; // NormalizeHeight
 
 			k += type;
 		}
@@ -401,6 +411,35 @@ void CTerrain::DrawGUI()
 	ImGui::End();
 }
 
+void CTerrain::CreateCollision()
+{
+	bool is_break = false;
+	for (int z = 0; z < m_terrainWidth; z++) {
+		for (int x = 0; x < m_terrainHeight; x++) {
+
+			if (m_Vertex[x + m_terrainWidth * z].Position.y >= 1.0f)continue;
+			// ÉRÉäÉWÉáÉì
+			for (int h = z - 1; h <= z + 1; h++) {
+				for (int w = x - 1; w <= x + 1; w++) {
+					if (m_Vertex[w + m_terrainWidth * h].Position.y >= 1.0f) {
+
+						Vector3 pos_terrian = Vector3(
+							m_Vertex[x + m_terrainWidth * z].Position.x,
+							m_Vertex[x + m_terrainWidth * z].Position.y,
+							m_Vertex[x + m_terrainWidth * z].Position.z);
+
+						m_Collisions.push_back(new CCollisionSphere(pos_terrian, 0.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)));
+						is_break = true;
+						break;
+					}
+				}
+				if (is_break)break;
+			}
+			is_break = false;	// Ç±Ç±Ç‹Ç≈ÉuÉåÉCÉN
+		}
+	}
+}
+
 float CTerrain::GetHeight(XMFLOAT3* _position)
 {
 	XMFLOAT3 position = *_position;
@@ -439,15 +478,15 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	// va Å~ vb ÇÃ y ê¨ï™ > 0.0f
 	if ((va.z * vb.x - va.x * vb.z > 0.0f) || (va.z * vb.x - va.x * vb.z == 0.0f)) {
 
-		p0 = m_Vertex[x + m_terrainWidth * (z + 1)].Position;				// p1|Å_
-		p1 = m_Vertex[x + m_terrainWidth * z].Position;							//     |Å@Å_
+		p0 = m_Vertex[x + m_terrainWidth * (z + 1)].Position;					// p1|Å_
+		p1 = m_Vertex[x + m_terrainWidth * z].Position;							//     |Å@  Å_
 		p2 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position;		// p0|____Å_p2
 	}
 	// va Å~ vb ÇÃ y ê¨ï™ < 0.0f
 	else {
-		p0 = m_Vertex[(x + 1) + m_terrainWidth * z].Position;				// p2Å_'''''''''''|p0
+		p0 = m_Vertex[(x + 1) + m_terrainWidth * z].Position;					// p2Å_''''''''''|p0
 		p1 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position;		//         Å_    |
-		p2 = m_Vertex[x + m_terrainWidth * z].Position;							//   Å@       Å_|p1
+		p2 = m_Vertex[x + m_terrainWidth * z].Position;							//   Å@       Å_ |p1
 	}
 
 	// p1 - p0
@@ -478,5 +517,29 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	IsRange = true;
 
 	return hp.y;
+}
+
+bool CTerrain::GetCollision(CCollisionSphere* collision, Vector3& _vec)
+{
+	_vec = Vector3();
+	bool is_collision = false;
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// óßÇ¡ÇƒÇ¢ÇÈÉ|ÉWÉVÉáÉìÇÃç∂âEè„â∫ judge_offset É}ÉXÇ∏Ç¬í≤Ç◊Çƒyç¿ïWÇ™0ÇÊÇËëÂÇ´ÇØÇÍÇŒÉRÉäÉWÉáÉì
+	///////////////////////////////////////////////////////////////////////////////////////////
+	for (CCollisionSphere* coll : m_Collisions) {
+		// ÉRÉäÉWÉáÉì
+		if (CCollision3DJudge::Collision3D_Spher_Spher(collision, coll)) {
+
+			float distance = collision->GetRadius() + coll->GetRadius();
+			Vector3 vec = collision->GetCenter() - coll->GetCenter();
+			float length = vec.Length();
+			vec.Normalize();
+			vec = vec * (distance - length);
+			_vec +=vec;
+			is_collision = true;
+		}
+	}
+
+	return is_collision;
 }
 

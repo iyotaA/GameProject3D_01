@@ -49,8 +49,11 @@ public:
 	bool& Attacked() { return m_StateFlags.Attack; }
 	bool& Battle() { return m_StateFlags.Battle; }
 	bool& InNearArea() { return m_StateFlags.InNearArea; }
+	bool& InNearFrontArea() { return m_StateFlags.InNearFrontArea; }
 	bool& InScoutingArea() { return m_StateFlags.InScoutingArea; }
+	bool& CollisionTerrian() { return m_StateFlags.CollisionTerrian; }
 	int& Life() { return m_Status.Life; }
+	int& Attack() { return m_Status.Attack; }
 	Vector3& Rotation() { return m_Rotation; }
 
 
@@ -81,6 +84,7 @@ private:
 	struct Status
 	{
 		int Life;
+		int Attack;
 	};
 	Status	m_Status;
 
@@ -93,6 +97,8 @@ private:
 		bool Died;			// €–S
 		bool InScoutingArea;	// õ“G”ÍˆÍ“à
 		bool InNearArea;		// ‹ß‹——£UŒ‚”ÍˆÍ“à
+		bool InNearFrontArea;// ‹ß‹——£‘O•ûUŒ‚”ÍˆÍ“à
+		bool CollisionTerrian;	// ’nŒ`‚Æ“–‚½‚Á‚Ä‚¢‚é‚©
 	};
 	StateFlag	m_StateFlags;
 

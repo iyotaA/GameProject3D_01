@@ -126,7 +126,7 @@ public:
 
 			if (i == CManager::LAYER_EFFECT) {
 				// コリジョングリッド描画
-				CDebugPrimitive::DebugPrimitive_BatchRun();
+				//CDebugPrimitive::DebugPrimitive_BatchRun();
 			}
 
 			for (CGameObject* object : m_GameObject[i]) {

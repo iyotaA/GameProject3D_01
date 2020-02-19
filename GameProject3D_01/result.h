@@ -52,6 +52,7 @@ public:
 		if (CInput::GetKeyTrigger(VK_RETURN) || CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A)) {
 			if (CFadeManager::FadeInComplete()) {
 				if (!CFadeManager::FadeOut()) {
+					CSound::Play(SOUND_LABEL_SE_BUTTON);
 					CFadeManager::StartFadeOut(3.0f);						// フェードアウト開始
 					m_UI[0]->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 					m_FrameCounter = 0;
@@ -96,12 +97,17 @@ public:
 	{
 		ImGui::Begin("System");
 		ImGui::SetWindowFontScale(1.3f);
-		ImGui::Text("[Scene : Title]");
+		ImGui::Text("[SCENE : RESULT]");
 
 		// FPS表示
 		DrawFPS();
 
+		// コリジョン用のデバッグ表示
+		CDebugPrimitive::DrawGUI();
 		ImGui::End();
+
+		// カメラのデバッグ表示
+		CCameraManager::DrawGUI();
 	}
 
 private:

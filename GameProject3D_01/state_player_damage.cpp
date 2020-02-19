@@ -4,14 +4,26 @@
 #include "state_player_damage_small.h"
 #include "modelAnimation.h"
 #include "player.h"
+#include "enemy.h"
 #include "state_player_damage.h"
 #include "state_player_died.h"
 
-CStatePlayerDamage::CStatePlayerDamage(CPlayer* pPlayer)
-	: m_pStateDamage(new CStatePlayerDamageLarge(pPlayer))
+CStatePlayerDamage::CStatePlayerDamage(CPlayer* pPlayer, int damage)
 {
-	// å¯â âπçƒê∂
-	//CSound::Play(SOUND_LABEL_SE_HIT);
+	switch (damage)
+	{
+	case 25:
+		m_pStateDamage = new CStatePlayerDamageSmall(pPlayer, 25);
+		break;
+	case 35:
+		m_pStateDamage = new CStatePlayerDamageLarge(pPlayer, 35);
+		break;
+	case 40:
+		m_pStateDamage = new CStatePlayerDamageLarge(pPlayer, 40);
+		break;
+	default:
+		m_pStateDamage = new CStatePlayerDamageNone(pPlayer);
+	}
 }
 
 CStatePlayerDamage::~CStatePlayerDamage()

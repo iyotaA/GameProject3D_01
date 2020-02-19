@@ -19,12 +19,28 @@ public:
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
 		}
+		{// ライフ・スタミナゲージのフレーム
+			CImage* image = new CImage("asset/image/user_interface/clock_hand.png");
+			image->SetSize(XMFLOAT2(120, 120));
+			image->SetPosition(XMFLOAT2(82, 82));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+			m_UI.push_back(image);
+		}
 		{// クエストボード
 			CImage* image = new CImage("asset/image/user_interface/game_quest.png");
 			image->SetSize(XMFLOAT2(600.0f, 600.0f));
 			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_2);// UIに追加する
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
+			m_UI.push_back(image);
+		}
+		{// アイテムの枠
+			CImage* image = new CImage("asset/image/user_interface/item_frame.png");
+			image->SetSize(XMFLOAT2(490 * 0.3, 390 * 0.4));
+			image->SetPosition(XMFLOAT2(1250, 650));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);// UIに追加する
 			m_UI.push_back(image);
 		}
 
@@ -95,8 +111,9 @@ public:
 	{
 		if (CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A) || CInput::GetKeyTrigger(VK_RETURN)) {
 			if (!m_Start) {
-				m_UI[0]->Delete() = true;
+				m_UI[1]->Delete() = true;
 				m_Start = true;
+				CSound::Play(SOUND_LABEL_SE_BUTTON);
 
 				//===== 入力を可能に戻す ==============
 				CInput::InputEnable(true);
@@ -121,6 +138,16 @@ public:
 			}
 		}
 
+		// 時間計測
+		if (!CManager::Clear()) {
+			float time = m_FrameCounter * DELTA_TIME / 600.0f * 360.0f;
+			if (time >= 360.0f) {
+				time = 360.0f;
+				CManager::Clear() = true;
+			}
+			m_UI[0]->SetRotate(time * DEGREE_TO_RADIAN);
+		}
+
 		// シーケンスの終了処理
 		CSeqenceManager::Update();
 
@@ -137,15 +164,15 @@ public:
 	{
 		ImGui::Begin("System");
 		ImGui::SetWindowFontScale(1.3f);
-		ImGui::Text("[Scene : GAME]");
+		ImGui::Text("[SCENE : GAME]");
 
 		// FPS表示
 		DrawFPS();
+		ImGui::InputFloat2("position", (float*)m_UI[0]->GetPosition());
 
 		// コリジョン用のデバッグ表示
 		CDebugPrimitive::DrawGUI();
 		ImGui::End();
-
 
 		// カメラのデバッグ表示
 		CCameraManager::DrawGUI();

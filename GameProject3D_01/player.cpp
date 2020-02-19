@@ -13,6 +13,7 @@
 #include "state_player_block.h"
 #include "state_player_died.h"
 #include "MathFunc.h"
+#include "recovery_drag.h"
 
 #define Glavity (-0.098f)
 #define Mass	(10.0f)
@@ -49,7 +50,7 @@ void CPlayer::Init()
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "mixamorig:LeftFoot"));		// 左足
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "mixamorig:RightHand"));	// 右手
 	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.15f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "mixamorig:LeftHand"));	// 左手
-	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 1.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "RootNode"));						// ルート
+	m_CollisionBody.push_back(new CCollisionWithBone(new CCollisionSphere(Vector3(), 0.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)), "RootNode"));						// ルート
 
 
 	// 剣のコリジョンの初期化
@@ -67,18 +68,26 @@ void CPlayer::Init()
 	m_WeaponBoneName.push_back("B_Weapon_Waist");
 	m_WeaponBoneName.push_back("B_Weapon");
 
-	m_Status.DeadTimes = 2;
+	m_Status.DeadTimes = 0;
 	m_Status.Life = 100;
 	m_Status.Stamina = 100;
+	m_Status.AttackValue = 10.0f;
+
+	m_FrameCounter = 30;
 
 	m_Collision = false;
+	m_StateFlags.Idle = false;
 	m_StateFlags.Damage = false;
 	m_StateFlags.Dodge = false;
 	m_StateFlags.Attack = false;
 	m_StateFlags.Block = false;
+	m_StateFlags.Dash = false;
+	m_StateFlags.Move = false;
 	m_StateFlags.Died = false;
 	m_StateFlags.StaminaEmpty = false;
 
+
+	m_Item = new CRecoveryDrag(10);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//		UIオブジェクトの初期化
@@ -88,7 +97,7 @@ void CPlayer::Init()
 	m_Number->SetNum(100);
 	m_Number->SetSize(XMFLOAT2(25.0f, 25.0f));
 	m_Number->SetPosition(XMFLOAT2(40.0f, 200.0f));
-	m_Number->SetColor(XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f));
+	m_Number->SetColor(XMFLOAT4(1.0f, 0.5f, 0.0f, 0.0f));
 	CUserInterfaceManager::AddUI(m_Number, CUserInterfaceManager::LAYER_1);// UIに追加する
 
 	// ライフゲージ
@@ -142,8 +151,15 @@ void CPlayer::Update()
 	u = (m_Status.Stamina > 0) ? 0.5f - m_Status.Stamina / 100.0f * 0.5f : 0.5f;
 	m_UIAccesser[1]->SetUV(UV(u, 0.0f, u + 0.5f, 1.0f));
 
+	// ダメージ値を徐々に消す
+	float alpha = 1.0f - m_FrameCounter / 50.0f;
+	if (alpha <= 0.0f) { alpha = 0.0f; }
+	m_Number->SetColor(XMFLOAT4(1.0f, 0.5f, 0.0f, alpha));
+
 	// モデル更新
 	m_pModel->update(1);
+
+	m_FrameCounter++;
 }
 
 void CPlayer::Draw()
@@ -303,15 +319,11 @@ void CPlayer::Move()
 
 	// スタミナ消費処理
 	if (m_StateFlags.Dash) {
-		(m_Status.Stamina > 0) ? m_Status.Stamina -= 0.3f : m_StateFlags.StaminaEmpty = true;
+		(m_Status.Stamina > 0) ? m_Status.Stamina -= 0.15f : m_StateFlags.StaminaEmpty = true;
 	}
 	else {
-		(m_Status.Stamina < 100) ? m_Status.Stamina += 0.25f : m_StateFlags.StaminaEmpty = false;
+		(m_Status.Stamina < 100 && !m_StateFlags.Dodge) ? m_Status.Stamina += 0.2f : m_StateFlags.StaminaEmpty = false;
 	}
-
-	//if (m_Position.y > 0.0f) {
-	//	m_Position = prevPos;
-	//}
 }
 
 void CPlayer::CheckCollision_Enemy()
@@ -331,23 +343,25 @@ void CPlayer::CheckCollision_Enemy()
 				if (m_StateFlags.Damage)break;
 
 				//==============================================
-				// 体のコリジョン判定
+				// 体のコリジョン判定（敵が死亡していなければ実行）
 				//==============================================
-				for (CCollisionWithBone* playerColl : m_CollisionBody) {
-					if (CCollision3DJudge::Collision3D_Spher_Spher(playerColl->GetSphere(), enemyColl->GetSphere())) {
+				if (!obj->Died()) {
+					for (CCollisionWithBone* playerColl : m_CollisionBody) {
+						if (CCollision3DJudge::Collision3D_Spher_Spher(playerColl->GetSphere(), enemyColl->GetSphere())) {
 
-						float distance = playerColl->GetSphere()->GetRadius() + enemyColl->GetSphere()->GetRadius();
-						Vector3 vec	   = playerColl->GetSphere()->GetCenter() - enemyColl->GetSphere()->GetCenter();
-						float length   = vec.Length();
-						vec.Normalize();
-						vec = vec * (distance - length);
-						m_Position += vec;
+							float distance = playerColl->GetSphere()->GetRadius() + enemyColl->GetSphere()->GetRadius();
+							Vector3 vec = playerColl->GetSphere()->GetCenter() - enemyColl->GetSphere()->GetCenter();
+							float length = vec.Length();
+							vec.Normalize();
+							vec = vec * (distance - length);
+							m_Position += vec;
 
-						// 敵が攻撃状態ならダメージ
-						if (obj->Attacked()) {
-							m_StateFlags.Damage = true;
+							// 敵が攻撃状態ならダメージ
+							if (obj->Attacked()) {
+								m_StateFlags.Damage = true;
+							}
+							break;
 						}
-						break;
 					}
 				}
 				//==============================================
@@ -370,9 +384,12 @@ void CPlayer::CheckCollision_Enemy()
 						CSound::Play(SOUND_LABEL_SE_ATTACK_LARGE);
 						m_StateFlags.Attack = false;
 						m_Number->SetPosition(GetScreenPos(coll_weapon->GetCenter()));
+						m_Number->SetNum(m_Status.AttackValue);
+						m_Number->SetColor(XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f));
+						m_FrameCounter = 0;
 
 						// ダメージを与える
-						obj->DealDamage(1000);
+						obj->DealDamage(m_Status.AttackValue);
 						break;
 					}
 				}
@@ -434,6 +451,11 @@ bool CPlayer::IsLanding()
 {
 	// 地面とのコリジョン
 	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::LAYER_BACKGROUND);
+
+	Vector3 push_Vec;
+	if (pTerrain->GetCollision(m_CollisionBody[6]->GetSphere(), push_Vec)) {
+		m_Position += Vector3(push_Vec.x, 0.0f, push_Vec.z);
+	}
 	float height = pTerrain->GetHeight(&m_Position);
 	if (FAILD_NUM != (int)height) {
 
@@ -477,6 +499,11 @@ void CPlayer::SetMotionStop(const bool _stop)
 	m_pModel->StopMotion(_stop);
 }
 
+void CPlayer::UseItem()
+{
+	m_Item->Use();
+}
+
 void CPlayer::ChangeState(CStatePlayer* pState)
 {
 	delete m_pState;
@@ -502,13 +529,13 @@ void CPlayer::ReSpwan()
 
 	// 各フラグの初期化
 	m_Collision = false;
+	m_StateFlags.Idle = false;
 	m_StateFlags.Damage = false;
 	m_StateFlags.Dodge = false;
 	m_StateFlags.Attack = false;
 	m_StateFlags.Block = false;
+	m_StateFlags.Dash = false;
+	m_StateFlags.Move = false;
 	m_StateFlags.Died = false;
 	m_StateFlags.StaminaEmpty = false;
-
-	// 待機状態にする
-	ChangeState(new CStatePlayerIdle(this));
 }
