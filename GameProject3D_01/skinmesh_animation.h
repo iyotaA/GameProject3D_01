@@ -1,7 +1,22 @@
 #ifndef SKINMESH_ANIMATION_H_
 #define SKINMESH_ANIMATION_H_
 
-class MESH;
+// ライブラリ
+#pragma comment(lib, "assimp.lib")
+
+// インクルード
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/matrix4x4.h>
+
+struct MESH
+{
+	ID3D11Buffer* VertexBuffer;
+	ID3D11Buffer* IndexBuffer;
+	unsigned int  IndexNum;
+	MATERIAL* Material;
+};
 
 typedef enum {
 	E_NONE = -1,

@@ -1,6 +1,5 @@
 #include "game_objects_all.h"
 #include "state_player_idle.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "state_player_draw_sword.h"
 #include "state_player_attack_jump.h"

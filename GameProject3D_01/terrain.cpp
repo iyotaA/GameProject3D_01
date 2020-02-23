@@ -16,8 +16,9 @@
 void CTerrain::Init()
 {
 	bool result;
+	m_DrawCollision = false;
 
-	result = LoadHeightMap("asset/image/terrian/height_map.bmp");
+	result = LoadHeightMap("asset/image/terrian/height_map000.bmp");
 	assert(result);
 
 	// テクスチャ読み込み //////
@@ -25,6 +26,7 @@ void CTerrain::Init()
 	m_Texture[0] = new CTexture();
 	m_Texture[1] = new CTexture();
 	m_Texture[2] = new CTexture();
+
 
 	// シェーダー読み込み //////
 	m_Shader = ShaderManager::GetShader<CShaderNormalMap>();
@@ -37,6 +39,7 @@ void CTerrain::Init()
 	assert(result);
 
 	CreateCollision();
+
 }
 
 
@@ -96,11 +99,12 @@ void CTerrain::Draw()
 
 	DrawBuffers();
 
-	//for (CCollisionSphere* coll : m_Collisions) {
-	//	CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll);
-	//}
-
-	//DrawGUI();
+	// コリジョン描画
+	if (m_DrawCollision) {
+		for (CCollisionSphere* coll : m_Collisions) {
+			CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll);
+		}
+	}
 }
 
 
@@ -376,6 +380,8 @@ void CTerrain::DrawGUI()
 
 	if (ImGui::CollapsingHeader("Field"))
 	{
+		ImGui::Checkbox("CollisionField", &m_DrawCollision);
+
 		ImGui::Columns(2, "Field");
 		{
 			int id = ImGui::GetColumnIndex();
@@ -391,7 +397,6 @@ void CTerrain::DrawGUI()
 		}
 		ImGui::NextColumn();
 
-		//＜:: Animation ::＞
 		{
 			int id = ImGui::GetColumnIndex();
 			float width = ImGui::GetColumnWidth(id);

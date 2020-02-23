@@ -5,7 +5,6 @@
 #include "state_player_attack_virtical.h"
 #include "state_player_attack_top.h"
 #include "state_player_attack_combo.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerAttackVirtical::CStatePlayerAttackVirtical(CPlayer* pPlayer)

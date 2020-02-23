@@ -2,7 +2,6 @@
 #include "state_enemy_idle_watch_around.h"
 #include "state_enemy_idle_stop.h"
 #include "state_enemy_move.h"
-#include "modelAnimation.h"
 #include "enemy.h"
 #include "MathFunc.h"
 

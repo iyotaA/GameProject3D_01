@@ -14,22 +14,22 @@ public:
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		{// ライフ・スタミナゲージのフレーム
 			CImage* image = new CImage("asset/image/user_interface/ui_header.png");
-			image->SetSize(XMFLOAT2(720.0f, 160.0f));
-			image->SetPosition(XMFLOAT2(360.0f, 80.0f));
+			image->SetSize(XMFLOAT2(720.0f * UI_MAGNIFICATION_WIDTH, 160.0f * UI_MAGNIFICATION_HEIGHT));
+			image->SetPosition(XMFLOAT2(360.0f * UI_MAGNIFICATION_WIDTH, 80.0f * UI_MAGNIFICATION_HEIGHT));
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
 		}
 		{// ライフ・スタミナゲージのフレーム
 			CImage* image = new CImage("asset/image/user_interface/clock_hand.png");
-			image->SetSize(XMFLOAT2(120, 120));
-			image->SetPosition(XMFLOAT2(82, 82));
+			image->SetSize(XMFLOAT2(120 * UI_MAGNIFICATION_WIDTH, 120 * UI_MAGNIFICATION_HEIGHT));
+			image->SetPosition(XMFLOAT2(82 * UI_MAGNIFICATION_WIDTH, 82 * UI_MAGNIFICATION_HEIGHT));
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
 			m_UI.push_back(image);
 		}
 		{// クエストボード
 			CImage* image = new CImage("asset/image/user_interface/game_quest.png");
-			image->SetSize(XMFLOAT2(600.0f, 600.0f));
+			image->SetSize(XMFLOAT2(600.0f * UI_MAGNIFICATION_WIDTH, 600.0f * UI_MAGNIFICATION_HEIGHT));
 			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_1);// UIに追加する
@@ -37,8 +37,8 @@ public:
 		}
 		{// アイテムの枠
 			CImage* image = new CImage("asset/image/user_interface/item_frame.png");
-			image->SetSize(XMFLOAT2(490 * 0.3, 390 * 0.4));
-			image->SetPosition(XMFLOAT2(1250, 650));
+			image->SetSize(XMFLOAT2(147 * UI_MAGNIFICATION_WIDTH, 156 * UI_MAGNIFICATION_HEIGHT));
+			image->SetPosition(XMFLOAT2(SCREEN_WIDTH - 100 * UI_MAGNIFICATION_WIDTH, SCREEN_HEIGHT - 100 * UI_MAGNIFICATION_HEIGHT));
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);// UIに追加する
 			m_UI.push_back(image);

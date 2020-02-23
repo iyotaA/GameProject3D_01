@@ -1,6 +1,5 @@
 #include "game_objects_all.h"
 #include "state_enemy_move_walk.h"
-#include "modelAnimation.h"
 #include "enemy.h"
 #include "MathFunc.h"
 

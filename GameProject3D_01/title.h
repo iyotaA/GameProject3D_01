@@ -21,7 +21,7 @@ public:
 		}
 		{// ƒ^ƒCƒgƒ‹ƒƒS
 			CImage* image = new CImage("asset/image/user_interface/title_rogo.png");
-			image->SetSize(XMFLOAT2(1011, 476));
+			image->SetSize(XMFLOAT2(1011 * UI_MAGNIFICATION_WIDTH, 476 * UI_MAGNIFICATION_HEIGHT));
 			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT * 0.4f));
 			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);// UI‚É’Ç‰Á‚·‚é

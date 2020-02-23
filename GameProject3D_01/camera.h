@@ -11,11 +11,12 @@ public:
 	void Update();
 	void Project();
 	void DrawGUI();
-	const Vector3 GetAt() { return m_Position; }
 
+
+	//=== ゲッタ ================================
+	const Vector3 GetAt() { return m_Position; }
 	XMFLOAT4X4 GetViewMatrix() { return m_ViewMatrix; }
 	XMFLOAT4X4 GetProjectionMatrix() { return m_ProjectionMatrix; }
-
 	unsigned int GetId() { return m_CameraId; }
 	Vector3X3* const GetDir3Vector() { return &m_DirVec; }
 	Vector3 GetPosition() const { return m_Position; }
@@ -24,6 +25,7 @@ public:
 	bool GetIsBindAtObject() const { return m_BindAtObject; }
 	bool GetVisivility(XMFLOAT3* position) const;
 
+	//=== セッタ ================================
 	void SetAt(CGameObject* pPlayer, Vector3 offset);
 	void SetPos(Vector3* pPos);
 	void SetAtPos(Vector3* pPos);
@@ -61,7 +63,7 @@ private:
 	bool		m_BindAtObject;
 	bool		m_Shake;
 
-	void IsRange();
+	void UpdateDirection();
 	bool CollisionTerrian();
 	void Shake();
 

@@ -1,42 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="ソース ファイル\GameObject">
-      <UniqueIdentifier>{a68ad31a-0736-4884-a6aa-0482c9131155}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\GameObject">
-      <UniqueIdentifier>{b02a924c-876a-45ed-8638-9307b8fc8d0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System">
-      <UniqueIdentifier>{91665541-2254-4fb8-8bca-4923b4a3c11b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\System">
-      <UniqueIdentifier>{f244c381-ce46-4225-a01f-dc924c96f1e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\stb">
-      <UniqueIdentifier>{3a5c6570-a481-4293-9e5d-05edebb27101}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\imgui">
-      <UniqueIdentifier>{bdb2b9ea-2ffa-496d-91ba-3d32eb315a6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\System\imgui">
-      <UniqueIdentifier>{9050f863-2935-4909-a87d-0afc28ddbb1e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\MyTypeClass">
-      <UniqueIdentifier>{ca17c882-461e-40af-8b90-59883c29fa96}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shader">
       <UniqueIdentifier>{f3a3b764-079d-4dd1-8e05-e01177998007}</UniqueIdentifier>
     </Filter>
@@ -79,94 +43,91 @@
     <Filter Include="State\EnemyState\StateAttack">
       <UniqueIdentifier>{17a8984f-7933-4ea1-8a4f-e27bcf7a9f98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{a68ad31a-0736-4884-a6aa-0482c9131155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyTypeClass">
+      <UniqueIdentifier>{ca17c882-461e-40af-8b90-59883c29fa96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{91665541-2254-4fb8-8bca-4923b4a3c11b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\imgui">
+      <UniqueIdentifier>{bdb2b9ea-2ffa-496d-91ba-3d32eb315a6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\stb">
+      <UniqueIdentifier>{3a5c6570-a481-4293-9e5d-05edebb27101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\managers">
+      <UniqueIdentifier>{ac14ba74-250e-4826-a362-7096e6252bf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\scene">
+      <UniqueIdentifier>{41848d8f-6dc9-4be4-a655-924f40e09cca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="field.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="polygon3d.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="skyDome.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="input.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="renderer.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="texture.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="manager.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="wall.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="bullet.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="enemy.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="imgui.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_demo.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_draw.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_impl_dx11.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_impl_win32.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_widgets.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imguiManager.cpp">
-      <Filter>ソース ファイル\System\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="2dAnimation.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System\imgui</Filter>
     </ClCompile>
     <ClCompile Include="debug_primitive.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="sound.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="modelAnimation.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="terrain.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="camera_manager.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="collision3D.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="skinmesh_animation.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="state_player_idle.cpp">
       <Filter>State\PlayerState</Filter>
@@ -199,7 +160,7 @@
       <Filter>shader</Filter>
     </ClCompile>
     <ClCompile Include="MathFunc.cpp">
-      <Filter>ソース ファイル\MyTypeClass</Filter>
+      <Filter>MyTypeClass</Filter>
     </ClCompile>
     <ClCompile Include="state_player_attack.cpp">
       <Filter>State\PlayerState\StateAttack</Filter>
@@ -255,11 +216,8 @@
     <ClCompile Include="state_player_draw_sword.cpp">
       <Filter>State\PlayerState</Filter>
     </ClCompile>
-    <ClCompile Include="user_interface_manager.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="polygon.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="state_enemy_attack.cpp">
       <Filter>State\EnemyState\StateAttack</Filter>
@@ -298,10 +256,10 @@
       <Filter>State\EnemyState</Filter>
     </ClCompile>
     <ClCompile Include="image.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="number.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="state_player_died.cpp">
       <Filter>State\PlayerState</Filter>
@@ -309,145 +267,37 @@
     <ClCompile Include="state_enemy_died.cpp">
       <Filter>State\EnemyState</Filter>
     </ClCompile>
-    <ClCompile Include="fade_manager.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="seqence_manager.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="item.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="recovery_drag.cpp">
-      <Filter>ソース ファイル\System</Filter>
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_manager.cpp">
+      <Filter>System\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="fade_manager.cpp">
+      <Filter>System\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="seqence_manager.cpp">
+      <Filter>System\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_manager.cpp">
+      <Filter>System\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="manager.cpp">
+      <Filter>System\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.cpp">
+      <Filter>GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="field.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="gameObject.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon3d.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="skyDome.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="renderer.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="manager.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="player.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="wall.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="scene.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="bullet.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="enemy.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="stb_image.h">
-      <Filter>ヘッダー ファイル\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="imconfig.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui_impl_dx11.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui_impl_win32.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui_internal.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imstb_rectpack.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imstb_textedit.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imstb_truetype.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imguiManager.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="2dAnimation.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="debug_primitive.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="collision3D.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="sound.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="result.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="title.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="tutorial.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="damage.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="modelAnimation.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="terrain.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="imGui_all.h">
-      <Filter>ヘッダー ファイル\System\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="game_objects_all.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
+      <Filter>System\stb</Filter>
     </ClInclude>
     <ClInclude Include="Vector3.h">
-      <Filter>ソース ファイル\MyTypeClass</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_manager.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="skinmesh_animation.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="stl.h">
-      <Filter>ヘッダー ファイル\System</Filter>
+      <Filter>MyTypeClass</Filter>
     </ClInclude>
     <ClInclude Include="state_player.h">
       <Filter>State\PlayerState</Filter>
@@ -486,7 +336,7 @@
       <Filter>shader</Filter>
     </ClInclude>
     <ClInclude Include="MathFunc.h">
-      <Filter>ソース ファイル\MyTypeClass</Filter>
+      <Filter>MyTypeClass</Filter>
     </ClInclude>
     <ClInclude Include="state_player_attack.h">
       <Filter>State\PlayerState\StateAttack</Filter>
@@ -542,12 +392,6 @@
     <ClInclude Include="state_player_draw_sword.h">
       <Filter>State\PlayerState</Filter>
     </ClInclude>
-    <ClInclude Include="user_interface_manager.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="state_enemy_attack.h">
       <Filter>State\EnemyState\StateAttack</Filter>
     </ClInclude>
@@ -587,32 +431,143 @@
     <ClInclude Include="state_enemy_damage.h">
       <Filter>State\EnemyState</Filter>
     </ClInclude>
-    <ClInclude Include="image.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="number.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="state_player_died.h">
       <Filter>State\PlayerState</Filter>
-    </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="state_enemy_died.h">
       <Filter>State\EnemyState</Filter>
     </ClInclude>
-    <ClInclude Include="fade_manager.h">
-      <Filter>ヘッダー ファイル\System</Filter>
+    <ClInclude Include="camera.h">
+      <Filter>GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="seqence_manager.h">
-      <Filter>ヘッダー ファイル\System</Filter>
+    <ClInclude Include="enemy.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="game_objects_all.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="gameObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="polygon3d.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="skyDome.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="imconfig.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imGui_all.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_dx11.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_win32.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_internal.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imguiManager.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_rectpack.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_textedit.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_truetype.h">
+      <Filter>System\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="collision3D.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="damage.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_primitive.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="item.h">
-      <Filter>ヘッダー ファイル\System</Filter>
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="number.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="polygon.h">
+      <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="recovery_drag.h">
-      <Filter>ヘッダー ファイル\System</Filter>
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="skinmesh_animation.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sound.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="stl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_manager.h">
+      <Filter>System\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="fade_manager.h">
+      <Filter>System\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="seqence_manager.h">
+      <Filter>System\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_manager.h">
+      <Filter>System\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>System\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="manager.h">
+      <Filter>System\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>System\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="result.h">
+      <Filter>System\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="title.h">
+      <Filter>System\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial.h">
+      <Filter>System\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -650,6 +605,15 @@
       <Filter>shader\hlsl</Filter>
     </FxCompile>
     <FxCompile Include="shader2DVS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DParticleGS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DParticlePS.hlsl">
+      <Filter>shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="shader3DParticleVS.hlsl">
       <Filter>shader\hlsl</Filter>
     </FxCompile>
   </ItemGroup>

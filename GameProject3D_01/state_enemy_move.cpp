@@ -1,5 +1,4 @@
 #include "game_objects_all.h"
-#include "modelAnimation.h"
 #include "state_enemy_move.h"
 #include "state_enemy_move_run.h"
 #include "state_enemy_move_walk.h"

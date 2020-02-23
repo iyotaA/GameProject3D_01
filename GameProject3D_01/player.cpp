@@ -95,22 +95,22 @@ void CPlayer::Init()
 	// ダメージ値
 	m_Number = new CNumber("asset/image/user_interface/number.png");
 	m_Number->SetNum(100);
-	m_Number->SetSize(XMFLOAT2(25.0f, 25.0f));
-	m_Number->SetPosition(XMFLOAT2(40.0f, 200.0f));
+	m_Number->SetSize(XMFLOAT2(25.0f * UI_MAGNIFICATION_WIDTH, 25.0f * UI_MAGNIFICATION_HEIGHT));
+	m_Number->SetPosition(XMFLOAT2(40.0f * UI_MAGNIFICATION_WIDTH, 200.0f * UI_MAGNIFICATION_HEIGHT));
 	m_Number->SetColor(XMFLOAT4(1.0f, 0.5f, 0.0f, 0.0f));
 	CUserInterfaceManager::AddUI(m_Number, CUserInterfaceManager::LAYER_1);// UIに追加する
 
 	// ライフゲージ
 	m_UIAccesser.push_back(new CImage("asset/image/user_interface/guage.png"));
-	m_UIAccesser[0]->SetSize(XMFLOAT2(600.0f, 10.0f));
-	m_UIAccesser[0]->SetPosition(XMFLOAT2(400.0f, 20.0f));
+	m_UIAccesser[0]->SetSize(XMFLOAT2(600.0f * UI_MAGNIFICATION_WIDTH, 10.0f * UI_MAGNIFICATION_HEIGHT));
+	m_UIAccesser[0]->SetPosition(XMFLOAT2(400.0f * UI_MAGNIFICATION_WIDTH, 20.0f * UI_MAGNIFICATION_HEIGHT));
 	m_UIAccesser[0]->SetColor(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
 	m_UIAccesser[0]->SetUV(UV(0.0f, 0.0f, 0.5f, 1.0f));
 
 	// スタミナゲージ
 	m_UIAccesser.push_back(new CImage("asset/image/user_interface/guage.png"));
-	m_UIAccesser[1]->SetSize(XMFLOAT2(560.0f, 10.0f));
-	m_UIAccesser[1]->SetPosition(XMFLOAT2(420.0f, 40.0f));
+	m_UIAccesser[1]->SetSize(XMFLOAT2(560.0f * UI_MAGNIFICATION_WIDTH, 10.0f * UI_MAGNIFICATION_HEIGHT));
+	m_UIAccesser[1]->SetPosition(XMFLOAT2(420.0f, 40.0f * UI_MAGNIFICATION_HEIGHT));
 	m_UIAccesser[1]->SetColor(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
 	m_UIAccesser[1]->SetUV(UV(0.0f, 0.0f, 0.5f, 1.0f));
 

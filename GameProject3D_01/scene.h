@@ -8,18 +8,12 @@
 #include "shader_all.h"
 #include "debug_primitive.h"
 #include "gameObject.h"
-#include "model.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "polygon3d.h"
 #include "polygon.h"
-#include "field.h"
 #include "skyDome.h"
-#include "wall.h"
-#include "bullet.h"
 #include "enemy.h"
 #include "texture.h"
-#include "2dAnimation.h"
 #include "number.h"
 #include "image.h"
 #include "shader_all.h"
@@ -126,7 +120,7 @@ public:
 
 			if (i == CManager::LAYER_EFFECT) {
 				// コリジョングリッド描画
-				//CDebugPrimitive::DebugPrimitive_BatchRun();
+				CDebugPrimitive::DebugPrimitive_BatchRun();
 			}
 
 			for (CGameObject* object : m_GameObject[i]) {

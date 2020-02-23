@@ -35,7 +35,7 @@ void CManager::Init()
 	CFadeManager::Init();
 
 	// シーンの初期化
-	SetScene<CGame>();
+	SetScene<CTitle>();
 
 	//カメラマネージャーの設定
 	CCameraManager::Init();
@@ -104,10 +104,6 @@ void CManager::Draw()
 	// imgui描画準備
 	CImgui::NewFrame();
 
-	//// Zバッファ書き込み
-	//CRenderer::BeginDepth();
-	//m_Scene->Draw();
-
 	// 描画の開始
 	CRenderer::Begin();
 
@@ -116,7 +112,7 @@ void CManager::Draw()
 
 	// シーンの描画
 	m_Scene->Draw();
-	//m_Scene->DrawGUI();
+	m_Scene->DrawGUI();
 
 	// UI描画
 	CUserInterfaceManager::Draw();

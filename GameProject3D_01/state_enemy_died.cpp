@@ -2,7 +2,6 @@
 #include "state_enemy_died.h"
 #include "seqence_manager.h"
 #include "user_interface_manager.h"
-#include "modelAnimation.h"
 #include "enemy.h"
 #include "sound.h"
 #include "image.h"

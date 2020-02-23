@@ -6,7 +6,6 @@
 #include "state_player_move_run.h"
 #include "state_player_move_dash.h"
 #include "state_player_damage_large.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
 

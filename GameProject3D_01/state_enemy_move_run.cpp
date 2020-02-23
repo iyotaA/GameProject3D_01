@@ -3,7 +3,6 @@
 #include "state_enemy_move_run.h"
 #include "state_enemy_move_rotate.h"
 #include "state_enemy_idle.h"
-#include "modelAnimation.h"
 #include "enemy.h"
 #include "MathFunc.h"
 
@@ -20,7 +19,7 @@ CStateEnemyMoveRun::CStateEnemyMoveRun(CEnemy* pEnemy)
 	direction.Normalize();
 
 	// Œü‚«‚Æ‘¬‚³‚©‚ç‘¬“x‚ğZo
-	m_MoveSpeed = direction * 0.7f;
+	m_MoveSpeed = direction * 0.45f;
 
 	// UŒ‚‚ğ—LŒøó‘Ô‚É
 	pEnemy->Attacked() = true;

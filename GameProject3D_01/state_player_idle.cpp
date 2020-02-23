@@ -7,7 +7,6 @@
 #include "state_player_sheathe_sword.h"
 #include "state_player_block.h"
 #include "state_player_died.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
 #include "scene.h"

@@ -12,7 +12,7 @@ CRecoveryDrag::CRecoveryDrag(int count)
 	// ‰ñ•œ–ò
 	m_Polygon = new CImage("asset/image/user_interface/recovery_drag.png");
 	m_Polygon->SetSize(XMFLOAT2(269 * 0.25, 388 * 0.25));
-	m_Polygon->SetPosition(XMFLOAT2(1250.0f, 650.0f));
+	m_Polygon->SetPosition(XMFLOAT2(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100));
 	m_Polygon->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	m_Polygon->SetUV(UV(0.0f, 0.0f, 1.0f, 1.0f));
 
@@ -21,7 +21,7 @@ CRecoveryDrag::CRecoveryDrag(int count)
 	// Xƒ{ƒ^ƒ“
 	CImage* image = new CImage("asset/image/user_interface/button_X.png");
 	image->SetSize(XMFLOAT2(256 * 0.12, 256 * 0.12));
-	image->SetPosition(XMFLOAT2(1220.0f, 630.0f));
+	image->SetPosition(XMFLOAT2(SCREEN_WIDTH - 130, SCREEN_HEIGHT - 120));
 	image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	image->SetUV(UV(0.0f, 0.0f, 1.0f, 1.0f));
 	CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);
@@ -30,7 +30,7 @@ CRecoveryDrag::CRecoveryDrag(int count)
 	m_Number = new CNumber("asset/image/user_interface/number.png");
 	m_Number->SetNum(m_Count);
 	m_Number->SetSize(XMFLOAT2(25.0f, 25.0f));
-	m_Number->SetPosition(XMFLOAT2(1255.0f, 685.0f));
+	m_Number->SetPosition(XMFLOAT2(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 50));
 	m_Number->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	CUserInterfaceManager::AddUI(m_Number, CUserInterfaceManager::LAYER_0);
 
