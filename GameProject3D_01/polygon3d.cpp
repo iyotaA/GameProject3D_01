@@ -5,7 +5,6 @@
 #include "texture.h"
 #include "game_objects_all.h"
 #include "shader_all.h"
-#include "field.h"
 #include "polygon3d.h"
 
 

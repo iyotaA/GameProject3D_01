@@ -1,6 +1,5 @@
 #include "game_objects_all.h"
 #include "scene.h"
-#include "modelAnimation.h"
 #include "state_enemy_move_rotate.h"
 #include "state_enemy_idle.h"
 #include "enemy.h"

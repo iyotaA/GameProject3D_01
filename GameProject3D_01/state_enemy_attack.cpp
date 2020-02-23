@@ -6,7 +6,6 @@
 #include "state_enemy_attack_hook.h"
 #include "state_enemy_damage.h"
 #include "state_enemy_died.h"
-#include "modelAnimation.h"
 #include "enemy.h"
 
 CStateEnemyAttack::CStateEnemyAttack(CEnemy* pEnemy, ENEMY_STATE state_index)

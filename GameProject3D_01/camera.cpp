@@ -6,6 +6,14 @@
 #include "camera_manager.h"
 #include "camera.h"
 
+//=======================================
+//	関数名	: Init()
+//-----------------------------------------------------------------------
+// 機能	: 初期化
+// 引数	:
+//     _id = カメラ識別番号
+// 戻り値	:　void
+//=======================================
 void CCamera::Init(unsigned int _id)
 {
 	m_CameraId = _id;
@@ -38,6 +46,13 @@ void CCamera::Init(unsigned int _id)
 }
 
 
+//=======================================
+//	関数名	: Uninit()
+//-----------------------------------------------------------------------
+// 機能	: 終了処理
+// 引数	: 無し
+// 戻り値	:　void
+//=======================================
 void CCamera::Uninit()
 {
 
@@ -45,6 +60,13 @@ void CCamera::Uninit()
 }
 
 
+//=======================================
+//	関数名	: Update()
+//-----------------------------------------------------------------------
+// 機能	: 更新
+// 引数	: 無し
+// 戻り値	:　void
+//=======================================
 void CCamera::Update()
 {
 	// 追従移動
@@ -55,17 +77,29 @@ void CCamera::Update()
 		}
 	}
 
-	IsRange();
+	// 視点の方向を切り替える
+	UpdateDirection();
 
+	// カメラシェイク（有効時のみ）
 	Shake();
 
-	// 地面との衝突が無ければカメラの位置更新
+	// 位置更新
 	Vector3 vFront = m_DirVec.front * m_LengthToAt;
 	m_Position = m_At - vFront;
+
+	// 地面との衝突が無ければカメラの位置更新
 	CollisionTerrian();
 }
 
 
+//=======================================
+//	関数名	: Project()
+//-----------------------------------------------------------------------
+// 機能	: 座標・上方向・注視点を元にビューマトリクス生成
+//           プロジェクションマトリクス生成
+// 引数	: 無し
+// 戻り値	:　void
+//=======================================
 void CCamera::Project()
 {
 	// ビューポート設定
@@ -91,6 +125,15 @@ void CCamera::Project()
 	XMStoreFloat4x4(&m_ProjectionMatrix ,XMMatrixPerspectiveFovLH(1.0f, dxViewport.Width / dxViewport.Height, 0.1f, 1000.0f));
 }
 
+
+//=======================================
+//	関数名	: GetVisivility()
+//-----------------------------------------------------------------------
+// 機能	: 対象のワールド座標が視野内にあるかの判定
+// 引数	:
+//     position :: 判定対象のワールド座標ポインタ
+// 戻り値	: 視野内に入っていたらtrue
+//=======================================
 bool CCamera::GetVisivility(XMFLOAT3* position)const
 {
 	XMFLOAT3 pos = *position;
@@ -112,6 +155,13 @@ bool CCamera::GetVisivility(XMFLOAT3* position)const
 }
 
 
+//=======================================
+//	関数名	: DrawGUI()
+//-----------------------------------------------------------------------
+// 機能	: ImGuiによるデバッグウィンドウへの描画
+// 引数	: 無し
+// 戻り値	: void
+//=======================================
 void CCamera::DrawGUI()
 {
 	{
@@ -126,7 +176,15 @@ void CCamera::DrawGUI()
 	ImGui::Checkbox("BindAt", &m_BindAtObject);
 }
 
-void CCamera::IsRange()
+
+//=======================================
+//	関数名	: UpdateDirection()
+//-----------------------------------------------------------------------
+// 機能	: 回転角度を元に視点方向を回転させる
+// 引数	: 無し
+// 戻り値	: void
+//=======================================
+void CCamera::UpdateDirection()
 {
 	Vector3X3 prevDir = m_DirVec;
 
@@ -169,22 +227,31 @@ void CCamera::IsRange()
 		}
 	}
 
-	// カメラの回転可能範囲か？
+	// カメラの回転を徐々に弱める
 	m_SpinVerticall *= 0.92f;
 	m_SpinHorizontal *= 0.92f;
 }
 
+
+//=======================================
+//	関数名	: CollisionTerrian()
+//-----------------------------------------------------------------------
+// 機能	: 地形との当たり判定と押し出し
+// 引数	: 無し
+// 戻り値	: 地形と衝突したらtrue
+//=======================================
 bool CCamera::CollisionTerrian()
 {
-	// 地面とのコリジョン
+	// 地面へのアクセスポインタゲット
 	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::LAYER_BACKGROUND);
 	if (!pTerrain)return false;
 
-	float height = pTerrain->GetHeight(&(m_Position + Vector3(0.0f, 0.1f, 0.0f)));
+	// 地面とのコリジョン
+	float height = pTerrain->GetHeight(&(m_Position + Vector3(0.0f, 0.5f, 0.0f)));
 	if (FAILD_NUM != (int)height) {
 
 		if (m_Position.y <= height) {
-			m_Position.y = height + 0.1f;
+			m_Position.y = height + 0.5f;
 			return true;
 		}
 		else {
@@ -194,6 +261,13 @@ bool CCamera::CollisionTerrian()
 }
 
 
+//=======================================
+//	関数名	: SetRotation()
+//-----------------------------------------------------------------------
+// 機能	: カメラの向きをセット
+// 引数	: 角度（ラジアン）
+// 戻り値	: void
+//=======================================
 void CCamera::SetRotation(Vector3* rotation)
 {
 	m_PrevRotation = m_Rotation;
@@ -205,6 +279,15 @@ void CCamera::SetRotation(Vector3* rotation)
 	m_PrevRotation = m_Rotation;
 }
 
+
+//=======================================
+//	関数名	: Pan()
+//-----------------------------------------------------------------------
+// 機能	: 横方向の回転
+// 引数	:
+//     _rotate_dir :: 左右判定ENUM
+// 戻り値	: void
+//=======================================
 void CCamera::Pan(CCameraManager::CameraRotate _rotate_dir)
 {
 	if (_rotate_dir == CCameraManager::RotateLeft) {
@@ -218,6 +301,15 @@ void CCamera::Pan(CCameraManager::CameraRotate _rotate_dir)
 	m_PrevRotation = m_Rotation;
 }
 
+
+//=======================================
+//	関数名	: Tilt()
+//-----------------------------------------------------------------------
+// 機能	: 縦方向の回転
+// 引数	:
+//     _rotate_dir :: 上下判定ENUM
+// 戻り値	: void
+//=======================================
 void CCamera::Tilt(CCameraManager::CameraRotate _rotate_dir)
 {
 	if (_rotate_dir == CCameraManager::RotateUp) {
@@ -231,6 +323,15 @@ void CCamera::Tilt(CCameraManager::CameraRotate _rotate_dir)
 	m_PrevRotation = m_Rotation;
 }
 
+
+//=======================================
+//	関数名	: Move()
+//-----------------------------------------------------------------------
+// 機能	: 注視オブジェクトが無い時の注視点移動
+// 引数	:
+//     _move_dir :: 移動方向ENUM
+// 戻り値	: void
+//=======================================
 void CCamera::Move(CCameraManager::CameraMove _move_dir)
 {
 
@@ -264,6 +365,16 @@ void CCamera::Move(CCameraManager::CameraMove _move_dir)
 	}
 }
 
+
+//=======================================
+//	関数名	: SetAt()
+//-----------------------------------------------------------------------
+// 機能	: 注視点オブジェクトをセット（CGameObject*）
+// 引数	:
+//     pAt :: バインドするオブジェクトのポインタ
+//     offset :: オブジェクトからの注視点のオフセット
+// 戻り値	: void
+//=======================================
 void CCamera::SetAt(CGameObject* pAt, Vector3 offset)
 {
 	if (pAt) {
@@ -283,22 +394,13 @@ void CCamera::SetAt(CGameObject* pAt, Vector3 offset)
 }
 
 
-void CCamera::SetPos(Vector3* pPos)
-{
-	m_Position = *pPos;
-}
-
-void CCamera::SetAtPos(Vector3* pPos)
-{
-	m_At = *pPos;
-}
-
-void CCamera::AddPos(Vector3* pAddPos)
-{
-	m_Position += *pAddPos;
-}
-
-
+//=======================================
+//	関数名	: Shake()
+//-----------------------------------------------------------------------
+// 機能	: カメラシェイク
+// 引数	: 無し
+// 戻り値	: void
+//=======================================
 void CCamera::Shake()
 {
 	if (!m_Shake)return;
@@ -309,6 +411,7 @@ void CCamera::Shake()
 		return;
 	}
 
+	// 2F毎に座標移動
 	if (m_FrameCounter++ % 2 == 0) {
 
 		XMFLOAT2 shake = XMFLOAT2(rand() % 10 / 40.0f - 0.125f, rand() % 10 / 40.0f - 0.125f);
@@ -316,3 +419,20 @@ void CCamera::Shake()
 	}
 }
 
+
+void CCamera::SetPos(Vector3* pPos)
+{
+	m_Position = *pPos;
+}
+
+
+void CCamera::SetAtPos(Vector3* pPos)
+{
+	m_At = *pPos;
+}
+
+
+void CCamera::AddPos(Vector3* pAddPos)
+{
+	m_Position += *pAddPos;
+}

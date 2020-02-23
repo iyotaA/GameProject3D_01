@@ -35,6 +35,7 @@ public:
 
 	// ƒQƒbƒ^
 	std::vector<CCollisionWithBone*> GetCollisionSphere(void) const { return m_CollisionBody; }
+	CCollisionWithBone* GetCollisionSphere(int id) { return m_CollisionBody[id]; }
 	Vector3 GetFront() const{ return m_DirVec.front; }
 	Vector3 GetCenterPosition() const{ return m_CollisionBody[1]->GetSphere()->GetCenter(); }
 	CSkinModel* GetModel() { return m_pModel; }

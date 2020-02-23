@@ -4,7 +4,6 @@
 #include "state_player_idle.h"
 #include "state_player_died.h"
 #include "state_player_damage.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "scene.h"
 #include "enemy.h"

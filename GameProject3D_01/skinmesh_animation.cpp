@@ -1,14 +1,4 @@
-// ライブラリ
-#pragma comment(lib, "assimp.lib")
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glu32.lib")
-
 // インクルード
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <assimp/matrix4x4.h>
-
 #include "main.h"
 #include "renderer.h"
 #include "input.h"
@@ -16,7 +6,6 @@
 #include "gameObject.h"
 #include "shader_all.h"
 #include "skinmesh_animation.h"
-#include "modelAnimation.h"
 #include "camera_manager.h"
 #include "camera.h"
 

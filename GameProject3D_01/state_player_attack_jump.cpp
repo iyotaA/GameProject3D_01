@@ -6,7 +6,6 @@
 #include "state_player_attack_combo.h"
 #include "state_player_attack_top.h"
 #include "state_player_damage_large.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerAttackJump::CStatePlayerAttackJump(CPlayer* pPlayer, bool isMove)

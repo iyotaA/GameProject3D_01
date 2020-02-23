@@ -5,7 +5,6 @@
 #include "state_player_attack_horizontal.h"
 #include "state_player_attack_virtical.h"
 #include "state_player_attack_low.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerAttackHorizontal::CStatePlayerAttackHorizontal(CPlayer* pPlayer)

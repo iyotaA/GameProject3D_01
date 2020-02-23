@@ -74,7 +74,8 @@ void CEnemy::Init()
 	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 8.0f, XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)));	// 近距離攻撃範囲
 	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 4.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));	// 近距離前方攻撃範囲
 	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 35.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));	// 索敵範囲
-	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 5.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));	// 地形との当たり判定
+	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 3.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));	// 地形との当たり判定
+	m_JudgeArea.push_back(new CCollisionSphere(m_Position, 3.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));	// 地形との当たり判定
 
 
 	//---   その他メンバの初期化   ----------------------------------------------------------------------------
@@ -282,13 +283,25 @@ void CEnemy::UpdateCollision()
 
 	// 範囲を中心座標にセットする
 	for (CCollisionSphere* coll : m_JudgeArea) {
-		coll->SetCenter(&m_CollisionBody[2]->GetSphere()->GetCenter());
+		Vector3 pos = m_CollisionBody[2]->GetSphere()->GetCenter();	// 胴の位置取得
+		pos.y = 0.0f;
+		coll->SetCenter(&pos);
 	}
-	Vector3 pos = m_CollisionBody[4]->GetSphere()->GetCenter();
-	pos += m_DirVec.front *2;
-	pos.y = 0.0f;
-	m_JudgeArea[1]->SetCenter(&pos);	// 近距離前方攻撃範囲
-	m_JudgeArea[m_JudgeArea.size() - 1]->SetCenter(&Vector3(m_Position.x, 0.0f, m_Position.z));  // 地形との当たり判定
+
+	{
+		Vector3 pos = m_CollisionBody[4]->GetSphere()->GetCenter();
+		pos += m_DirVec.front * 2;
+		pos.y = 0.0f;
+		m_JudgeArea[1]->SetCenter(&pos);	// 近距離前方攻撃範囲
+	}
+	{
+		Vector3 pos_hip = m_CollisionBody[16]->GetSphere()->GetCenter();	// 尻尾の付け根の位置取得
+		m_JudgeArea[m_JudgeArea.size() - 2]->SetCenter(&Vector3(pos_hip.x, 0.0f, pos_hip.z));  // 地形との当たり判定
+	}
+	{
+		Vector3 pos_spine = m_CollisionBody[4]->GetSphere()->GetCenter();	// 首の付け根の位置取得
+		m_JudgeArea[m_JudgeArea.size() - 1]->SetCenter(&Vector3(pos_spine.x, 0.0f, pos_spine.z));  // 地形との当たり判定
+	}
 }
 
 void CEnemy::AddGlavity()
@@ -319,7 +332,11 @@ bool CEnemy::IsLanding()
 	CTerrain* pTerrain = CManager::GetScene()->GetGameObject<CTerrain>(CManager::LAYER_BACKGROUND);
 
 	Vector3 push_Vec;
-	if (pTerrain->GetCollision(m_JudgeArea[m_JudgeArea.size() - 1], push_Vec)) {
+	if (pTerrain->GetCollision(m_JudgeArea[m_JudgeArea.size() - 2], push_Vec)) {
+		m_Position += Vector3(push_Vec.x, 0.0f, push_Vec.z);
+		m_StateFlags.CollisionTerrian = true;
+	}
+	else if (pTerrain->GetCollision(m_JudgeArea[m_JudgeArea.size() - 1], push_Vec)) {
 		m_Position += Vector3(push_Vec.x, 0.0f, push_Vec.z);
 		m_StateFlags.CollisionTerrian = true;
 	}

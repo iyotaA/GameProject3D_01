@@ -2,7 +2,6 @@
 #include "state_player_idle.h"
 #include "state_player_damage_large.h"
 #include "state_player_damage_small.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "enemy.h"
 #include "state_player_damage.h"

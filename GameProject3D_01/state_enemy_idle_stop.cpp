@@ -4,7 +4,6 @@
 #include "state_enemy_idle_watch_around.h"
 #include "state_enemy_move.h"
 #include "state_enemy_attack.h"
-#include "modelAnimation.h"
 #include "skinmesh_animation.h"
 #include "enemy.h"
 #include "MathFunc.h"

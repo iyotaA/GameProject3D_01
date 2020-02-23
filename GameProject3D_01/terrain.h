@@ -53,6 +53,7 @@ private:
 	std::vector<CCollisionSphere*> m_Collisions;
 
 	// デバッグ用
+	bool m_DrawCollision;
 	XMFLOAT3 PlayerArea = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	int PlayerArea_Index_W = 0;
 	int PlayerArea_Index_H = 0;

@@ -3,7 +3,6 @@
 #include "state_player_move.h"
 #include "state_player_attack.h"
 #include "state_player_attack_low.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerAttackLow::CStatePlayerAttackLow(CPlayer* pPlayer)

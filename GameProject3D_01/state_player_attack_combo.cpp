@@ -6,7 +6,6 @@
 #include "state_player_attack_combo.h"
 #include "state_player_attack_horizontal.h"
 #include "state_player_attack_jump.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerAttackCombo::CStatePlayerAttackCombo(CPlayer* pPlayer)

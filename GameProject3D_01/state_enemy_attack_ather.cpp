@@ -4,7 +4,6 @@
 #include "state_enemy_attack_hook.h"
 #include "state_enemy_attack_jump.h"
 #include "state_enemy_attack_ather.h"
-#include "modelAnimation.h"
 #include "enemy.h"
 
 CStateEnemyAttackAther::CStateEnemyAttackAther(CEnemy* pEnemy)

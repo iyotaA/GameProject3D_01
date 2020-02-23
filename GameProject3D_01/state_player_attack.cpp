@@ -6,7 +6,6 @@
 #include "state_player_attack_jump.h"
 #include "state_player_attack_virtical.h"
 #include "state_player_damage.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "scene.h"
 #include "enemy.h"

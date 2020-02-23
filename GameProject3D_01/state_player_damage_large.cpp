@@ -1,7 +1,6 @@
 #include "game_objects_all.h"
 #include "state_player_idle.h"
 #include "state_player_damage_large.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerDamageLarge::CStatePlayerDamageLarge(CPlayer* pPlayer, int damage)

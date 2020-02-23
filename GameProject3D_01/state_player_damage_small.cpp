@@ -1,7 +1,6 @@
 #include "state_player_damage_small.h"
 #include "game_objects_all.h"
 #include "state_player_idle.h"
-#include "modelAnimation.h"
 #include "player.h"
 
 CStatePlayerDamageSmall::CStatePlayerDamageSmall(CPlayer* pPlayer, int damage)

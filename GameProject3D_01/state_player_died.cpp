@@ -4,7 +4,6 @@
 #include "fade_manager.h"
 #include "state_player_died.h"
 #include "state_player_idle.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
 

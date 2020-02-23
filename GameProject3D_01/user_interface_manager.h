@@ -2,6 +2,8 @@
 #define USER_INTERFACE_MANAGER_H_
 
 #include "polygon.h"
+#define UI_MAGNIFICATION_WIDTH	(SCREEN_WIDTH / 1366)
+#define UI_MAGNIFICATION_HEIGHT	(SCREEN_HEIGHT / 768)
 
 class CUserInterfaceManager
 {

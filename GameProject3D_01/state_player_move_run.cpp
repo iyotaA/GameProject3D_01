@@ -6,7 +6,6 @@
 #include "state_player_dodge.h"
 #include "state_player_damage_large.h"
 #include "state_player_sheathe_sword.h"
-#include "modelAnimation.h"
 #include "player.h"
 #include "MathFunc.h"
 
