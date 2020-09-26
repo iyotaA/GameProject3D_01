@@ -35,7 +35,7 @@ void CDebugPrimitive::DebugPrimitive_Init(void)
 {
 	m_CircleCount = 0;
 	m_CubeCount = 0;
-	m_IsDisplayed = true;
+	m_IsDisplayed = false;
 
 	m_Texture = new CTexture();
 	m_Texture->LoadSTB("asset/image/white.png");
