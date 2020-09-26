@@ -11,6 +11,7 @@
 bool	CImgui::m_ShowWindow			= false;
 bool	CImgui::m_ShowAnotherWindow		= false;
 ImVec4	CImgui::m_ClearColor			= ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+ImGuiWindowFlags CImgui::m_Flags			= 0;
 
 
 void CImgui::Init()
@@ -27,6 +28,20 @@ void CImgui::Init()
 	m_ShowWindow = true;
 	m_ShowAnotherWindow = false;
 	m_ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+
+	m_Flags |= ImGuiWindowFlags_NoTitleBar; // タイトルバーを非表示にします。
+	m_Flags |= ImGuiWindowFlags_NoResize; // ウィンドウをリサイズ不可にします。
+	m_Flags |= ImGuiWindowFlags_NoMove; // ウィンドウを移動不可にします。
+	m_Flags |= ImGuiWindowFlags_NoScrollbar; // スクロールバーを無効にします。
+	m_Flags |= ImGuiWindowFlags_NoScrollWithMouse; // マウスホイールでのスクロール操作を無効にします。
+	m_Flags |= ImGuiWindowFlags_NoCollapse; // タイトルバーをダブルクリックして閉じる挙動を無効にします。
+	m_Flags |= ImGuiWindowFlags_NoBackground; // ウィンドウ内の背景を非表示にします。
+	m_Flags |= ImGuiWindowFlags_NoBringToFrontOnFocus; // ウィンドウをクリックしてフォーカスした際に他のウィンドウよりも前面に表示する挙動を無効にします。
+	m_Flags |= ImGuiWindowFlags_NoNav; // ゲームパッドやキーボードでのUIの操作を無効にします。
+	m_Flags |= ImGuiWindowFlags_NoSavedSettings; // imgui.iniでウィンドウの位置などを自動保存/ロードさせないようにします。
+	m_Flags |= ImGuiWindowFlags_AlwaysAutoResize; // 自動でウィンドウ内のコンテンツに合わせてリサイズします。
+	m_Flags |= ImGuiWindowFlags_NoFocusOnAppearing; // 表示/非表示の際のトランジションアニメーションを無効にします。
 }
 
 void CImgui::Uninit()

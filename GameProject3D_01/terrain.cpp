@@ -4,25 +4,42 @@
 #include "renderer.h"
 #include "texture.h"
 #include "gameObject.h"
+#include "shader_all.h"
+#include "collision3D.h"
+#include "debug_primitive.h"
 #include "terrain.h"
+#include "camera_manager.h"
+#include "camera.h"
 
 #define GRID_SIZE 1.0f
 
 void CTerrain::Init()
 {
 	bool result;
+	m_DrawCollision = false;
 
-	result = LoadHeightMap("asset/image/height_map3.bmp");
+	result = LoadHeightMap("asset/image/terrian/height_map000.bmp");
 	assert(result);
 
 	// テクスチャ読み込み //////
-	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/image/field_dart1.png");
+	m_Texture = new CTexture*[m_TextureNum];
+	m_Texture[0] = new CTexture();
+	m_Texture[1] = new CTexture();
+	m_Texture[2] = new CTexture();
 
-	NormalizeHeightMap();
+
+	// シェーダー読み込み //////
+	m_Shader = ShaderManager::GetShader<CShaderNormalMap>();
+
+	m_Texture[0]->LoadSTB("asset/image/terrian/dart000.png");
+	m_Texture[1]->LoadSTB("asset/image/terrian/grass002.png");
+	m_Texture[2]->LoadSTB("asset/image/normal_map/terrian000.png");
 
 	result = InitializeBuffers();
 	assert(result);
+
+	CreateCollision();
+
 }
 
 
@@ -33,6 +50,8 @@ void CTerrain::Uninit()
 	m_indexBuffer->Release();
 
 	UnloadHeightMap();
+
+	m_Collisions.clear();
 
 	return;
 }
@@ -45,10 +64,47 @@ void CTerrain::Update()
 void CTerrain::Draw()
 {
 	XMMATRIX world = XMMatrixIdentity();
-	CRenderer::SetWorldMatrix(&world);
+
+	XMFLOAT4X4 world_4x4;
+	XMFLOAT4X4 mtxWIT4x4;
+	XMMATRIX mtxWIT;
+
+	// ワールド行列変換
+	XMStoreFloat4x4(&world_4x4, world);
+
+	// World * Inverse * Transpose
+	mtxWIT = XMMatrixInverse(nullptr, world);
+	mtxWIT = XMMatrixTranspose(mtxWIT);
+	XMStoreFloat4x4(&mtxWIT4x4, mtxWIT);
+
+	m_Shader->SetMtxWIT(&mtxWIT4x4);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	XMFLOAT4 camera_pos = XMFLOAT4(camera->GetPosition().x, camera->GetPosition().y, camera->GetPosition().z, 1.0f);
+	m_Shader->SetCameraPosition(&camera_pos);
+	m_Shader->SetLight(LIGHT());
+
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_Shader->SetMaterial(material);
+	m_Shader->SetSpequlerPow(0.2f);
+	m_Shader->Set();
 
 	DrawBuffers();
-	DrawGUI();
+
+	// コリジョン描画
+	if (m_DrawCollision) {
+		for (CCollisionSphere* coll : m_Collisions) {
+			CDebugPrimitive::DebugPrimitive_BatchCirecleDraw(coll);
+		}
+	}
 }
 
 
@@ -69,53 +125,37 @@ bool CTerrain::LoadHeightMap(char* filename)
 	unsigned char height;
 
 	error = fopen_s(&filePtr, filename, "rb");
-	if (error != 0)
-	{
-		return false;
-	}
+	assert(error == 0);
+	assert(filePtr != 0);
 
 	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
+	assert(count == 1);
 
 	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
+	assert(count == 1);
+	assert(filePtr);
+
+	int type = bitmapInfoHeader.biBitCount / 8;
 
 	m_terrainWidth = bitmapInfoHeader.biWidth;
 	m_terrainHeight = bitmapInfoHeader.biHeight;
 
-	imageSize = m_terrainWidth * m_terrainHeight * 3;
+	imageSize = bitmapInfoHeader.biSizeImage;
 
 	bitmapImage = new unsigned char[imageSize];
-	if (!bitmapImage)
-	{
-		return false;
-	}
+	assert(bitmapImage);
 
 	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
 
 	count = fread(bitmapImage, 1, imageSize, filePtr);
-	if (count != imageSize)
-	{
-		return false;
-	}
+	assert(count == imageSize);
+	assert(filePtr);
 
 	error = fclose(filePtr);
-	if (error != 0)
-	{
-		return false;
-	}
+	assert(error == 0);
 
 	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
-	if (!m_heightMap)
-	{
-		return false;
-	}
+	assert(m_heightMap);
 
 	k = 0;
 
@@ -128,13 +168,13 @@ bool CTerrain::LoadHeightMap(char* filename)
 		{
 			height = bitmapImage[k];
 
-			index = (m_terrainHeight * z) + x;
+			index = (m_terrainWidth * z) + x;
 
-			m_heightMap[index].x = (float)x;
-			m_heightMap[index].y = (float)height / 15.0f;
-			m_heightMap[index].z = (float)z;
+			m_heightMap[index].x = (float)x * GRID_SIZE - offset_x;
+			m_heightMap[index].z = (float)z * GRID_SIZE - offset_z;
+			m_heightMap[index].y = (1.0f >= (float)height / 15.0f * GRID_SIZE) ? 0.0f : (float)height / 15.0f * GRID_SIZE; // NormalizeHeight
 
-			k += 3;
+			k += type;
 		}
 	}
 
@@ -144,28 +184,9 @@ bool CTerrain::LoadHeightMap(char* filename)
 	return true;
 }
 
-void CTerrain::NormalizeHeightMap()
-{
-	return;
-	for (int z = 0; z < m_terrainHeight; z++)
-	{
-		for (int x = 0; x < m_terrainWidth; x++)
-		{
-			m_heightMap[m_terrainHeight * z + x].y /= 15.0f;
-		}
-	}
-
-}
-
 void CTerrain::UnloadHeightMap()
 {
-	if (m_heightMap)
-	{
-		delete[] m_heightMap;
-		m_heightMap = 0;
-	}
-
-	return;
+	SAFE_DELETE(m_heightMap)
 }
 
 bool CTerrain::InitializeBuffers()
@@ -184,7 +205,7 @@ bool CTerrain::InitializeBuffers()
 
 	// ヴァーテクス情報格納
 	{
-		m_Vertex = new VERTEX_3D[m_vertexCount];
+		m_Vertex = new VERTEX_3D_NOMAL_MAP[m_vertexCount];
 
 		for (int z = 0; z < m_terrainHeight; z++) {
 			for (int x = 0; x < m_terrainWidth; x++) {
@@ -197,12 +218,18 @@ bool CTerrain::InitializeBuffers()
 					V = 1.0f;
 				}
 
+				int blend = ((int)m_heightMap[m_terrainHeight * z + x].y <= 0) ? 1 :(int)m_heightMap[m_terrainHeight * z + x].y;
+
 				m_Vertex[m_terrainHeight * z + x] = {
 
-					XMFLOAT3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
-					XMFLOAT3(0.0f, 1.0f, 0.0f),
+					//Vector3(m_heightMap[m_terrainHeight * z + x].x, 0.0f, m_heightMap[m_terrainHeight * z + x].z),
+					Vector3(m_heightMap[m_terrainHeight * z + x].x, m_heightMap[m_terrainHeight * z + x].y, m_heightMap[m_terrainHeight * z + x].z),
+					Vector3(0.0f, 0.0f, 1.0f),
+					Vector3(1.0f, 0.0f, 0.0f),
+					Vector3(0.0f, 1.0f, 0.0f),
 					XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-					XMFLOAT2(x, z)
+					XMFLOAT2(x * 0.2f, z * 0.2f),
+					max((rand() % blend) * (1.0f / blend), m_heightMap[m_terrainHeight * z + x].y / (10.0f * GRID_SIZE))
 				};
 			}
 		}
@@ -211,7 +238,7 @@ bool CTerrain::InitializeBuffers()
 		for (int z = 1; z < m_terrainHeight - 1; z++) {
 			for (int x = 1; x < m_terrainWidth - 1; x++) {
 
-				XMFLOAT3 va, vb, vc;
+				Vector3 va, vb, vc;
 				va.x = m_Vertex[x + 1 + m_terrainWidth * z].Position.x - m_Vertex[x - 1 + m_terrainWidth * z].Position.x;
 				va.y = m_Vertex[x + 1 + m_terrainWidth * z].Position.y - m_Vertex[x - 1 + m_terrainWidth * z].Position.y;
 				va.z = m_Vertex[x + 1 + m_terrainWidth * z].Position.z - m_Vertex[x - 1 + m_terrainWidth * z].Position.z;
@@ -240,9 +267,8 @@ bool CTerrain::InitializeBuffers()
 	UINT* indices;
 	indices = new UINT[m_indexCount];
 	{
-		int i = 0;
 		/* インデックス情報格納 */
-		for (int z = 0; z < m_terrainHeight - 1; z++) {
+		for (int z = 0, i = 0; z < m_terrainHeight - 1; z++) {
 			for (int x = 0; x < m_terrainWidth; x++) {
 				if (x == (m_terrainWidth - 1)) {/* 右端の頂点情報（行の終わり） */
 					indices[i] = x + m_terrainWidth * z + m_terrainWidth;
@@ -273,7 +299,7 @@ bool CTerrain::InitializeBuffers()
 	}
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D) * m_vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D_NOMAL_MAP) * m_vertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -284,10 +310,7 @@ bool CTerrain::InitializeBuffers()
 	vertexData.SysMemSlicePitch = 0;
 
 	result = CRenderer::GetDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(SUCCEEDED(result));
 
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned int) * m_indexCount;
@@ -301,10 +324,7 @@ bool CTerrain::InitializeBuffers()
 	indexData.SysMemSlicePitch = 0;
 
 	result = CRenderer::GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(SUCCEEDED(result));
 
 	delete[] indices;
 	indices = 0;
@@ -338,30 +358,91 @@ void CTerrain::DrawBuffers()
 	unsigned int stride;
 	unsigned int offset;
 
-	stride = sizeof(VERTEX_3D);
+	stride = sizeof(VERTEX_3D_NOMAL_MAP);
 	offset = 0;
 
 	CRenderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
 	CRenderer::GetDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	CRenderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	CRenderer::SetTexture(m_Texture);
+	CRenderer::SetTexture(m_Texture, 0, m_TextureNum);
 
-	CRenderer::GetDeviceContext()->DrawIndexed(m_indexCount, 0, 0);
+	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_FRONT);
+	CRenderer::DrawIndexed(m_indexCount, 0, 0);
+	CRenderer::SetRasterizerState(D3D11_FILL_SOLID, D3D11_CULL_NONE);
 }
 
 void CTerrain::DrawGUI()
 {
-	ImGui::Begin("Field");
+	ImGui::Begin("System");
 
-	ImGui::Text("StandArea_x = %.1f / StandArea_y = %.1f / StandArea_z = %.1f", PlayerArea.x, PlayerArea.y, PlayerArea.z);
-	ImGui::Text("index_Width = %d", PlayerArea_Index_W);
-	ImGui::Text("index_Height = %d", PlayerArea_Index_H);
-	ImGui::Text(IsRange ?"True" : "False");
+	if (ImGui::CollapsingHeader("Field"))
+	{
+		ImGui::Checkbox("CollisionField", &m_DrawCollision);
+
+		ImGui::Columns(2, "Field");
+		{
+			int id = ImGui::GetColumnIndex();
+			float width = ImGui::GetColumnWidth(id);
+
+			ImGuiID HeaderId = ImGui::GetID("PlayerAreaParam");
+
+			ImGui::BeginChildFrame(HeaderId, ImVec2(width, 60));
+			ImGui::Text("StandArea_x = %.1f", PlayerArea.x);
+			ImGui::Text("StandArea_y = %.1f", PlayerArea.y);
+			ImGui::Text("StandArea_z = %.1f", PlayerArea.z);
+			ImGui::EndChildFrame();
+		}
+		ImGui::NextColumn();
+
+		{
+			int id = ImGui::GetColumnIndex();
+			float width = ImGui::GetColumnWidth(id);
+
+			ImGuiID HeaderId = ImGui::GetID("PlayerAreaStatus");
+
+			ImGui::BeginChildFrame(HeaderId, ImVec2(width, 60));
+
+			ImGui::Text("index_Width = %d", PlayerArea_Index_W);
+			ImGui::Text("index_Height = %d", PlayerArea_Index_H);
+			ImGui::Text(IsRange ? "Range" : "Out of Range");
+
+			ImGui::EndChildFrame();
+		}
+	}
 
 	ImGui::End();
+}
+
+void CTerrain::CreateCollision()
+{
+	bool is_break = false;
+	for (int z = 0; z < m_terrainWidth; z++) {
+		for (int x = 0; x < m_terrainHeight; x++) {
+
+			if (m_Vertex[x + m_terrainWidth * z].Position.y >= 1.0f)continue;
+			// コリジョン
+			for (int h = z - 1; h <= z + 1; h++) {
+				for (int w = x - 1; w <= x + 1; w++) {
+					if (m_Vertex[w + m_terrainWidth * h].Position.y >= 1.0f) {
+
+						Vector3 pos_terrian = Vector3(
+							m_Vertex[x + m_terrainWidth * z].Position.x,
+							m_Vertex[x + m_terrainWidth * z].Position.y,
+							m_Vertex[x + m_terrainWidth * z].Position.z);
+
+						m_Collisions.push_back(new CCollisionSphere(pos_terrian, 0.5f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)));
+						is_break = true;
+						break;
+					}
+				}
+				if (is_break)break;
+			}
+			is_break = false;	// ここまでブレイク
+		}
+	}
 }
 
 float CTerrain::GetHeight(XMFLOAT3* _position)
@@ -382,9 +463,11 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	// プレイヤーから伸びる下方向のベクトル
 	v = XMFLOAT3(0.0f, -1.0f, 0.0f);
 
-	// プレイヤーの座標を幅で割るとインデックスが取得できる
-	x = position.x  / m_terrainWidth;
-	z = -position.z / m_terrainHeight;
+	float offset_x =  GRID_SIZE * m_terrainWidth / 2.0f;
+	float offset_z =  GRID_SIZE * m_terrainHeight / 2.0f;
+
+	x = static_cast<int>(position.x + offset_x) / GRID_SIZE;
+	z = static_cast<int>(position.z + offset_z) / GRID_SIZE;
 
 	PlayerArea_Index_W = x;
 	PlayerArea_Index_H = z;
@@ -400,15 +483,15 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	// va × vb の y 成分 > 0.0f
 	if ((va.z * vb.x - va.x * vb.z > 0.0f) || (va.z * vb.x - va.x * vb.z == 0.0f)) {
 
-		p0 = m_Vertex[x + m_terrainWidth * (z + 1)].Position;		// p1|＼
-		p1 = m_Vertex[x + m_terrainWidth * z].Position;				//   |　＼
-		p2 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position; // p0|____＼p2
+		p0 = m_Vertex[x + m_terrainWidth * (z + 1)].Position;					// p1|＼
+		p1 = m_Vertex[x + m_terrainWidth * z].Position;							//     |　  ＼
+		p2 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position;		// p0|____＼p2
 	}
 	// va × vb の y 成分 < 0.0f
 	else {
-		p0 = m_Vertex[(x + 1) + m_terrainWidth * z].Position;       // p2＼'''''|p0
-		p1 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position; //     ＼   |
-		p2 = m_Vertex[x + m_terrainWidth * z].Position;             //   　   ＼|p1
+		p0 = m_Vertex[(x + 1) + m_terrainWidth * z].Position;					// p2＼''''''''''|p0
+		p1 = m_Vertex[(x + 1) + m_terrainWidth * (z + 1)].Position;		//         ＼    |
+		p2 = m_Vertex[x + m_terrainWidth * z].Position;							//   　       ＼ |p1
 	}
 
 	// p1 - p0
@@ -439,5 +522,29 @@ float CTerrain::GetHeight(XMFLOAT3* _position)
 	IsRange = true;
 
 	return hp.y;
+}
+
+bool CTerrain::GetCollision(CCollisionSphere* collision, Vector3& _vec)
+{
+	_vec = Vector3();
+	bool is_collision = false;
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// 立っているポジションの左右上下 judge_offset マスずつ調べてy座標が0より大きければコリジョン
+	///////////////////////////////////////////////////////////////////////////////////////////
+	for (CCollisionSphere* coll : m_Collisions) {
+		// コリジョン
+		if (CCollision3DJudge::Collision3D_Spher_Spher(collision, coll)) {
+
+			float distance = collision->GetRadius() + coll->GetRadius();
+			Vector3 vec = collision->GetCenter() - coll->GetCenter();
+			float length = vec.Length();
+			vec.Normalize();
+			vec = vec * (distance - length);
+			_vec +=vec;
+			is_collision = true;
+		}
+	}
+
+	return is_collision;
 }
 

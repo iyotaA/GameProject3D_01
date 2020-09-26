@@ -1,0 +1,48 @@
+#ifndef STATE_PLAYER_H_
+#define STATE_PLAYER_H_
+
+class CPlayer;
+
+
+typedef enum
+{
+	PLAYER_STATE_ATTACK_COMBO,
+	PLAYER_STATE_ATTACK_HORIZONTAL,
+	PLAYER_STATE_ATTACK_JUMP,
+	PLAYER_STATE_ATTACK_LOW,
+	PLAYER_STATE_ATTACK_TOP,
+	PLAYER_STATE_ATTACK_VIRTICAL,
+	PLAYER_STATE_BLOCK_IDLE,
+	PLAYER_STATE_BLOCK_REACT,
+	PLAYER_STATE_DAMAGE_LARGE,
+	PLAYER_STATE_DAMAGE_SMALL,
+	PLAYER_STATE_DIED,
+	PLAYER_STATE_DRAW_A_SWORD,
+	PLAYER_STATE_IDLE,
+	PLAYER_STATE_DASH,
+	PLAYER_STATE_RUN,
+	PLAYER_STATE_ROOL,
+	PLAYER_STATE_SHEATHE_A_SWORD,
+}PLAYER_STATE;
+
+typedef enum
+{
+	SWORD_STATE_SHEATHE, // î[ìÅ
+	SWORD_STATE_DRAW	 // î≤ìÅ
+}SWORD_STATE;
+
+class CStatePlayer
+{
+public:
+	virtual ~CStatePlayer() {}
+	virtual void Update(CPlayer* pPlayer) = 0;
+};
+
+class CStatePlayerNone: public CStatePlayer
+{
+public:
+	~CStatePlayerNone() {}
+	virtual void Update(CPlayer* pPlayer) override {}
+};
+
+#endif // !STATE_PLAYER_H_

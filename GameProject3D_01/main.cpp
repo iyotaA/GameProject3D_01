@@ -4,11 +4,10 @@
 #include "manager.h"
 #include "renderer.h"
 #include "sound.h"
-#include "imGui_all.h"
 
 // グローバル変数 ////////////////////////////////////
 const char* CLASS_NAME = "DX11AppClass";
-const char* WINDOW_NAME = "DX11_FrameWork";
+const char* WINDOW_NAME = "Game_NONAME";
 DWORD dwExecLastTime;
 DWORD dwCurrentTime;
 HWND g_Window;
@@ -25,7 +24,9 @@ HWND GetWindow()
 void DrawFPS()
 {
 	ImGui::Begin("System");
-	ImGui::Text("[fps]:%.1f", (1000.0 / (dwCurrentTime - dwExecLastTime)));
+	ImGui::Text("FPS: %.1f //", ImGui::GetIO().Framerate);
+	ImGui::SameLine();
+	ImGui::Text("%.2f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::End();
 }
 
@@ -68,7 +69,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	// 初期化処理(ウィンドウを作成してから行う)
 	CManager::Init();
-	CSound::InitSound(g_Window);
 
 	// ウインドウの表示(初期化処理の後に行う)
 	ShowWindow(g_Window, nCmdShow);
@@ -100,7 +100,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		{
 			dwCurrentTime = timeGetTime();
 
-			if((dwCurrentTime - dwExecLastTime) >= (1000 / 60))
+			if((dwCurrentTime - dwExecLastTime) >= (1000.0 / 60.0))
 			{
 
 				// 更新処理
@@ -120,7 +120,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	UnregisterClass(CLASS_NAME, wcex.hInstance);
 
 	// 終了処理
-	CSound::UninitSound();
 	CManager::Uninit();
 
 	return (int)msg.wParam;

@@ -3,16 +3,20 @@
 
 class CPolygon3D : public CGameObject
 {
-private:
-	ID3D11Buffer*	m_VertexBufer = NULL;
-	CTexture*		m_Texture = NULL;
-	float			m_Counter = 0.0f;
-
 public:
-	void Init(XMFLOAT3 pos, XMFLOAT3 scal, XMFLOAT3 rot);
+	void Init(Vector3 pos, Vector3 scal, Vector3 rot, const char* pFilename);
 	void Uninit();
 	void Update();
 	void Draw();
+	void DrawGUI() {}
+	const Vector3 GetAt() { return m_Position; }
+
+private:
+	ID3D11Buffer*	m_VertexBufer = NULL;
+	CShaderDefault* m_Shader;
+	CTexture*		m_Texture = NULL;
+	float			m_Counter = 0.0f;
+
 };
 
 #endif

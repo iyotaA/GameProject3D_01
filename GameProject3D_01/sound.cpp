@@ -21,9 +21,25 @@ DWORD CSound::m_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 // 各音素材のパラメータ
 SOUNDPARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 {
-	{ "asset/sound/shot000.wav"		, ONCE, 1.0f },	// 発射音
-	{ "asset/sound/hit.wav"			, ONCE, 1.0f },	// 衝突音
-	{ "asset/sound/attack.wav"		, ONCE, 1.0f },	// 攻撃音
+	{ "asset/sound/bgm/bgm_game_battle.wav"	, LOOP, 0.5f },	// 戦闘時BGM
+	{ "asset/sound/bgm/bgm_environment.wav"	, LOOP, 0.5f },	// 環境音BGM
+	{ "asset/sound/bgm/bgm_title.wav"				, LOOP, 0.5f },	// タイトルBGM
+	{ "asset/sound/bgm/bgm_victory.wav"			, LOOP, 0.5f },	// 勝利BGM
+	{ "asset/sound/se/title_return.wav"				, ONCE, 1.0f },	// タイトルシーンの入力時
+	{ "asset/sound/se/button.wav"						, ONCE, 0.5f },	// ボタン
+	{ "asset/sound/se/hit.wav"								, ONCE, 1.0f },	// ドンッ！
+	{ "asset/sound/se/katya.wav"							, ONCE, 0.7f },	// カチャッ
+	{ "asset/sound/se/victory.wav"						, ONCE, 0.3f },	// 戦闘勝利時
+	{ "asset/sound/se/attack_small.wav"				, ONCE, 0.3f },	// 攻撃（小）
+	{ "asset/sound/se/attack_large.wav"				, ONCE, 0.3f },	// 攻撃（大）
+	{ "asset/sound/se/draw_a_sword.wav"			, ONCE, 0.6f },	// 抜刀
+	{ "asset/sound/se/gard.wav"							, ONCE, 0.3f },	// ガード
+	{ "asset/sound/se/sword_swing.wav"				, ONCE, 0.3f },	// 空振り
+	{ "asset/sound/se/step.wav"							, ONCE, 0.3f },	// 足音
+	{ "asset/sound/se/wing.wav"							, ONCE, 1.0f },	// 羽ばたく音
+	{ "asset/sound/se/damage.wav"						, ONCE, 1.0f },	// ダメージ
+	{ "asset/sound/se/landing.wav"						, ONCE, 0.8f },	// 着地
+	{ "asset/sound/se/recovery.wav"					, ONCE, 0.8f },	// 回復
 };
 
 //=============================================================================
@@ -47,7 +63,7 @@ bool CSound::InitSound(HWND hWnd)
 
 		return false;
 	}
-	
+
 	// マスターボイスの生成
 	hr = m_pXAudio2->CreateMasteringVoice(&m_pMasteringVoice);
 	if(FAILED(hr))
@@ -93,7 +109,7 @@ bool CSound::InitSound(HWND hWnd)
 			MessageBox(hWnd, "サウンドデータファイルの生成に失敗！(2)", "警告！", MB_ICONWARNING);
 			return false;
 		}
-	
+
 		// WAVEファイルのチェック
 		hr = CheckChunk(hFile, 'FFIR', &dwChunkSize, &dwChunkPosition);
 		if(FAILED(hr))
@@ -112,7 +128,7 @@ bool CSound::InitSound(HWND hWnd)
 			MessageBox(hWnd, "WAVEファイルのチェックに失敗！(3)", "警告！", MB_ICONWARNING);
 			return false;
 		}
-	
+
 		// フォーマットチェック
 		hr = CheckChunk(hFile, ' tmf', &dwChunkSize, &dwChunkPosition);
 		if(FAILED(hr))
@@ -141,7 +157,7 @@ bool CSound::InitSound(HWND hWnd)
 			MessageBox(hWnd, "オーディオデータ読み込みに失敗！(2)", "警告！", MB_ICONWARNING);
 			return false;
 		}
-	
+
 		// ソースボイスの生成
 		hr = m_pXAudio2->CreateSourceVoice(&m_apSourceVoice[nCntSound], &(wfx.Format));
 		if(FAILED(hr))
@@ -179,28 +195,28 @@ void CSound::UninitSound(void)
 		{
 			// 一時停止
 			m_apSourceVoice[nCntSound]->Stop(0);
-	
+
 			// ソースボイスの破棄
 			m_apSourceVoice[nCntSound]->DestroyVoice();
 			m_apSourceVoice[nCntSound] = NULL;
-	
+
 			// オーディオデータの開放
 			free(m_apDataAudio[nCntSound]);
 			m_apDataAudio[nCntSound] = NULL;
 		}
 	}
-	
+
 	// マスターボイスの破棄
 	m_pMasteringVoice->DestroyVoice();
 	m_pMasteringVoice = NULL;
-	
+
 	if(m_pXAudio2)
 	{
 		// XAudio2オブジェクトの開放
 		m_pXAudio2->Release();
 		m_pXAudio2 = NULL;
 	}
-	
+
 	// COMライブラリの終了処理
 	CoUninitialize();
 }
@@ -225,7 +241,7 @@ void CSound::Play(SOUND_LABEL label)
 	if(xa2state.BuffersQueued != 0)
 	{// 再生中
 		// 一時停止
-		m_apSourceVoice[label]->Stop(0);
+		m_apSourceVoice[label]->Stop();
 
 		// オーディオバッファの削除
 		m_apSourceVoice[label]->FlushSourceBuffers();
@@ -286,12 +302,12 @@ HRESULT CSound::CheckChunk(HANDLE hFile, DWORD format, DWORD *pChunkSize, DWORD 
 	DWORD dwFileType;
 	DWORD dwBytesRead = 0;
 	DWORD dwOffset = 0;
-	
+
 	if(SetFilePointer(hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 	{// ファイルポインタを先頭に移動
 		return HRESULT_FROM_WIN32(GetLastError());
 	}
-	
+
 	while(hr == S_OK)
 	{
 		if(ReadFile(hFile, &dwChunkType, sizeof(DWORD), &dwRead, NULL) == 0)
@@ -337,7 +353,7 @@ HRESULT CSound::CheckChunk(HANDLE hFile, DWORD format, DWORD *pChunkSize, DWORD 
 			return S_FALSE;
 		}
 	}
-	
+
 	return S_OK;
 }
 
@@ -347,7 +363,7 @@ HRESULT CSound::CheckChunk(HANDLE hFile, DWORD format, DWORD *pChunkSize, DWORD 
 HRESULT CSound::ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, DWORD dwBufferoffset)
 {
 	DWORD dwRead;
-	
+
 	if(SetFilePointer(hFile, dwBufferoffset, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 	{// ファイルポインタを指定位置まで移動
 		return HRESULT_FROM_WIN32(GetLastError());
@@ -357,7 +373,7 @@ HRESULT CSound::ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, D
 	{// データの読み込み
 		return HRESULT_FROM_WIN32(GetLastError());
 	}
-	
+
 	return S_OK;
 }
 

@@ -4,12 +4,18 @@
 #include "renderer.h"
 #include "texture.h"
 #include "gameObject.h"
+#include "shader_all.h"
 #include "skyDome.h"
 
-#define Radius		(300.0f)
-#define Height		(100)
+#include "camera_manager.h"
+#include "camera.h"
+
+
+#define Radius		(400.0f)
+#define Height		(300.0f)
 #define GridNumX	(500)
 #define GridNumZ	(60)
+#define RotateSpeed (0.005f)
 
 void CSkyDome::Init()
 {
@@ -31,37 +37,37 @@ void CSkyDome::Init()
 				if (z == GridNumZ) {	// 最後の列の頂点
 					radius = 0.0f;
 				}
-				else {                      // 最後以外の列
-					radius = cosf(((90 / (GridNumZ)) * z) * PI / 180.0f) * Radius;
+				else {                  // 最後以外の列
+					radius = sinf(((180.0f / GridNumZ) * z) * PI / 180.0f) * Radius;
 				}
 
 
-				float height = sinf(((90  / GridNumZ) * z) * PI / 180.0f) * Height;
+				float height = sinf((270.0f + (180.0f  / GridNumZ) * z) * PI / 180.0f) * Height;
 				float Pos_x  = cosf(((360.0f / GridNumX) * x) * PI / 180.0f) * radius;
 				float Pos_z  = sinf(((360.0f / GridNumX) * x) * PI / 180.0f) * radius;
 
 				if (x == 0) {
 					pVertex[x + (GridNumX + 1) * z] = {
-						XMFLOAT3(Pos_x, height, Pos_z),
-						XMFLOAT3(0.0f, 1.0f, 0.0f),
+						Vector3(Pos_x, height, Pos_z),
+						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-						XMFLOAT2((float)x * 2 / GridNumX + 0.01f, (float)(GridNumZ - z) / GridNumZ)
+						XMFLOAT2((float)x / GridNumX + 0.01f, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 				else if (x == GridNumX) {
 					pVertex[x + (GridNumX + 1) * z] = {
-						XMFLOAT3(Pos_x, height, Pos_z),
-						XMFLOAT3(0.0f, 1.0f, 0.0f),
+						Vector3(Pos_x, height, Pos_z),
+						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-						XMFLOAT2((float)x * 2 / GridNumX - 0.01f, (float)(GridNumZ - z) / GridNumZ)
+						XMFLOAT2((float)x / GridNumX - 0.01f, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 				else {
 					pVertex[x + (GridNumX + 1) * z] = {
-						XMFLOAT3(Pos_x, height, Pos_z),
-						XMFLOAT3(0.0f, 1.0f, 0.0f),
+						Vector3(Pos_x, height, Pos_z),
+						Vector3(0.0f, 1.0f, 0.0f),
 						XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-						XMFLOAT2((float)x * 2 / GridNumX, (float)(GridNumZ - z) / GridNumZ)
+						XMFLOAT2((float)x / GridNumX, (float)(GridNumZ - z) / GridNumZ)
 					};
 				}
 			}
@@ -130,12 +136,15 @@ void CSkyDome::Init()
 
 	// テクスチャ読み込み /////
 	m_Texture = new CTexture();
-	m_Texture->LoadSTB("asset/sky001.tga");
+	m_Texture->LoadSTB("asset/image/skydome.png");
+
+	// シェーダー読み込み //////
+	m_Shader = ShaderManager::GetShader<CShaderDefault>();
 
 	// トランスフォーム初期化
-	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	m_Position = Vector3(0.0f, 0.0f, 0.0f);
+	m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
+	m_Scale = Vector3(1.0f, 1.0f, 1.0f);
 }
 
 void CSkyDome::Uninit()
@@ -147,7 +156,7 @@ void CSkyDome::Uninit()
 
 void CSkyDome::Update()
 {
-	m_Rotation.y += XMConvertToRadians(0.005f);
+	m_Rotation.y += XMConvertToRadians(RotateSpeed);
 }
 
 void CSkyDome::Draw()
@@ -156,7 +165,23 @@ void CSkyDome::Draw()
 	world = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
 	world *= XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 	world *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	CRenderer::SetWorldMatrix(&world);
+	XMFLOAT4X4 world_4x4;
+	XMStoreFloat4x4(&world_4x4, world);
+
+	CCamera* camera = CCameraManager::GetCamera();
+
+	m_Shader->SetWorldMatrix(&world_4x4);
+	m_Shader->SetViewMatrix(&camera->GetViewMatrix());
+	m_Shader->SetProjectionMatrix(&camera->GetProjectionMatrix());
+	m_Shader->SetLight(LIGHT());
+
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	material.Ambient = COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_Shader->SetMaterial(material);
+	m_Shader->Set();
 
 	UINT Stride = sizeof(VERTEX_3D);
 	UINT offdet = 0;

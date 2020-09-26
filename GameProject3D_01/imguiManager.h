@@ -3,12 +3,6 @@
 
 class CImgui
 {
-private:
-
-	static bool m_ShowWindow;
-	static bool m_ShowAnotherWindow;
-	static ImVec4 m_ClearColor;
-
 public:
 	static void Init();
 	static void Uninit();
@@ -20,6 +14,14 @@ public:
 
 	static bool GetShowWindowState() { return m_ShowWindow; }
 	static bool GetShowAnotherWindowState() { return m_ShowAnotherWindow; }
+	static ImGuiWindowFlags GetFlags() { return m_Flags; }
+
+private:
+
+	static bool m_ShowWindow;
+	static bool m_ShowAnotherWindow;
+	static ImVec4 m_ClearColor;
+	static ImGuiWindowFlags m_Flags;
 };
 
 #endif // !IMGUI_MANAGER_H_

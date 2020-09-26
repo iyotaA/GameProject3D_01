@@ -1,77 +1,45 @@
 #ifndef RESULT_H_
 #define RESULT_H_
 
+class CTitle;
 
 class CResult : public CScene
 {
-private:
-	int FrameCount;
-
 public:
 	void Init()
 	{
-		// カメラの初期化
-		CCamera* camera;
-		camera = AddGameObject<CCamera>(CManager::E_Camera);
+		//カメラの生成
+		CCameraManager::CreateCamera();
 
-		// フィールドの初期化
-		AddGameObject<CField>(CManager::E_Background);
-
-		// スカイドームの初期化
-		AddGameObject<CSkyDome>(CManager::E_Background);
-
-		// 壁の初期化
-		for (int i = 0; i < 4; i++) {
-			CWall* wall;
-			wall = AddGameObject<CWall>(CManager::E_Background);
-			switch (i)
-			{
-			case 0:
-				wall->SetPosition(XMFLOAT3(15.0f, 2.5f, 0.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 90.0f, 0.0f));
-				break;
-
-			case 1:
-				wall->SetPosition(XMFLOAT3(0.0f, 2.5f, -15.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 180.0f, 0.0f));
-				break;
-
-			case 2:
-				wall->SetPosition(XMFLOAT3(-15.0f, 2.5f, 0.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 270.0f, 0.0f));
-				break;
-
-			case 3:
-				wall->SetPosition(XMFLOAT3(0.0f, 2.5f, 15.0f));
-				wall->SetRotation(XMFLOAT3(90.0f, 0.0f, 0.0f));
-				break;
-
-			}
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		//		UIオブジェクトの初期化
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		{//リザルト画面の背景
+			CImage* image = new CImage("asset/image/user_interface/result.png");
+			image->SetSize(XMFLOAT2(SCREEN_WIDTH, SCREEN_HEIGHT));
+			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);// UIに追加する
+		}
+		{// Press Button A
+			CImage* image = new CImage("asset/image/user_interface/press_button_A.png");
+			image->SetSize(XMFLOAT2(267.0f, 70.0f));
+			image->SetPosition(XMFLOAT2(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT * 0.9f));
+			image->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			CUserInterfaceManager::AddUI(image, CUserInterfaceManager::LAYER_0);// UIに追加する
+			m_UI.push_back(image);
 		}
 
-		// タイトルロゴの初期化	
-		CPolygon* ui = new CPolygon;
-		ui->Init(XMFLOAT2(350, 70), XMFLOAT2(670, 200), "asset/score.tga");
-		m_GameObject[CManager::E_UI].push_back(ui);
+		//===== フェードイン開始 ==============
+		CFadeManager::StartFadeIn(3.0f);
+		m_FrameCounter = 0;
 
-		CPolygon* ui2 = new CPolygon;
-		ui2->Init(XMFLOAT2(530, 600), XMFLOAT2(315, 75), "asset/press.tga");
-		m_GameObject[CManager::E_UI].push_back(ui2);
-
-		// 数字の初期化	
-		CNumber* number = new CNumber;
-		number->Init("asset/number.tga");
-		number->SetPosition(XMFLOAT2(550.0f, 300.0f));
-		number->SetNum(CManager::GetScore());
-		m_GameObject[CManager::E_UI].push_back(number);
-
-		FrameCount = 0;
+		CManager::Clear() = false;
+		CManager::Failed() = false;
 	}
 
 	void Uninit()
 	{
-		// ゲームの終了処理
-
 		// 継承元の終了処理
 		CScene::Uninit();
 	}
@@ -81,22 +49,71 @@ public:
 		CScene::Update();
 
 		// キー入力でシーン遷移
-		if (FrameCount >= 500) {
-			if (CInput::GetKeyTrigger(VK_SPACE)) {
-				CManager::SetScene<CTitle>();
+		if (CInput::GetKeyTrigger(VK_RETURN) || CInput::GetGamepadTrigger(XINPUT_GAMEPAD_A)) {
+			if (CFadeManager::FadeInComplete()) {
+				if (!CFadeManager::FadeOut()) {
+					CSound::Play(SOUND_LABEL_SE_BUTTON);
+					CFadeManager::StartFadeOut(3.0f);						// フェードアウト開始
+					m_UI[0]->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+					m_FrameCounter = 0;
+				}
 			}
 		}
-		FrameCount++;
+
+
+		// フェードアウト中に徐々に音量を下げる ============================
+		if (CFadeManager::FadeOut()) {
+			float t = m_FrameCounter * DELTA_TIME / 2.0f;
+			if (t >= 1.0f) { t = 1.0f; }
+			float volume = Lerp(0.5f, 0.0f, t);
+			CSound::SetVolume(SOUND_LABEL_BGM_TITLE, volume);
+		}
+
+
+		// フェードアウト終了でシーン遷移 ===============================
+		if (CFadeManager::FadeOutComplete()) {
+			// 再生しているすべてのサウンドを停止
+			CSound::StopSound();
+			CSound::SetVolume(SOUND_LABEL_BGM_TITLE, 0.5f);
+			CManager::SetScene<CTitle>();
+			return;
+		}
+
+		// 点滅させる =========================================
+		if (!CFadeManager::FadeOut()) {
+			float a = sinf(m_FrameCounter * 4 * DEGREE_TO_RADIAN) * 0.4f + 0.6f;
+			m_UI[0]->SetColor(XMFLOAT4(1.0f, 1.0f, 1.0f, a));
+		}
+
+		m_FrameCounter++;
 	}
 
 	void Draw()
 	{
 		CScene::Draw();
-
-		ImGui::Begin("State");
-		ImGui::Text("Result");
-		ImGui::End();
 	}
+
+	void DrawGUI()
+	{
+		ImGui::Begin("System");
+		ImGui::SetWindowFontScale(1.3f);
+		ImGui::Text("[SCENE : RESULT]");
+
+		// FPS表示
+		DrawFPS();
+
+		// コリジョン用のデバッグ表示
+		CDebugPrimitive::DrawGUI();
+		ImGui::End();
+
+		// カメラのデバッグ表示
+		CCameraManager::DrawGUI();
+	}
+
+private:
+	int m_FrameCounter;
+	std::vector<CImage*> m_UI;
+
 };
 
 #endif // !RESULT_H

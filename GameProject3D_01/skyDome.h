@@ -3,17 +3,20 @@
 
 class CSkyDome : public CGameObject
 {
-private:
-	ID3D11Buffer*	m_VertexBufer = NULL;
-	ID3D11Buffer*	m_IndexBufer = NULL;
-	CTexture*		m_Texture = NULL;
-	int				m_IndexNum;
-
 public:
 	void Init();
 	void Uninit();
 	void Update();
 	void Draw();
+	void DrawGUI() {}
+	const Vector3 GetAt() { return m_Position; }
+
+private:
+	ID3D11Buffer*	m_VertexBufer = NULL;
+	ID3D11Buffer*	m_IndexBufer = NULL;
+	CTexture*		m_Texture = NULL;
+	CShaderDefault* m_Shader;
+	int				m_IndexNum;
 
 };
 

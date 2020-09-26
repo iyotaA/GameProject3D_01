@@ -3,21 +3,25 @@
 
 class CGameObject
 {
-private:
-	bool m_Destroy = false;
-
-protected:
-	XMFLOAT3 m_Position;
-	XMFLOAT3 m_Rotation;
-	XMFLOAT3 m_Scale;
-
 public:
+	// getter
+	const Vector3* GetPosition() { return &m_Position; }
+	const Vector3* GetRotation() { return &m_Rotation; }
+	const Vector3* GetScale() { return &m_Scale; }
+
+	// setter
+	void SetPosition(const Vector3* _pos) { m_Position = *_pos; }
+	void SetRotation(const Vector3* _rot) { m_Rotation = *_rot; }
+	void SetScale(const Vector3* _scl) { m_Scale = *_scl; }
+
 	CGameObject() {}
 	virtual ~CGameObject() {}
 	virtual void Init() {}
-	virtual void Uninit(){}
-	virtual void Update(){}
-	virtual void Draw(){}
+	virtual void Uninit() {}
+	virtual void Update() {}
+	virtual void Draw() {}
+	virtual void DrawGUI() {}
+	virtual const Vector3 GetAt() = 0;
 
 	void SetDestroy() { m_Destroy = true; }
 	bool Destroy()
@@ -31,6 +35,15 @@ public:
 			return false;
 		}
 	}
+
+protected:
+	Vector3 m_Position;
+	Vector3 m_Rotation;
+	Vector3 m_Scale;
+
+private:
+	bool m_Destroy = false;
+
 };
 
 #endif
